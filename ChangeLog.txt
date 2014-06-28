@@ -1,0 +1,57 @@
+
+Warlock of Firetop Mountain (c) 2014 Corremn
+============================================
+
+Change log
+
+
+version 0.2.0 19/06/2014
+========================
+- Rebuilt under MS Visual Studio 2013
+- Added loops in standard dungeon generation
+- All elemetal resistance items have max resistance
+- Added flee command ('F')
+- Added teleports
+- Fixed crash bug upon ascending special (red) down stairs
+- Removed some startup crashes upon building the dungeon
+- Items are highlighted (blue) on the ground if better than your current equipment.
+- Fixed possible crash on exit when you have more than 3 inventory items.
+- Orc colours are now different.
+- Monster resistances are now known via [m]ore command
+- Brief monster descriptions via [m]ore command
+- Automatic gate unlocking, when descending and the correct key is in inventory.
+- Fixed some graphical weirdness and changed the world size to 80 x 39
+- Hacked up an auto-target routine for shooting.
+- Cleaner shooting path generation
+
+
+version 0.1.9 25/01/09
+======================
+- Rebuilt under MS Visual Studio 2005
+- Modified health, resting system and added health fountains
+- Added 1 new item
+- Fixed bug that stopped orcish archers from being generated
+- Added flood fill test to dungeon connectivity
+
+
+version 0.1.8 08/03/06
+======================
+- Fixed info screens refresh problem
+- Fixed run problem ('.')(cant run if see monster)
+- Cannot target when you have no projectiles
+- Game does not end when all monsters are dead unless you meet another condition
+- Added poison death message
+- Removed bug where a monster can hit you when you enter a rest stage
+- Can not shoot yourself
+- You now have to get past the river level for it to show up in your messages.
+- Fixed 'Do you want to leave?' bug. Caused by any mob trying to enter the edge of screen instead of only player.
+- Dropping projectiles no longer reduces them by 70% (possibly the most stupidest code ever written)
+- Animals above dungeon level 9 have had there attack toned down
+- Fixed projectile bug - where game crashed when last projectile hit the enemy
+- Fixed projectile equip bug - where some projectiles could not be equipped
+- Now uses same font for text and map - the original map font can be used (see Fonts.txt)
+
+
+version 0.1.7drl 03/02/06
+=========================
+- Initial release

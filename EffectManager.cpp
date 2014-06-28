@@ -1,0 +1,303 @@
+#include "WorldBuilder.h"
+#include ".\effectmanager.h"
+
+EffectManager::EffectManager(void)
+{
+}
+
+EffectManager::~EffectManager(void)
+{
+}
+
+int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
+{
+    if (strength == 0)
+        return 0;
+
+    int ret = 0;
+
+    switch (effect)
+    {
+    case no_effect: break;
+    case poisoned: RunPoison(monster, strength); break;
+    case repelMissiles:
+        ret = TestEffect(monster, effect, strength);
+        if (monster->isPlayer())
+        {
+            if (ret == REDUCED)
+                WorldBuilder::textManager.newLine("Your glow fades slightly. ");
+            else if (ret == REMOVED)
+                WorldBuilder::textManager.newLine("You stop glowing. ");
+        }
+        else  if (monster->isSeen() && ret == REMOVED)
+            WorldBuilder::textManager.newLine("The %s stops glowing. ", monster->monster.name);
+        break;
+    case diseased:
+        ret = TestEffect(monster, effect, strength);
+        if (monster->isPlayer())
+        {
+            if (ret == REDUCED)
+                WorldBuilder::textManager.newLine("You feel healthier. ");
+            else if (ret == REMOVED)
+                WorldBuilder::textManager.newLine("You feel better. ");
+        }
+        else  if (monster->isSeen() && ret == REMOVED)
+            WorldBuilder::textManager.newLine("The %s looks better. ", monster->monster.name);
+        break;
+
+    case slowed:
+        ret = TestEffect(monster, effect, strength);
+        if (monster->isPlayer())
+        {
+            if (ret == REDUCED)
+                WorldBuilder::textManager.newLine("You speed up slightly. ");
+            else if (ret == REMOVED)
+                WorldBuilder::textManager.newLine("You speed up. ");
+        }
+        else  if (monster->isSeen() && ret == REMOVED)
+            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name);
+
+        break;
+
+    case paralysis:
+        ret = TestEffect(monster, effect, strength);
+        if (monster->isPlayer())
+        {
+            if (ret == REDUCED)
+                WorldBuilder::textManager.newLine("You feel movement. ");
+            else if (ret == REMOVED)
+                WorldBuilder::textManager.newLine("You can move again. ");
+        }
+        else  if (monster->isSeen() && ret == REMOVED)
+            WorldBuilder::textManager.newLine("The %s can move again. ", monster->monster.name);
+        break;
+
+    case teleportitus: ret = TestEffect(monster, effect, strength);
+        if (ret != REMOVED)
+            RunTeleport(monster, strength);
+        if (monster->isPlayer())
+        {
+            //if(ret == REDUCED)
+            //	WorldBuilder::textManager.newLine("You feel more stable. ");
+            if (ret == REMOVED)
+                WorldBuilder::textManager.newLine("Your feel stable. ");
+        }
+        else  if (monster->isSeen() && ret == REMOVED)
+            WorldBuilder::textManager.newLine("The %s looks stable. ", monster->monster.name);
+        break;
+
+
+    case confused:
+        ret = TestEffect(monster, effect, strength);
+        if (monster->isPlayer())
+        {
+            if (ret == REDUCED)
+                WorldBuilder::textManager.newLine("You feel less confused. ");
+            else if (ret == REMOVED)
+                WorldBuilder::textManager.newLine("Your head clears. ");
+        }
+        else  if (monster->isSeen() && ret == REMOVED)
+            WorldBuilder::textManager.newLine("The %s looks normal. ", monster->monster.name);
+        break;
+    }
+
+    return ret;
+}
+
+
+int EffectManager::TestGetEffect(monsterData *monster, eBrandType brand, int strength)
+{
+    int monster_resistance = 0;
+
+    if (monster->monster.hasResistance()) //get natural resistance
+    {
+        monster_resistance = monster->monster.GetResistance(brand);
+        //resList.push_back(monster_resistance);
+    }
+
+    int found_all = 0;
+
+    ITEMLIST::iterator it;
+
+    //do  //search through equipment
+    //{
+    int highest_res = monster_resistance;
+    for (it = monster->inventory.begin(); it != monster->inventory.end(); it++)
+    {
+        int res = it->GetResistance(brand);
+        if (res > highest_res)
+            highest_res = res;
+    }
+    //}while (!found_all);
+
+    //float modifier =  1-(highest_res)*0.3f;
+    //new_damage = (int)((damage* modifier)+.5f);
+
+    int hit = Random::getInt(10, 0);
+    int avoid = Random::getInt(10, 0);
+
+    if (hit*(strength) > avoid*(highest_res + 1) && !Random::getInt(3, 0)) //+33% chance to tone it down
+        return 1;
+
+    return 0;
+
+}
+
+void EffectManager::AddBrandEffect(monsterData *monster, eBrandType brand, int strength)
+{
+    switch (brand)
+    {
+    case bPoison: monster->monster.AddEffect(poisoned, strength); break;
+    case bParalysis: monster->monster.AddEffect(paralysis, strength); break;
+        /*	if(monster->isPlayer())
+                WorldBuilder::textManager.newLine("You are poisoned. ");
+                else if(monster->isSeen())
+                WorldBuilder::textManager.newLine("The %s is poisoned. ",monster->monster.name);*/
+        break;
+    }
+}
+
+void EffectManager::AddOtherEffect(monsterData *monster, eEffect effect, int strength) //spell/potion/scroll
+{
+    monster->monster.AddEffect(effect, strength);
+    /*switch(effect)
+    {
+    case bPoison: monster->monster.AddEffect(poisoned,strength);
+    break;
+    }*/
+}
+
+int EffectManager::TestEffect(monsterData *monster, eEffect effect, int strength)
+{
+    int ret = NO_CHANGE;
+
+    //get Resistance
+    int resistance = monster->monster.GetResistance(EquivalentResistance(effect));
+
+    //determine reducement
+    int chance = Random::getInt(10, 0);
+    if (chance < resistance + 1)//10% chance reduction + 10% for each resistance point - 0= 10%
+    {
+        monster->monster.ReduceEffect(effect, 1);
+        ret = REDUCED;
+    }
+
+    //determine effect
+    if (monster->monster.GetEffect(effect) == 0)
+        ret = REMOVED;
+
+    return ret;
+
+}
+
+int EffectManager::RunSlowed(monsterData *monster, int strength)
+{
+    //get Resistance
+    int resistance = monster->monster.GetResistance(bSlow);
+
+    //determine reducement
+    int chance = Random::getInt(10, 0);
+    if (chance < resistance + 1)//10% chance reduction + 10% for each resistance point - 0= 10%
+    {
+        if (monster->isPlayer())
+            WorldBuilder::textManager.newLine("You speed up slightly. ");
+        monster->monster.ReduceEffect(slowed, 1);
+    }
+
+    //determine effect
+    if (monster->monster.GetEffect(slowed) > 0)
+    {
+        // nothing for slowed
+        return 1;
+    }
+    else
+    {
+        if (monster->isPlayer())
+            WorldBuilder::textManager.newLine("You speed up. ");
+        else if (monster->isSeen())
+            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name);
+        return 0;
+    }
+
+}
+void EffectManager::RunPoison(monsterData *monster, int strength)
+{
+    //get Resistance
+    int resistance = monster->monster.GetResistance(EquivalentResistance(poisoned));
+
+    //determine reducement
+    int chance = Random::getInt(10, 0);
+    if (chance < resistance + 1)//10% chance reduction + 10% for each resistance point - 0= 10%
+    {
+        monster->monster.ReduceEffect(poisoned, 1);
+        if (monster->isPlayer())
+            WorldBuilder::textManager.newLine("You feel less poisoned. ");
+    }
+
+    //determine effect
+    if (monster->monster.GetEffect(poisoned) > 0)
+    {
+        int damage = Random::getInt(10, 0);
+        if (damage > resistance + 5) //50% take damage + 10% for each resistance point
+        {
+            monster->monster.stamina--;
+
+            if (monster->isPlayer())
+            {
+                WorldBuilder::textManager.newLine("You are poisoned. ");
+                WorldBuilder::deathMessage.SetDeathMessage("became immune to poison the moment he died of it. ");
+            }
+            else if (monster->isSeen())
+                WorldBuilder::textManager.newLine("The %s is poisoned. ", monster->monster.name);
+        }
+    }
+    else
+    {
+        if (monster->isPlayer())
+            WorldBuilder::textManager.newLine("You are no longer poisoned. ");
+        else if (monster->isSeen())
+            WorldBuilder::textManager.newLine("The %s recovers. ", monster->monster.name);
+
+    }
+}
+
+void EffectManager::RunTeleport(monsterData *monster, int strength)
+{
+    int resistance = monster->monster.GetResistance(EquivalentResistance(teleportitus));
+
+    int chance = Random::getInt(100, 0) + strength * 2;
+    if (chance > 98)
+    {
+        int range = 10 * strength;
+        //Teleport(monster,range);
+    }
+}
+
+eBrandType EffectManager::EquivalentResistance(eEffect effect)
+{
+    switch (effect)
+    {
+    case poisoned:		return bPoison;
+    case diseased:		return bDisease;
+    case slowed:		return bSlow;
+    case paralysis:		return bParalysis;
+    case teleportitus:	return bDisplacment;
+    case confused:		return bConfusion;
+    default:			return bNone;
+    }
+}
+
+const char* EffectManager::EffectName(eEffect effect)
+{
+    switch (effect)
+    {
+    case poisoned:			return "Posioned";
+    case diseased:			return "Diseased";
+    case slowed:			return "Slowed";
+    case paralysis:			return "Paralysed";
+    case teleportitus:		return "Teleports";
+    case confused:			return "Confused";
+    case repelMissiles:		return "Repel Missiles";
+    default:				return "Error";
+    }
+}
