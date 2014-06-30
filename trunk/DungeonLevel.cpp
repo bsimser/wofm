@@ -23,7 +23,8 @@ COORDLIST lit_cells;
 using namespace Random;
 
 DungeonLevel::DungeonLevel() :
-initialised(0)
+initialised(0),
+mapLighting(eNormal)
 {
     _type = lNormal;
 }
@@ -89,7 +90,6 @@ int DungeonLevel::Initialise(int level_type)
     initialised = 1;
     return initialised;
 }
-
 
 int DungeonLevel::MakeLevelMap()
 {
@@ -589,7 +589,6 @@ int DungeonLevel::isNearWall(int x, int y)
 
 bool DungeonLevel::IsCellTransparent(int x, int y)
 {
-
     bool is = map[x][y].terrain.type == stone || map[x][y].terrain.type == closedDoor ? 0 : 1;
 
     if (highlight)
@@ -609,9 +608,15 @@ bool DungeonLevel::IsCellTransparent(int x, int y)
         //else
         //map[x][y].show_path = blocked;
     }
-
     return is;
+}
 
+DungeonLevel::EMapLight DungeonLevel::getMapLight()
+{
+    return mapLighting;
+}
 
-
+void DungeonLevel::setMapLight(EMapLight lighting)
+{
+    mapLighting = lighting;
 }
