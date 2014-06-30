@@ -177,7 +177,15 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
             }
             //	WorldBuilder::textManager.newLine("You die. Your spirit floats to another soul.");
             else if (r_it->isSeen())
+            {
                 WorldBuilder::textManager.newLine("The %s dies. ", r_it->monster.name);
+            }
+
+            if (r_it->Name() == "minotaur")
+            {
+                WorldBuilder::textManager.newLine("You see more clearly. ");
+                dungeonLevel->setMapLight(DungeonLevel::eNormal);
+            }
 
             WorldBuilder::monsterManager.monsterItems.DropRandomItems(&(*r_it));
             r_it->SetState(dead);

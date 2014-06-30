@@ -114,6 +114,20 @@ public:
     int _type;
     coord tempPos;
     int initialised;
+
+    enum EMapLight
+    {
+        eNormal,    // show lit tiles, and show found tiles
+        eShowAll,   // show lit tiles and all tiles
+        eLightAll,  // show all tiles as lit tiles.
+        eNoFound,   // show lit tiles
+    };
+
+    EMapLight getMapLight();
+    void setMapLight(EMapLight mapLighting);
+private:
+
+    EMapLight mapLighting;
 };
 
 #endif // !defined(AFX_DUNGEONLEVEL_H__764234F8_4887_42E3_812F_FD367433372A__INCLUDED_)

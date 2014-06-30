@@ -270,21 +270,24 @@ void OpenGLSceneGen::DrawMap()
     if(W_MOD < 0) W_MOD=0;
     else if(W_MOD > DUNGEON_SIZE_W-width_scr) W_MOD = DUNGEON_SIZE_W-width_scr;
 
-
     h_MOD = (h_MOD/5 * 5); //make screen move in steps (this calc works because it is using integers)
     W_MOD = (W_MOD/12 * 12);*/
 
+    if (dLevel->getMapLight() == DungeonLevel::eNoFound)
+         addShadows = false; 
+    else
+        addShadows = true; 
 
     for (int h = 0; h < height_scr; h++)
     {
         for (int w = 0; w < width_scr; w++)
         {
-            if (WorldBuilder::GetCurrentLevel() == 0)
+            if (WorldBuilder::GetCurrentLevel() == 0) // show all level
                 ;
             else if (!showAll && !dLevel->map[w + W_MOD][h + h_MOD].terrain.found) //don't show
                 continue;
 
-            if ((dLevel->map[w + W_MOD][h + h_MOD].GetMonster() && dLevel->map[w + W_MOD][h + h_MOD].terrain.light)  //display creature
+            if ((dLevel->map[w + W_MOD][h + h_MOD].GetMonster() && dLevel->map[w + W_MOD][h + h_MOD].terrain.light)  //display creature if lit
                 || (dLevel->map[w + W_MOD][h + h_MOD].GetMonster() && showAll))
             {
                 Monster* monster = dLevel->map[w + W_MOD][h + h_MOD].GetMonster();
@@ -292,7 +295,7 @@ void OpenGLSceneGen::DrawMap()
 
                 freetype::qprint(map_font, calcX(w), calcY(h), dLevel->map[w + W_MOD][h + h_MOD].GetMonster()->symbol);
             }
-            else if (dLevel->map[w + W_MOD][h + h_MOD].getItem()) //display items
+            else if (dLevel->map[w + W_MOD][h + h_MOD].getItem() && (addShadows || dLevel->map[w + W_MOD][h + h_MOD].terrain.light)) //display items
             {
                 Item * item = dLevel->map[w + W_MOD][h + h_MOD].getItem();
                 glColor3ub(item->color1, item->color2, item->color3);

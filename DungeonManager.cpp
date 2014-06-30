@@ -72,6 +72,9 @@ int DungeonManager::CreateDungeon(int dlevel, int type)
 {
     level[dlevel].Initialise(type);
 
+    if (dlevel == 8) // minotaur level
+        level[dlevel].setMapLight(DungeonLevel::eNoFound);
+
     return 1;
 }
 

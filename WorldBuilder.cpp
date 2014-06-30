@@ -692,9 +692,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
     }
     else if (keys[VK_3])
     {
-
         player->monster.stamina = player->monster.MaxStamina();
-
     }
 
     else if (keys[VK_T]) //transfer soul
