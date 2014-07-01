@@ -25,7 +25,7 @@ public:
 
 private:
 	int TestEffect(monsterData *monster, eEffect effect, int strength);
-	void RunPoison(monsterData *monster, int strength);
+	int RunPoison(monsterData *monster, int strength);
 	int RunSlowed(monsterData *monster, int strength);
 	void RunTeleport(monsterData *monster, int strength);
 

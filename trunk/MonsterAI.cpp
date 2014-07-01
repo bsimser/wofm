@@ -57,7 +57,7 @@ int MonsterAI::ProcessEffects(monsterData* monster)
     int size = monster->monster.effectList.size();
     for (it = monster->monster.effectList.begin(); it != monster->monster.effectList.end();)
     {
-        if (effectManager.RunEffect(monster, it->type, it->strength) == REMOVED)
+        if (effectManager.RunEffect(monster, it->type, it->strength) == REMOVED ||  it->strength <= 0)
         {
             it = monster->monster.effectList.erase(it);
         }
@@ -66,7 +66,6 @@ int MonsterAI::ProcessEffects(monsterData* monster)
             move_done |= EffectAction(monster, it->type, it->strength);
             it++;
         }
-
     }
     return move_done;
     /*//EFFECTMAP_CITERATOR it;
@@ -114,8 +113,11 @@ int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
     {
                        RandomMove(monster);
                        move_done = 1;
-                       if (monster->isPlayer())
+                       if (!monster->isPlayer())
                            WorldBuilder::textManager.newLine("%s is confused. ", monster->monster.name);
+                       else
+                           WorldBuilder::textManager.newLine("You are confused. ");
+
     } break; //70%+10% for strength random move;
 
     case teleportitus: if (Random::getInt(20, 0) < 0 + strength)

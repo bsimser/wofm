@@ -5,17 +5,18 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 0.2.0 7DRL"
-
+#define VERSION "version 0.2.1 7DRL"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-StartScreen::StartScreen()
+StartScreen::StartScreen():
+    state(sIntro),
+    length(0),
+    pName(""),
+    pClass("")
 {
-    state = sIntro;
-    length = 0;
 }
 
 StartScreen::~StartScreen()
@@ -57,8 +58,6 @@ void StartScreen::Display()
     WorldBuilder::textManager.SetDisplayLine(++i, "                       '..~*       .  ");
 
     /*
-    
-                                                                                       
                          \`.  /'                                                 
                           \ '/''          ,.                                  
     /\               |\/|__)/ _''__.-.   /                                   
@@ -66,8 +65,8 @@ void StartScreen::Display()
   /    \/`-\  /` \    ^^      ~ ~                                                     
  /      \   --    \           __,-._                                              
     o    \         \-.''._,--'      `-''.._.                                           
-                                                
     */
+
 #ifdef _DEBUG
    // WorldBuilder::textManager.SetDisplayLine(20, "WARNING: Dubug Version for authors eyes only!");
 #endif
@@ -78,7 +77,6 @@ void StartScreen::Display()
     WorldBuilder::textManager.SetDisplayLine(39, "[space] to Start");
 }
 
-
 void StartScreen::GetPlayerInfo()
 {
     WorldBuilder::textManager.ClearDisplayLines();
@@ -87,10 +85,10 @@ void StartScreen::GetPlayerInfo()
     WorldBuilder::textManager.SetDisplayLine(1, "===========================");
 
     char sbuf[128];
-    sprintf(sbuf, "Name: %s", pName.c_str());
+    sprintf(sbuf, "Name: %s_", pName.c_str());
     WorldBuilder::textManager.SetDisplayLine(4, sbuf);
 
-    WorldBuilder::textManager.SetDisplayLine(39, "Enter Name");
+    WorldBuilder::textManager.SetDisplayLine(39, "Enter Name  %s", (length > 12) ? "(Max length!!!)":"");
 
     if (state == sClass)
     {
@@ -108,7 +106,6 @@ void StartScreen::GetPlayerInfo()
         pClass = "Adventurer";
 
         WorldBuilder::textManager.SetDisplayLine(4, "Welcome %s the %s.", pName.c_str(), pClass.c_str());
-
         WorldBuilder::textManager.SetDisplayLine(39, "[space] to begin");
     }
 }
@@ -123,7 +120,6 @@ int StartScreen::PassInput(bool *keys)
             GetPlayerInfo();
         }
         return 1;
-
     }
     else if (state == sName)
     {
@@ -138,7 +134,6 @@ int StartScreen::PassInput(bool *keys)
             GetPlayerInfo();
         }
         return 1;
-
     }/*
     else if(state ==sClass)
     {
@@ -151,7 +146,6 @@ int StartScreen::PassInput(bool *keys)
         if (keys[VK_SPACE] || keys[VK_ESCAPE])
             return 0;
     }
-
     return 1;
 }
 
@@ -168,50 +162,61 @@ int StartScreen::GetClass(bool *keys)
             case 2: pClass = "Priest"; break;
             case 3: pClass = "Thief"; break;
             case 4: pClass = "Wizard"; break;
-
             }
             return 1;
         }
     }
-
     return 0;
 }
 
-
 int StartScreen::GetName(bool *keys)
 {
-
     bool shift = false;
+
     if (keys[VK_SHIFT])
         shift = true;
 
     if ((keys[VK_DELETE] || keys[VK_BACK]) && length >= 0)
     {
-        pName.assign(pName.c_str(), length--);
+        keys[VK_DELETE] = false;
+        keys[VK_BACK] = false;
 
+        if(length > 0)
+        {
+            length--;
+            pName.assign(pName.c_str(), length);
+        }
         return 0;
     }
-
 
     if (length > 12)
         return 0;
 
-    int i;
-
-    for (i = 65; i<123; i++) //alpha keys only
+    if (keys[VK_SPACE])
     {
-        if (keys[i])
-            break;
+        keys[VK_SPACE] = false;
+        pName += ' ';
+        length++;
+        return 1;
     }
 
+    int i;
+    bool found = false;
+    for (i = 48; i<123; i++) //alpha keys only
+    {
+        if (keys[i])
+        {
+            found = true;
+            break;
+        }
+    }
 
-
-    if (i>122) //not anything
+    if (i > 122 || found == false) //not anything
         return 0;
 
     char c[1];
 
-    if (shift)
+    if (shift || i < 65)
         c[0] = i;
     else
         c[0] = i + 32;
@@ -219,8 +224,6 @@ int StartScreen::GetName(bool *keys)
     pName.append(c, 1);
     length++;
     return 1;
-
-
 }
 
 

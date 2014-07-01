@@ -250,7 +250,7 @@ int DungeonGenerator::makeEncounterDungeon()
             break;
         }
     }
-    if (!created) throw std::exception("Cound not add exit to enconter dungeon");
+    if (!created) throw std::exception("Cound not add exit to encounter dungeon");
 
     created = 0;
 

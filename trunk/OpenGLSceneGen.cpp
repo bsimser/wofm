@@ -166,7 +166,7 @@ int OpenGLSceneGen::DrawGLScene(GLvoid)				// Here's Where We Do All The Drawing
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 
-    DrawBackgroundArea();
+    //DrawBackgroundArea();
 
     if (drawMap)
     {
@@ -195,7 +195,7 @@ void OpenGLSceneGen::DrawTextDisplay()
     freetype::print(our_font, 5, height_scr_offset - (1 * 14.0f), WorldBuilder::textManager.GetDisplayLine(0)->c_str());
     freetype::print(our_font, 5, height_scr_offset - (2 * 14.0f), WorldBuilder::textManager.GetDisplayLine(1)->c_str());
 
-    glColor3ub(0xff, 0xff, 0);
+    glColor3ub(0xff, 0xff, 64);
     for (int i = 2; i < 39; i++)
     {
         freetype::print(our_font, 5.0f, height_scr_offset - ((i + 1)*14.0f), WorldBuilder::textManager.GetDisplayLine(i)->c_str());
@@ -442,7 +442,7 @@ void OpenGLSceneGen::DrawTextLines()
 {
     //Text 3 lines
 
-    glColor3ub(0, 0, 0xff);
+    glColor3ub(224, 224, 224);
 
     glPushMatrix();
     glLoadIdentity(); //22,5

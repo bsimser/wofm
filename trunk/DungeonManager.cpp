@@ -294,19 +294,16 @@ void DungeonManager::CreateSpecialDungeon()
                 CreateDungeon(i + 10, slBarracks);
                 PopulateSpecialDungeon(i + 10, slRandom);
 
-                int h, w;
-                do //make special entrance
+                // make entrance
+                coord * pos = level[i].FreeTerrainPosition("dungeon floor");
+                if (!pos)
                 {
-                    h = getInt(DUNGEON_SIZE_H - 2, 10);
-                    w = getInt(DUNGEON_SIZE_W - 2, 2);
-                    test++;
-                    if (test > 10000)
-                        break;
+                    pos->x = 5;
+                    pos->y = 5;
+                }
+                level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
 
-                } while (strcmp(level[i].map[w][h].terrain.name, "dungeon floor"));
-                level[i].map[w][h].terrain.Create(specialOpen);
-
-                coord* pos = level[i + 10].NewSpecialItemPosition();
+                pos = level[i + 10].NewSpecialItemPosition();
                 level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
 
                // pos = level[i + 10].NewSpecialItemPosition(); //??

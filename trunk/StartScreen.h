@@ -30,19 +30,16 @@ public:
 
 	virtual void Display();
 
-	eStartState state;
-
-	virtual int PassInput(bool *keys);
+    virtual int PassInput(bool *keys);
 	virtual void GetPlayerInfo();
 
 	virtual int GetName(bool *keys);
 	virtual int GetClass(bool *keys);
 
+    eStartState state;
 	std::string pName;
 	std::string pClass;
 	int length;
-
-
 };
 
 #endif // !defined(AFX_STARTSCREEN_H__1D5424E9_99A9_4C84_A282_EEEEB647DB79__INCLUDED_)

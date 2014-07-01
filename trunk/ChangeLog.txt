@@ -7,7 +7,13 @@ Change log
 version 0.2.X
 ========================
 - Modified Maze 
-
+- Fixed name entering
+- Quality name prefix for armour and glowing prefix for magic items
+- Bug in removing poisoning
+- Poisoned weapons now show green
+- Fixed confusion text
+- Added support for non-US keyboards
+- Modified some UI colours.
 
 
 version 0.2.0 19/06/2014

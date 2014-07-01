@@ -30,7 +30,6 @@ void Effects::AddEffect(eEffect effect, int strength)
         e->type = effect;
         effectList.push_back(*e);
     }
-
 }
 
 //set effects strength
