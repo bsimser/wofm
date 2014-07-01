@@ -33,7 +33,9 @@ void RestLevel::Rest(int level)
     WorldBuilder::textManager.SetDisplayLine(2, "");
     if (level == 1)
     {
-        WorldBuilder::textManager.SetDisplayLine(3, "You enter the mountain.");
+        WorldBuilder::textManager.SetDisplayLine(3, "Peering into the gloom you see dark, slimy walls with pools of water on the stone floor.");
+        WorldBuilder::textManager.SetDisplayLine(4, "The air is cold and dank. You light your lantern and step warily into the blackness.");
+        WorldBuilder::textManager.SetDisplayLine(4, "Far off you hear the scurrying of tiny feet: rats, most likely.");
         WorldBuilder::textManager.SetDisplayLine(5, "You can choose to rest before you continue.");
         restComplete[0] = 1;
     }
@@ -41,7 +43,7 @@ void RestLevel::Rest(int level)
     {
         WorldBuilder::textManager.SetDisplayLine(3, "You cautiously creep down the steps, listening for the slightest sound of");
         WorldBuilder::textManager.SetDisplayLine(4, "trouble. The steps round a bend and hidden in a alcove you see a sign.");
-        WorldBuilder::textManager.SetDisplayLine(5, "'Rest here weary traveller'. Below the sign is a comfortable looking chair.");
+        WorldBuilder::textManager.SetDisplayLine(5, "'Rest Ye Here Weary Traveller'. Below the sign is a comfortable looking chair.");
         WorldBuilder::textManager.SetDisplayLine(6, "You feel drowsy and wish to rest. Do you dare? You hear no signs of trouble,");
         WorldBuilder::textManager.SetDisplayLine(7, "but as always you feel as though you are being watched.");
         WorldBuilder::textManager.SetDisplayLine(9, "You can choose to rest before you continue.");
@@ -69,6 +71,11 @@ void RestLevel::Rest(int level)
 int RestLevel::Resting(int level)
 {
     if (rest_count > 10)
+        return 0;
+
+    monsterData* player = WorldBuilder::monsterManager.Player();
+
+    if (player->monster.stamina == player->monster.MaxStamina() && player->luck_counter <= 0)
         return 0;
 
     Rest(level);
@@ -102,7 +109,6 @@ int RestLevel::Resting(int level)
     sleep.append("z");
     WorldBuilder::textManager.SetDisplayLine(9, (char *)sleep.c_str());
 
-    monsterData* player = WorldBuilder::monsterManager.Player();
 
     if (player->monster.stamina != player->monster.MaxStamina())// && rest_count%3 ==0)
     {

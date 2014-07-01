@@ -104,7 +104,7 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
 
     try
     {
-        if (!world.Initialise("WOFM RL (c) 2014 Corremn"))
+        if (!world.Initialise("The Warlock of Firetop Mountain: Roguelike (c) 2014 Corremn"))
             return 0;
     }
     catch (std::exception & ex)
@@ -153,7 +153,7 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
 					if (world.State() == sRunning || world.State() == sResting) //update while player is running or resting(HACK)
 						world.Run();
                 }
-				Sleep(1);
+				Sleep(10);
             }
 
             if (keys[VK_F1])                // Is F1 Being Pressed?

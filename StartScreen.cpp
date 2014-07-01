@@ -5,7 +5,7 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 0.2.1 7DRL"
+#define VERSION "version 0.2.1"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -28,7 +28,7 @@ void StartScreen::Display()
 {
     WorldBuilder::textManager.ClearDisplayLines();
 
-    WorldBuilder::textManager.SetDisplayLine(0, "The Warlock of FIRETOP MOUNTAIN RL by Corremn");
+    WorldBuilder::textManager.SetDisplayLine(0, "The Warlock of FIRETOP MOUNTAIN: Roguelike by Corremn");
     WorldBuilder::textManager.SetDisplayLine(1, "=============================================");
     WorldBuilder::textManager.SetDisplayLine(3, VERSION);
 
@@ -71,7 +71,7 @@ void StartScreen::Display()
    // WorldBuilder::textManager.SetDisplayLine(20, "WARNING: Dubug Version for authors eyes only!");
 #endif
 
-    WorldBuilder::textManager.SetDisplayLine(32, "Based on the book by Ian Livingstone & Steve Jackson.");
+    WorldBuilder::textManager.SetDisplayLine(32, "Based on the book by Ian Livingstone & Steve Jackson - 1982.");
     WorldBuilder::textManager.SetDisplayLine(33, "Press '?' to get help on commands. Good Luck!");
 
     WorldBuilder::textManager.SetDisplayLine(39, "[space] to Start");
@@ -81,8 +81,8 @@ void StartScreen::GetPlayerInfo()
 {
     WorldBuilder::textManager.ClearDisplayLines();
 
-    WorldBuilder::textManager.SetDisplayLine(0, "Warlock of Firetop Mountain");
-    WorldBuilder::textManager.SetDisplayLine(1, "===========================");
+    WorldBuilder::textManager.SetDisplayLine(0, "The Warlock of Firetop Mountain");
+    WorldBuilder::textManager.SetDisplayLine(1, "===============================");
 
     char sbuf[128];
     sprintf(sbuf, "Name: %s_", pName.c_str());

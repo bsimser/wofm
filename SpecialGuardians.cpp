@@ -180,9 +180,9 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 6)
     {
         symbol = 'W';
-        strcpy(name, "giant sand worm");
+        strcpy(name, "giant sandworm");
 
-        setDescription("This chitinous monstrosity is a giant same worm, its looking to swallow you whole. ");
+        setDescription("This chitinous monstrosity is a giant sandworm, its looking to swallow you whole. ");
         setColor(128, 128, 63);
 
         stamina = 15 + getInt(3, 1);

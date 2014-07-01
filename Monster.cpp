@@ -353,7 +353,7 @@ int Monster::createOrc(int level)
     if (level > 9)
         mLevel = level / 2;
 
-    static bool cheif = false;
+    static bool chief = false;
     static bool shaman = false;
 
     int varient = mLevel;//getInt(5,0);
@@ -422,16 +422,16 @@ int Monster::createOrc(int level)
     }
     else  if (varient == 10)
     {
-        strcpy(name, "cheiftain's servant"); varient /= 2; color1 = 200;
-        setDescription("If this guys around here then... ");
+        strcpy(name, "chieftain's servant"); varient /= 2; color1 = 200;
+        setDescription("Looks like he has just been beaten up by someone. ");
         experience = 10;
     }
     else
     {
-        strcpy(name, "orc cheiftain"); varient += 2;	color1 = 0; color2= 128; color3 = 128;
+        strcpy(name, "orc chieftain"); varient += 2;	color1 = 0; color2= 128; color3 = 128;
         setDescription("A leader of orcs. Must be tough then. ");
         experience = 20;
-        cheif = true;
+        chief = true;
     }
 
     sight_range = 6;
