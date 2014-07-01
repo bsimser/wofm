@@ -282,22 +282,24 @@ void OpenGLSceneGen::DrawMap()
     {
         for (int w = 0; w < width_scr; w++)
         {
-            if (WorldBuilder::GetCurrentLevel() == 0) // show all level
+            cell & currentCell = dLevel->map[w + W_MOD][h + h_MOD];
+
+            /*if (WorldBuilder::GetCurrentLevel() == 0) // show all level
                 ;
-            else if (!showAll && !dLevel->map[w + W_MOD][h + h_MOD].terrain.found) //don't show
+            else*/ if (!showAll && !currentCell.terrain.found) //don't show
                 continue;
 
-            if ((dLevel->map[w + W_MOD][h + h_MOD].GetMonster() && dLevel->map[w + W_MOD][h + h_MOD].terrain.light)  //display creature if lit
-                || (dLevel->map[w + W_MOD][h + h_MOD].GetMonster() && showAll))
+            if ((currentCell.GetMonster() && currentCell.terrain.light)  //display creature if lit
+                || (currentCell.GetMonster() && showAll))
             {
-                Monster* monster = dLevel->map[w + W_MOD][h + h_MOD].GetMonster();
+                Monster* monster = currentCell.GetMonster();
                 glColor3ub(monster->color1, monster->color2, monster->color3);
 
-                freetype::qprint(map_font, calcX(w), calcY(h), dLevel->map[w + W_MOD][h + h_MOD].GetMonster()->symbol);
+                freetype::qprint(map_font, calcX(w), calcY(h), monster->symbol);
             }
-            else if (dLevel->map[w + W_MOD][h + h_MOD].getItem() && (addShadows || dLevel->map[w + W_MOD][h + h_MOD].terrain.light)) //display items
+            else if (currentCell.getItem() && (addShadows || currentCell.terrain.light)) //display items
             {
-                Item * item = dLevel->map[w + W_MOD][h + h_MOD].getItem();
+                Item * item = currentCell.getItem();
                 glColor3ub(item->color1, item->color2, item->color3);
 
                 // update colour on screen if better than item held
@@ -345,16 +347,14 @@ void OpenGLSceneGen::DrawMap()
                     }
 
                 }
-                freetype::qprint(map_font, calcX(w), calcY(h), dLevel->map[w + W_MOD][h + h_MOD].getItem()->symbol);
+                freetype::qprint(map_font, calcX(w), calcY(h), currentCell.getItem()->symbol);
             }
-            else if (dLevel->map[w + W_MOD][h + h_MOD].terrain.light) //display terrain
+            else if (currentCell.terrain.light) //display terrain
             {
-                glColor3ub((dLevel->map[w + W_MOD][h + h_MOD].terrain.color1),
-                    (dLevel->map[w + W_MOD][h + h_MOD].terrain.color2),
-                    (dLevel->map[w + W_MOD][h + h_MOD].terrain.color3));
-
+                glColor3ub((currentCell.terrain.color1), (currentCell.terrain.color2), (currentCell.terrain.color3));
+                           
                 //special water  effect
-                if (dLevel->map[w + W_MOD][h + h_MOD].terrain.type == deepWater && dLevel->map[w + W_MOD][h + h_MOD].terrain.light) //make water flow
+                if (currentCell.terrain.type == deepWater && currentCell.terrain.light) //make water flow
                 {
                     int flow = WorldBuilder::GetTurns();
 
@@ -365,30 +365,30 @@ void OpenGLSceneGen::DrawMap()
                     else
                         glColor3ub(0, 128, 255);
                 }
-                freetype::qprint(map_font, calcX(w), calcY(h), dLevel->map[w + W_MOD][h + h_MOD].terrain.symbol);
+                freetype::qprint(map_font, calcX(w), calcY(h), currentCell.terrain.symbol);
                 //freetype::qprint(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14), '.');
 
             }
             else if (addShadows)//add night effect
             {
-                glColor3ub((GLubyte)(dLevel->map[w + W_MOD][h + h_MOD].terrain.color1*shadowStrength),
-                    (GLubyte)(dLevel->map[w + W_MOD][h + h_MOD].terrain.color2*shadowStrength),
-                    (GLubyte)(dLevel->map[w + W_MOD][h + h_MOD].terrain.color3*shadowStrength));
+                glColor3ub((GLubyte)(currentCell.terrain.color1*shadowStrength),
+                    (GLubyte)(currentCell.terrain.color2*shadowStrength),
+                    (GLubyte)(currentCell.terrain.color3*shadowStrength));
 
-                freetype::qprint(map_font, calcX(w), calcY(h), dLevel->map[w + W_MOD][h + h_MOD].terrain.symbol);
-                //freetype::qprint(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14.5f), dLevel->map[w + W_MOD][h + h_MOD].terrain.symbol);
+                freetype::qprint(map_font, calcX(w), calcY(h), currentCell.terrain.symbol);
+                //freetype::qprint(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14.5f), currentCell.terrain.symbol);
             }
             //add extra characters
-            if (dLevel->map[w + W_MOD][h + h_MOD].show_target != 0) //show target
+            if (currentCell.show_target != 0) //show target
             {
                 glColor3ub(0xff, 0xff, 0xff);
                 freetype::qprint(map_font, calcX(w), calcY(h), 0);
             }
-            if (dLevel->map[w + W_MOD][h + h_MOD].show_path != none) //show target path (overlay)
+            if (currentCell.show_path != none) //show target path (overlay)
             {
-                if (dLevel->map[w + W_MOD][h + h_MOD].show_path == clear)
+                if (currentCell.show_path == clear)
                     glColor3ub(0xff, 0xff, 0xff);
-                else if (dLevel->map[w + W_MOD][h + h_MOD].show_path == blocked)
+                else if (currentCell.show_path == blocked)
                     glColor3ub(0xff, 0, 0);
                 freetype::qprint(map_font, calcX(w), calcY(h) , '*');
             }
