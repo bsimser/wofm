@@ -105,6 +105,7 @@ public:
     coord * NewItemPosition();
     coord * NewSpecialItemPosition();
     coord * FreeTerrainPosition(eTerrainType type);
+    coord * FreeTerrainPosition(const std::string & name);
 
     bool IsCellTransparent(int x, int y);
     bool HighLightPath(int x, int y, int w, int h);

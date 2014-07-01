@@ -117,7 +117,7 @@ int UndeadMonster::createVampire()
     symbol = 'V';
     strcpy(name, "big scary vampire");
     setDescription("Big and scary this vampire is big and scary. ");
-    SetBrand(bConfusion, 1);
+    SetBrand(bConfusion, 2);
 
     setColor(100, 100, 140);
 

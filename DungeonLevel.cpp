@@ -439,8 +439,38 @@ coord * DungeonLevel::GetEndPosition()
     return NULL;
 }
 
+coord * DungeonLevel::FreeTerrainPosition(const std::string & name)
+{
+    COORDLIST posList;
+    COORDLIST::iterator it;
+    for (int h = 1; h < DUNGEON_SIZE_H - 1; h++)
+    {
+        for (int w = 1; w < DUNGEON_SIZE_W - 1; w++)
+        {
+            if (name == map[w][h].terrain.name)
+            {
+                coord pos;
+                pos.x = w;
+                pos.y = h;
+                posList.push_back(pos);
+            }
+        }
+    }
 
+    int pos = getInt(posList.size(), 0);
 
+    int i = 0;
+    for (it = posList.begin(); it != posList.end(); it++, i++)
+    {
+        if (i == pos)
+        {
+            tempPos.x = it->x;
+            tempPos.y = it->y;
+            return &tempPos;
+        }
+    }
+    return NULL;
+}
 
 coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
 {
@@ -460,16 +490,6 @@ coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
         }
     }
 
-
-    /*if(posList.size()==0)
-    {
-    char err[128];
-    sprintf(err,"Could not find new position of type: %d",type);
-    std::string ex = err;
-
-    throw ex;
-    }*/
-
     int pos = getInt(posList.size(), 0);
 
     int i = 0;
@@ -482,8 +502,6 @@ coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
             return &tempPos;
         }
     }
-
-
     return NULL;
 }
 

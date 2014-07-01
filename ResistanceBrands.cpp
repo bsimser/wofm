@@ -67,6 +67,7 @@ char * ResistanceBrands::GetBrandName(eBrandType brandType)
     case bAcid:             return "partially dissolved";
     case bPoison:           return "poisoned";
     case bParalysis:        return "paralysed";
+    case bConfusion:        return "confused";
 #ifdef _DEBUG
     default:                return "tickled";
 #else
@@ -86,6 +87,7 @@ char * ResistanceBrands::GetResistanceName(eBrandType brandType)
     case bAcid:             return "acid";
     case bPoison:           return "poison";
     case bParalysis:        return "paralysis";
+    case bConfusion:        return "confusion";
 #ifdef _DEBUG
     default: return "tickling";
 #else

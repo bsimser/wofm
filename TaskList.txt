@@ -8,4 +8,6 @@ Some ideas
 * Make the Maze more confusing. DONE
 * Fix the Enter Name screen.
 
+glowing prefix to magic items.
+
  

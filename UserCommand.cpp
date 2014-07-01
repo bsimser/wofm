@@ -35,7 +35,6 @@ coord UserCommand::autoTarget()
     {
         MONSTERLIST & monsters = WorldBuilder::monsterManager.monster_list;
 
-        Monster * closest;
         float range = 100;
         MONSTERLIST::iterator it = ++monsters.begin();// ignore player
 

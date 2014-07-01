@@ -19,7 +19,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
     switch (effect)
     {
     case no_effect: break;
-    case poisoned: RunPoison(monster, strength); break;
+    case poisoned: return RunPoison(monster, strength); break;
     case repelMissiles:
         ret = TestEffect(monster, effect, strength);
         if (monster->isPlayer())
@@ -148,13 +148,16 @@ void EffectManager::AddBrandEffect(monsterData *monster, eBrandType brand, int s
     switch (brand)
     {
     case bPoison: monster->monster.AddEffect(poisoned, strength); break;
-    case bParalysis: monster->monster.AddEffect(paralysis, strength); break;
-        /*	if(monster->isPlayer())
-                WorldBuilder::textManager.newLine("You are poisoned. ");
-                else if(monster->isSeen())
-                WorldBuilder::textManager.newLine("The %s is poisoned. ",monster->monster.name);*/
+    case bParalysis: monster->monster.AddEffect(paralysis, strength);     break;     	
+        if(monster->isPlayer())
+           WorldBuilder::textManager.newLine("You are paralysed. ");
+        else if(monster->isSeen())
+           WorldBuilder::textManager.newLine("The %s is paralysed. ",monster->monster.name);;
+
         break;
     }
+
+
 }
 
 void EffectManager::AddOtherEffect(monsterData *monster, eEffect effect, int strength) //spell/potion/scroll
@@ -220,7 +223,7 @@ int EffectManager::RunSlowed(monsterData *monster, int strength)
     }
 
 }
-void EffectManager::RunPoison(monsterData *monster, int strength)
+int EffectManager::RunPoison(monsterData *monster, int strength)
 {
     //get Resistance
     int resistance = monster->monster.GetResistance(EquivalentResistance(poisoned));
@@ -232,6 +235,7 @@ void EffectManager::RunPoison(monsterData *monster, int strength)
         monster->monster.ReduceEffect(poisoned, 1);
         if (monster->isPlayer())
             WorldBuilder::textManager.newLine("You feel less poisoned. ");
+        return REDUCED;
     }
 
     //determine effect
@@ -257,8 +261,9 @@ void EffectManager::RunPoison(monsterData *monster, int strength)
             WorldBuilder::textManager.newLine("You are no longer poisoned. ");
         else if (monster->isSeen())
             WorldBuilder::textManager.newLine("The %s recovers. ", monster->monster.name);
-
+        return REMOVED;
     }
+    return NO_CHANGE;
 }
 
 void EffectManager::RunTeleport(monsterData *monster, int strength)

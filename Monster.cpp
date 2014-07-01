@@ -233,7 +233,7 @@ int Monster::createSpecial(int level)
         symbol = 'V';
         strcpy(name, "master vampire");
         setDescription("A master vampire, are then any other kind? ");
-        SetBrand(bParalysis, 2);
+        SetBrand(bConfusion, 2);
         stamina = 11;
         skill = 9;
         luck = 3;

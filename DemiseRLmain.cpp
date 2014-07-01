@@ -1,15 +1,7 @@
-/*
- *        This Code Was Created By Jeff Molofee 2000
- *        A HUGE Thanks To Fredric Echols For Cleaning Up
- *        And Optimizing This Code, Making It More Flexible!
- *        If You've Found This Code Useful, Please Let Me Know.
- *        Visit My Site At nehe.gamedev.net
- */
 
 #include <windows.h>        // Header File For Windows
 #include "WorldBuilder.h"
 #include "OpenGLSceneGen.h"
-
 
 //general
 bool    keys[256];            // Array Used For The Keyboard Routine
@@ -20,61 +12,79 @@ bool    keypress;
 WorldBuilder world; //the one and only world
 
 LRESULT CALLBACK WndProc(HWND    hWnd,            // Handle For This Window
-    UINT    uMsg,            // Message For This Window
-    WPARAM    wParam,            // Additional Message Information
-    LPARAM    lParam)            // Additional Message Information
+						 UINT    uMsg,            // Message For This Window
+					 	 WPARAM    wParam,            // Additional Message Information
+					 	 LPARAM    lParam)            // Additional Message Information
 {
+	// initial check for non-US keys
+	switch (wParam)
+	{
+
+	case 60: // '<' 
+		keys[wParam] = TRUE;                                  // key
+		keypress = true;
+		return 0;
+	case 62: // '>'
+		keys[wParam] = TRUE;                                  // key
+		keypress = true;
+		return 0;
+	case 63: // '?'
+		keys[wParam] = TRUE;                                  // help key
+		keypress = true;
+		return 0;
+	}
+
     switch (uMsg)                                    // Check For Windows Messages
     {
     case WM_ACTIVATE:                            // Watch For Window Activate Message
     {
-                                                    if (!HIWORD(wParam))                    // Check Minimization State
-                                                    {
-                                                        active = true;                        // Program Is Active
-                                                    }
-                                                    else
-                                                    {
-                                                        active = false;                        // Program Is No Longer Active
-                                                    }
+        if (!HIWORD(wParam))                    // Check Minimization State
+        {
+            active = true;                        // Program Is Active
+        }
+        else
+        {
+            active = false;                        // Program Is No Longer Active
+        }
 
-                                                    return 0;                                // Return To The Message Loop
+        return 0;                                // Return To The Message Loop
     }
 
     case WM_SYSCOMMAND:                            // Intercept System Commands
     {
-                                                    switch (wParam)                            // Check System Calls
-                                                    {
-                                                    case SC_SCREENSAVE:                  // Screensaver Trying To Start?
-                                                    case SC_MONITORPOWER:                // Monitor Trying To Enter Powersave?
-                                                        return 0;                            // Prevent From Happening
-                                                    }
-                                                    break;                                    // Exit
-    }
+		switch (wParam)                            // Check System Calls
+		{
+		case SC_SCREENSAVE:                  // Screensaver Trying To Start?
+		case SC_MONITORPOWER:                // Monitor Trying To Enter Powersave?
+			return 0;                            // Prevent From Happening
+		}
+		break;                                    // Exit
+	}
 
     case WM_CLOSE:                                // Did We Receive A Close Message?
     {
-                                                    PostQuitMessage(0);                        // Send A Quit Message
-                                                    return 0;                                // Jump Back
+        PostQuitMessage(0);                        // Send A Quit Message
+        return 0;                                // Jump Back
     }
 
     case WM_KEYDOWN:                            // Is A Key Being Held Down?
     {
-                                                    keys[wParam] = true;                    // If So, Mark It As true
-                                                    keypress = true;
-                                                    return 0;                                // Jump Back
+        keys[wParam] = true;                    // If So, Mark It As true
+        keypress = true;
+        return 0;                                // Jump Back
     }
 
     case WM_KEYUP:                                // Has A Key Been Released?
     {
-                                                    keys[wParam] = false;                    // If So, Mark It As false
-                                                    return 0;                                // Jump Back
+        keys[wParam] = false;                    // If So, Mark It As false
+        return 0;                                // Jump Back
     }
 
     case WM_SIZE:                                // Resize The OpenGL Window
     {
-                                                    world.Resize(lParam, wParam);
+        world.Resize(lParam, wParam);
 
-                                                    return 0;                                // Jump Back
+        return 0;                                // Jump Back
     }
     }
 
@@ -107,9 +117,7 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
         ::MessageBox(NULL, "Unknown Error", "Initialisation", MB_ICONERROR);
     }
 
-    //    while(!world.Initialise());                        //keep building until no error
-
-
+	world.Run(); //display world
 
     while (!done)                                    // Loop That Runs While done=false
     {
@@ -134,22 +142,18 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
             // add key press handler here ??cjm
             if (active)                                // Program Active?
             {
-
-                //if (keys[VK_ESCAPE])                // Was ESC Pressed?
-                //{
-                //    done=true;                        // ESC Signalled A Quit
-                //}
-                //else 
                 if (keypress)
                 {
                     world.ProcessCommand(keys);
-                    keypress = false;
-                }
+					world.Run();
+					keypress = false;
+				}
                 else                                // Not Time To Quit, Update Screen
                 {
-                    world.Run();
+					if (world.State() == sRunning || world.State() == sResting) //update while player is running or resting(HACK)
+						world.Run();
                 }
-
+				Sleep(1);
             }
 
             if (keys[VK_F1])                // Is F1 Being Pressed?

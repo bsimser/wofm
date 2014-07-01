@@ -63,6 +63,7 @@ Item::Item(const Item& rhs) : ResistanceBrands(rhs)
 #else
     identified = rhs.identified;
 #endif
+    identified = rhs.identified;
 
     equipped = rhs.equipped;
 
@@ -74,10 +75,10 @@ Item::Item(const Item& rhs) : ResistanceBrands(rhs)
         itemNumber[i] = rhs.itemNumber[i];
 
     h2hSidesDice = rhs.h2hSidesDice;
-    h2hNumDice = rhs.h2hNumDice;
+    h2hNumDice   = rhs.h2hNumDice;
 
     thrSidesDice = rhs.thrSidesDice;
-    thrNumDice = rhs.thrNumDice;
+    thrNumDice   = rhs.thrNumDice;
 
     strcpy(postfix, rhs.postfix);
     strcpy(prefix, rhs.prefix);
@@ -268,6 +269,7 @@ void Item::createGold(int level)
     identified = 0;
     weight = 100;
     setColor(255, 255, 0);
+    identified = 1;
 }
 
 void Item::createCards(int level)
@@ -331,7 +333,7 @@ void Item::createWeapon(int level, int secondary_type)
     if (level < 2)
         return;
 
-    if (getInt(100, 0) == 99 && skill_bonus>2)
+    if (getInt(100, 0) == 99 && skill_bonus > 2)
     {
         strcpy(postfix, " of Pain");
         setColor(230, 230, 230);
@@ -398,6 +400,12 @@ void Item::createArmour(int level, int secondary_type)
     else if (varient < 70)
     {
         strcpy(name, "leather armour");
+
+        if(absorb_bonus == 0)
+            strcpy(prefix, "crude ");
+        else if(absorb_bonus == 2)
+            strcpy(prefix, "quality ");
+
         symbol = ']';
         setColor(128, 64, 0);
 
@@ -407,6 +415,12 @@ void Item::createArmour(int level, int secondary_type)
     else if (varient < 90 || level == 0)
     {
         strcpy(name, "chainmail");
+
+        if(absorb_bonus == 0)
+            strcpy(prefix, "orcish ");
+        else if(absorb_bonus == 2)
+            strcpy(prefix, "dwarven ");
+
         symbol = ']'; setColor(100, 100, 100);
         absorb_bonus += 2; //absorb 2-4 
         weight = 25;
@@ -414,6 +428,12 @@ void Item::createArmour(int level, int secondary_type)
     else
     {
         strcpy(name, "plate mail");
+
+        if(absorb_bonus == 0)
+            strcpy(prefix, "rusty ");
+        else if(absorb_bonus == 2)
+            strcpy(prefix, "full ");
+
         symbol = ']';
         setColor(200, 200, 200);
         absorb_bonus += 3; //absorb 3-5
@@ -447,19 +467,26 @@ char *Item::GetName()
         switch (type)
         {
         case armour:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix); break;
-        case weapon:            sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
+        case weapon:            sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, h2hNumDice, postfix);
+            //sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
             break;
 
         case projectile:        if (itemNumber[1] > 1)    sprintf(id_name, "%d +%d %s%s%s%s", itemNumber[1], skill_bonus, prefix, name, itemNumber[1] > 1 ? "s" : nothing, postfix);
                                 else                sprintf(id_name, "+%d %s%s%s", skill_bonus, prefix, name, postfix); break;
-        case projectileWeapon:  sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
+        case projectileWeapon:  sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, thrNumDice/*, thrSidesDice*/, postfix);    break;
+                                //sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
         case shield:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix);    break;
         default:                sprintf(id_name, "%s", name); break;
         }
     }
     else
     {
-        sprintf(id_name, "unidentified %s%s", name, itemNumber[1] > 1 ? "s" : nothing);
+        if (strlen(postfix) > 0)
+        {
+            sprintf(id_name, "glowing %s%s", name, itemNumber[1] > 1 ? "s" : nothing);
+        }
+        else
+            sprintf(id_name, "unidentified %s%s", name, itemNumber[1] > 1 ? "s" : nothing);
     }
 
     if (equipped)
@@ -492,8 +519,6 @@ int Item::GetAttack_h2h()
         attack += getInt(h2hSidesDice + 1, 1);
 
     return attack + skill_bonus;
-
-
 }
 
 float Item::getAverage_h2h()
@@ -537,7 +562,7 @@ void Item::AddBrand(bool special)
             strcpy(postfix, " of Venom");
         else if (poison == 1)
             strcpy(postfix, " of Weak Posion");
-        return;
+        
         setColor(0, 255, 0);
     }
 
@@ -594,6 +619,7 @@ void Item::AddBrand(bool special)
 
 void Item::AddResistance(bool special)
 {
+    special = true;
     int brandType = getInt(103, 0);
 
     if (special)
