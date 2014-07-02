@@ -42,7 +42,7 @@ int RandomMonster::Create(int level)
 int RandomMonster::createGoblin(int level)
 {
     symbol = 'g';
-    strcpy(name, "goblin");
+    name = ("goblin");
 
     setColor(0, 0, 200 - level * 5);
 
@@ -64,7 +64,7 @@ int RandomMonster::createGoblin(int level)
 int RandomMonster::createTroll(int level)
 {
     symbol = 'T';
-    strcpy(name, "troll");
+    name = ("troll");
     setDescription("A strong beast with teeth and claws. ");
 
     setColor(128, 128, 0);
@@ -86,7 +86,7 @@ int RandomMonster::createTroll(int level)
 int RandomMonster::createDwarf(int level)
 {
     symbol = 'd';
-    strcpy(name, "dwarf");
+    name = ("dwarf");
     setDescription("This dwarf eyes you with suspicion. 'Do ya ave ma gold?' ");
 
     setColor(150, 75, 0);
@@ -107,7 +107,7 @@ int RandomMonster::createDwarf(int level)
 int RandomMonster::createSpider(int level)
 {
     symbol = 'S';
-    strcpy(name, "spider");
+    name = ("spider");
     setDescription("A large arachnid with an alien gleam in its eyes. ");
 
     setColor(120, 150, 0);

@@ -108,7 +108,7 @@ int monsterData::TerrainAttack(int x, int y)
                 WorldBuilder::textManager.newLine("You are being eaten by paranhas!!. ");
             else if (isSeen())
             {
-                WorldBuilder::textManager.newLine("The %s is attacked by something. ", monster.name);
+                WorldBuilder::textManager.newLine("The %s is attacked by something. ", monster.name.c_str());
             }
 
             monster.stamina--;
@@ -120,9 +120,9 @@ int monsterData::TerrainAttack(int x, int y)
             if (isPlayer())
                 WorldBuilder::textManager.newLine("There's something in the water!! ");//("Something nibbles at you armour. ");
             else if (isSeen() == 1 && state != asleep)
-                WorldBuilder::textManager.newLine("The %s curses at the water. ", monster.name);
+                WorldBuilder::textManager.newLine("The %s curses at the water. ", monster.name.c_str());
             else if (isSeen() == 2 && state != asleep)
-                WorldBuilder::textManager.newLine("You hear cursing. ", monster.name);
+                WorldBuilder::textManager.newLine("You hear cursing. ", monster.name.c_str());
         }
 
         int slow_swept = WorldBuilder::GetCurrentLevel() / 2;
@@ -173,7 +173,7 @@ int monsterData::TerrainAttack(int x, int y)
 
                     else if (isSeen() == 1)
                     {
-                        WorldBuilder::textManager.newLine("The %s screams as it swept away. ", monster.name);
+                        WorldBuilder::textManager.newLine("The %s screams as it swept away. ", monster.name.c_str());
                     }
                     else if (isSeen() == 2)
                         WorldBuilder::textManager.newLine("You hear a gurgled scream. ");
@@ -191,7 +191,7 @@ int monsterData::TerrainAttack(int x, int y)
                     else if (isSeen() == 1)
                     {
                         //char buf[64];
-                        //sprintf(buf,"The %s is swept away. ",monster.name);
+                        //sprintf(buf,"The %s is swept away. ",monster.name.c_str());
                         //WorldBuilder::textManager.newLine(buf);
                     }
                 }

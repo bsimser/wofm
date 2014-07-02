@@ -45,7 +45,7 @@ int UndeadMonster::Create(int type, int level)
 int UndeadMonster::createSkeleton()
 {
     symbol = 'z';
-    strcpy(name, "skeleton");
+    name = ("skeleton");
     setDescription("A walking skeleton brought back to life to guard the inner mountain. ");
 
     setColor(230, 230, 230);
@@ -67,7 +67,7 @@ int UndeadMonster::createSkeleton()
 int UndeadMonster::createZombie()
 {
     symbol = 'z';
-    strcpy(name, "shambling zombie");
+    name = ("shambling zombie");
     setDescription("This poor soul has be returned from death to do its masters bidding. ");
 
     setColor(134, 85, 70);
@@ -90,7 +90,7 @@ int UndeadMonster::createZombie()
 int UndeadMonster::createGhoul()
 {
     symbol = 'c';
-    strcpy(name, "rotting ghoul");
+    name = ("rotting ghoul");
     setDescription("A rotting corpse, no wait its moving and coming straight towards you. ");
 
     SetBrand(bParalysis, 2);
@@ -115,7 +115,7 @@ int UndeadMonster::createGhoul()
 int UndeadMonster::createVampire()
 {
     symbol = 'V';
-    strcpy(name, "big scary vampire");
+    name = ("big scary vampire");
     setDescription("Big and scary this vampire is big and scary. ");
     SetBrand(bConfusion, 2);
 

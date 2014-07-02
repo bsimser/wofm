@@ -84,7 +84,7 @@ monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
 
 
     //set special states
-    if (!strcmp(new_monster.monster.name, "orc sentry"))
+    if (new_monster.monster.name == "orc sentry")
         new_monster.SetState(sentry);
 
     int asleep_test = getInt(100, 0);
@@ -149,10 +149,9 @@ int MonsterManager::DestroyMonster(MONSTERLIST::iterator it)
 
 monsterData * /*MONSTERLIST::iterator */MonsterManager::Player()
 {
-    return &(*monster_list.begin());
+    static monsterData * player = &(*monster_list.begin());
+    return player;
 }
-
-
 
 
 int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* actionManager)
@@ -178,7 +177,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
             //	WorldBuilder::textManager.newLine("You die. Your spirit floats to another soul.");
             else if (r_it->isSeen())
             {
-                WorldBuilder::textManager.newLine("The %s dies. ", r_it->monster.name);
+                WorldBuilder::textManager.newLine("The %s dies. ", r_it->monster.name.c_str());
             }
 
             if (r_it->Name() == "minotaur")

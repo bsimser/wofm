@@ -30,7 +30,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
                 WorldBuilder::textManager.newLine("You stop glowing. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s stops glowing. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s stops glowing. ", monster->monster.name.c_str());
         break;
     case diseased:
         ret = TestEffect(monster, effect, strength);
@@ -42,7 +42,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
                 WorldBuilder::textManager.newLine("You feel better. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s looks better. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s looks better. ", monster->monster.name.c_str());
         break;
 
     case slowed:
@@ -55,7 +55,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
                 WorldBuilder::textManager.newLine("You speed up. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name.c_str());
 
         break;
 
@@ -69,7 +69,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
                 WorldBuilder::textManager.newLine("You can move again. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s can move again. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s can move again. ", monster->monster.name.c_str());
         break;
 
     case teleportitus: ret = TestEffect(monster, effect, strength);
@@ -83,7 +83,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
                 WorldBuilder::textManager.newLine("Your feel stable. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s looks stable. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s looks stable. ", monster->monster.name.c_str());
         break;
 
 
@@ -97,7 +97,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
                 WorldBuilder::textManager.newLine("Your head clears. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s looks normal. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s looks normal. ", monster->monster.name.c_str());
         break;
     }
 
@@ -152,7 +152,7 @@ void EffectManager::AddBrandEffect(monsterData *monster, eBrandType brand, int s
         if(monster->isPlayer())
            WorldBuilder::textManager.newLine("You are paralysed. ");
         else if(monster->isSeen())
-           WorldBuilder::textManager.newLine("The %s is paralysed. ",monster->monster.name);;
+           WorldBuilder::textManager.newLine("The %s is paralysed. ",monster->monster.name.c_str());;
 
         break;
     }
@@ -218,7 +218,7 @@ int EffectManager::RunSlowed(monsterData *monster, int strength)
         if (monster->isPlayer())
             WorldBuilder::textManager.newLine("You speed up. ");
         else if (monster->isSeen())
-            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name.c_str());
         return 0;
     }
 
@@ -252,7 +252,7 @@ int EffectManager::RunPoison(monsterData *monster, int strength)
                 WorldBuilder::deathMessage.SetDeathMessage("became immune to poison the moment he died of it. ");
             }
             else if (monster->isSeen())
-                WorldBuilder::textManager.newLine("The %s is poisoned. ", monster->monster.name);
+                WorldBuilder::textManager.newLine("The %s is poisoned. ", monster->monster.name.c_str());
         }
     }
     else
@@ -260,7 +260,7 @@ int EffectManager::RunPoison(monsterData *monster, int strength)
         if (monster->isPlayer())
             WorldBuilder::textManager.newLine("You are no longer poisoned. ");
         else if (monster->isSeen())
-            WorldBuilder::textManager.newLine("The %s recovers. ", monster->monster.name);
+            WorldBuilder::textManager.newLine("The %s recovers. ", monster->monster.name.c_str());
         return REMOVED;
     }
     return NO_CHANGE;

@@ -56,8 +56,7 @@ Item * MonsterItems::GetInventoryItem(monsterData *monster, eItemType equip_type
 
 int MonsterItems::EquipMonster(monsterData *monster, int level)
 {
-    std::string name = monster->monster.name;
-
+    std::string & name = monster->monster.name;
 
     monster->inventory.clear();
 
@@ -81,9 +80,9 @@ int MonsterItems::EquipMonster(monsterData *monster, int level)
 
         switch (random_weapon)
         {
-        case 0: p = bolt; pw = crossbow; strcpy(monster->monster.name, "orc bolter"); break;
-        case 1: p = arrow; pw = bow;     strcpy(monster->monster.name, "orc archer"); break;
-        case 2: p = arrow; pw = longbow; strcpy(monster->monster.name, "orc archer"); break;
+        case 0: p = bolt; pw = crossbow; monster->monster.name = "orc bolter"; break;
+        case 1: p = arrow; pw = bow;     monster->monster.name = "orc archer"; break;
+        case 2: p = arrow; pw = longbow; monster->monster.name = "orc archer"; break;
         }
 
         monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, projectile, p));
@@ -375,11 +374,11 @@ int MonsterItems::PickupItem(monsterData *monster)
 
     //delete reference from map but item is still in all items list
     WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveItemRef();
-
+ 
     if (monster->isPlayer())
-        WorldBuilder::textManager.newLine("You pick up the %s%s", item.name, item.itemNumber[1] > 1 ? "s. " : ". ");
+        WorldBuilder::textManager.newLine("You pick up the %s%s", item.GetName(), item.itemNumber[1] > 1 ? ". " : ". ");
     else
-        WorldBuilder::textManager.newLine("The %s picks up the %s%s", monster->monster.name, item.name, item.itemNumber[1] > 1 ? "s. " : ". ");
+        WorldBuilder::textManager.newLine("The %s picks up the %s%s", monster->monster.name.c_str(), item.name, item.itemNumber[1] > 1 ? "s. " : ". ");
 
     //give item to monster
 
@@ -488,6 +487,9 @@ int MonsterItems::DropStackableItem(monsterData *monster, Item *item, int x, int
 
 int MonsterItems::DropItem(monsterData *monster, Item *item, int x, int y)
 {
+    if (std::string("a fountain") == WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name)
+        int test = 0;
+
     if (x <= 0 || y <= 0 || x >= (DUNGEON_SIZE_W - 1) || y >= (DUNGEON_SIZE_W - 1))
         return 0;
 
@@ -495,16 +497,17 @@ int MonsterItems::DropItem(monsterData *monster, Item *item, int x, int y)
     {
         return DropStackableItem(monster, item, x, y);
     }
-
-    else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].getItem() ||
+    // dont drop if there is an item there or the ground is not floor or bridge
+    else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x ][y].getItem() ||
              (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != dfloor &&
-              WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != bridge &&
-              std::string("a fountain") != WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name &&
-              std::string("a teleport") != WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name))
+              WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != bridge))
     {
         return 0;
     }
-
+    else if (std::string("a fountain") == WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name)
+        return 0;
+    else if (std::string("a teleport") == WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name)
+        return 0;
     else
         WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].AssignItem(item);
     return 1;

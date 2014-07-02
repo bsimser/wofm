@@ -169,11 +169,11 @@ int DeathMessage::ShowDeath(int success)
     }
     i += 5;
 
-    WorldBuilder::textManager.SetDisplayLine(35, "Output to %s.txt", WorldBuilder::monsterManager.Player()->monster.name);
+    WorldBuilder::textManager.SetDisplayLine(35, "Output to %s.txt", WorldBuilder::monsterManager.Player()->monster.name.c_str());
 
     WorldBuilder::textManager.SetDisplayLine(39,/*[i] see inventory,*/"[x] to quit");
 
-    WorldBuilder::textManager.PrintDisplay(WorldBuilder::monsterManager.Player()->monster.name, i);
+    WorldBuilder::textManager.PrintDisplay(WorldBuilder::monsterManager.Player()->monster.name.c_str(), i);
     return 1;
 }
 

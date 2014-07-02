@@ -6,10 +6,15 @@ Change log
 
 version 0.2.1b 3/07/2014
 ========================
-- fix bug in flood fill test
-- items cant be dropped on teleport or fountain
-- removed chance of empty chest upon opening
-- increased change of better items from chests
+- Fix bug in flood fill test
+- Items cant be dropped on teleport or fountain
+- Removed chance of empty chest upon opening
+- Increased change of better items from chests
+- Luck now has a minor effect on waking enemies
+- Fixed wierd player description text
+- Removed 0 strength resistances from list
+- Removed chance of no entry on level 6
+- Picking up items now use identified description message.
 
 
 version 0.2.1 1/07/2014

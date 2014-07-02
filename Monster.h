@@ -51,7 +51,8 @@ public:
 	int sight_range;
 	int asleep_sight_Range;
 
-	char name[64];
+    std::string name;
+	//char name[64];
 
 	bool humanoid;
     bool special;

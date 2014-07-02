@@ -32,7 +32,7 @@ void MonsterInfo::ShowNormalMonsterInfo(monsterData* monster)
 {
     WorldBuilder::textManager.ClearDisplayLines();
 
-    WorldBuilder::textManager.SetDisplayLine(0, monster->monster.name);
+    WorldBuilder::textManager.SetDisplayLine(0, "%s", monster->monster.name.c_str());
     WorldBuilder::textManager.SetDisplayLine(1, "==============");
 
     WorldBuilder::textManager.SetDisplayLine(3, "%s", WorldBuilder::monsterManager.getDescription(monster->monster).c_str());
@@ -153,7 +153,7 @@ void MonsterInfo::ShowCompleteMonsterInfo(monsterData* monster)
 
     char buf[128];
 
-    WorldBuilder::textManager.SetDisplayLine(0, monster->monster.name);
+    WorldBuilder::textManager.SetDisplayLine(0, "%s", monster->monster.name.c_str());
     WorldBuilder::textManager.SetDisplayLine(1, "==========");
 
     WorldBuilder::textManager.SetDisplayLine(3, "");

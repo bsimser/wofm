@@ -22,12 +22,20 @@ ResistanceBrands::ResistanceBrands(const ResistanceBrands& rhs)
 
 int ResistanceBrands::GetResistance(eBrandType type)
 {
-    return resistanceMap[type];
+    BRANDMAP::iterator it = resistanceMap.find(type);
+    if (it != resistanceMap.end())
+        return it->second;
+
+    return 0;
 }
 
 int ResistanceBrands::GetBrand(eBrandType type)
 {
-    return brandMap[type];
+    BRANDMAP::iterator it = brandMap.find(type);
+    if (it != brandMap.end())
+        return it->second;
+
+    return 0;
 }
 
 int ResistanceBrands::hasResistance()
