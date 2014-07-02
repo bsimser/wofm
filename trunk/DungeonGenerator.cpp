@@ -972,7 +972,6 @@ int DungeonGenerator::createDoor(int x, int y, int chance)
 //this would have to be the worst path finder routine ever. Hell it works! (most of the time)
 int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
 {
-
     int dir1;
     int dir2;
     //go from x1 to x2
@@ -1007,7 +1006,6 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
         TraceMsg("Start Dir W/E");
     if (start_dir == 2)
         TraceMsg("Start Dir N/S");
-
 
     if (start_dir == 1) //use dir 1 to start;
     {
@@ -1121,7 +1119,6 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
         SafetyReset();
         while (dmap[x1][y1] == '.') //find wall
         {
-
             if (dir2 == dNorth) y1++;
             else if (dir2 == dSouth) y1--;
             Safety("X1");
@@ -1129,7 +1126,8 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
 
         do
         {
-            dmap[x1][y1] = '.';
+            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                dmap[x1][y1] = '.';
 
             if (dir2 == dNorth) y1++;
             else if (dir2 == dSouth) y1--;
@@ -1137,7 +1135,8 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
             //if(dmap[x1][y1] == '.') //another path encountered
             if (isNearWall(x1, y1))
             {
-                dmap[x1][y1] = '.';
+                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                    dmap[x1][y1] = '.';
                 createDoor(x1, y1, 100);
                 return 0;
             }
@@ -1152,14 +1151,16 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
 
         while (x1 != x2)
         {
-            dmap[x1][y1] = '.';
+            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                dmap[x1][y1] = '.';
             if (dir1 == dWest) x1--;
             else if (dir1 == dEast) x1++;
 
             //if(dmap[x1][y1] == '.') //another path encountered
             if (isNearWall(x1, y1))
             {
-                dmap[x1][y1] = '.';
+                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                    dmap[x1][y1] = '.';
                 createDoor(x1, y1, 100);
                 return 0;
             }
@@ -1174,13 +1175,15 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                 TraceMsg("Fixing");
                 while (y1 != y2)
                 {
-                    dmap[x1][y1] = '.';
+                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                        dmap[x1][y1] = '.';
                     if (dir2 == dNorth) y1--;	//reverse direction
                     else if (dir2 == dSouth) y1++;
 
-                    if (dmap[x1][y1] == '.')//another path encountered
+                    if (dmap[x1][y1] == '.') //another path encountered
                     {
-                        dmap[x1][y1] = '.';
+                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                            dmap[x1][y1] = '.';
                         createDoor(x1, y1, 100);
                         return 0;
                     }
@@ -1192,13 +1195,15 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                 TraceMsg("Fixing");
                 while (y1 != y2)
                 {
-                    dmap[x1][y1] = '.';
+                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                        dmap[x1][y1] = '.';
                     if (dir2 == dNorth) y1--;	//reverse direction
                     else if (dir2 == dSouth) y1++;
 
-                    if (dmap[x1][y1] == '.')//another path encountered
+                    if (dmap[x1][y1] == '.') //another path encountered
                     {
-                        dmap[x1][y1] = '.';
+                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                            dmap[x1][y1] = '.';
                         createDoor(x1, y1, 100);
                         return 0;
                     }
@@ -1384,10 +1389,8 @@ void DungeonGenerator::makeTomb(int x, int y)
 {
     if (x >= DUNGEON_SIZE_W - 1 || y >= DUNGEON_SIZE_H - 1 || x <= 0 || y <= 0) return;
 
-    if (dmap[x][y] == '>' || dmap[x][y] == '<' || dmap[x][y] == '=' || dmap[x][y] == '#')
-        return;
-
-    dmap[x][y] = 'u';
+    if (dmap[x][y] == '.')
+        dmap[x][y] = 'u';
 
 }
 void DungeonGenerator::makeFloor(int x, int y)
@@ -1401,24 +1404,19 @@ void DungeonGenerator::makeFloor(int x, int y)
 
 void DungeonGenerator::makeGrass(int x, int y)
 {
-
     if (x >= DUNGEON_SIZE_W - 1 || y >= DUNGEON_SIZE_H - 1 || x <= 0 || y <= 0)return;
 
     dmap[x][y] = 'g';
-
 }
 
 void DungeonGenerator::makeTree(int x, int y)
 {
-
     if (x >= DUNGEON_SIZE_W - 1 || y >= DUNGEON_SIZE_H - 1 || x <= 0 || y <= 0)return;
 
     if (dmap[x][y] == '>' || dmap[x][y] == '<' || dmap[x][y] == '=' || dmap[x][y] == '#' || dmap[x][y] == 'w')
         return;
 
-
     dmap[x][y] = 'T';
-
 }
 
 
@@ -1467,10 +1465,6 @@ int DungeonGenerator::createUndeadRoom(int rooms, const int max_rooms, int x, in
 
     if (rooms) //more than one room make a path
     {
-        /*TraceMsg("Room Suceeded");
-        char buf[32];
-        sprintf(buf,"x%d y%d x%d y%d",x,y,last_room_x,last_room_y);
-        TraceMsg(buf);*/
         createPath(x, y, last_room_x, last_room_y);
     }
 
@@ -1484,9 +1478,7 @@ int DungeonGenerator::createUndeadRoom(int rooms, const int max_rooms, int x, in
         dmap[x][y] = '>';
     }
 
-
-
-    //set up last know room to link next room to
+    // set up last know room to link next room to
     last_room_x = x;
     last_room_y = y;
     return 1;
@@ -1630,6 +1622,11 @@ bool DungeonGenerator::FloodTest()
 
 void DungeonGenerator::FloodFill(int x, int y)
 {
+    if (x < 0 || x >= DUNGEON_SIZE_W || y < 0 || y > DUNGEON_SIZE_H)
+    {
+        return;
+    }
+
     if ((dmap[x][y] != '#' && dmap[x][y] != 'r' && dmap[x][y] != 'M') && (flood_test[x][y] != '.'))
         flood_test[x][y] = '.';
     else
@@ -1644,12 +1641,11 @@ void DungeonGenerator::FloodFill(int x, int y)
     FloodFill(x + 1, y - 1);
     FloodFill(x - 1, y + 1);
     FloodFill(x + 1, y + 1);
-
 }
 
 void DungeonGenerator::addLoops(int nLoops)
 {
-    int loops = nLoops;// Random::getInt(nLoops + 1, 1);
+    int loops = nLoops; // Random::getInt(nLoops + 1, 1);
 
     do
     {

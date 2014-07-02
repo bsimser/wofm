@@ -1,7 +1,7 @@
 #pragma once
 
 #include <map>
-#include <list>
+#include <vector>
 
 
 enum eEffect
@@ -23,7 +23,7 @@ typedef struct
 
 //typedef std::map<eEffect,int> EFFECTMAP;
 
-typedef std::list<EFFECT> EFFECTLIST;
+typedef std::vector<EFFECT> EFFECTLIST;
 
 //typedef EFFECTMAP::const_iterator EFFECTMAP_CITERATOR;
 

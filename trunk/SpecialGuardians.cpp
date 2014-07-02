@@ -48,7 +48,7 @@ int SpecialGuardians::createGuard(int level)
     if (level == 0)
     {
         symbol = 'Z';
-        strcpy(name, "skeleton guard");
+        name = ("skeleton guard");
         setDescription("Look its a walking skeleton. ");
 
         setColor(230, 230, 230);
@@ -73,7 +73,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 1)
     {
         symbol = 'o';
-        strcpy(name, "orc captain");
+        name = ("orc captain");
         setDescription("Larger than most orcs, its a leader of some type. ");
 
         setColor(128, 0, 0);
@@ -93,7 +93,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 2)
     {
         symbol = 'T';
-        strcpy(name, "troll");
+        name = ("troll");
         setDescription("A long-limbed beast with teeth and claws. It has a cunning intelligence about it. ");
 
         setColor(128, 64, 64);
@@ -115,7 +115,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 3)
     {
         symbol = '0';
-        strcpy(name, "ogre");
+        name = ("ogre");
         setDescription("Big strong and smelly and I think it wants to eat you. ");
 
         setColor(20, 80, 20);
@@ -134,7 +134,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 4)
     {
         symbol = 'Z';
-        strcpy(name, "skeleton pirate");
+        name = ("skeleton pirate");
         setDescription("A regular skeleton but with a patch over one of it eye socket. ");
 
         setColor(255, 255, 155);
@@ -158,7 +158,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 5)
     {
         symbol = 'S';
-        strcpy(name, "giant cave spider");
+        name = ("giant cave spider");
         setDescription("This enormous hairy spider has venom dripping from is fangs.");
 
         setColor(255, 128, 64);
@@ -180,7 +180,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 6)
     {
         symbol = 'W';
-        strcpy(name, "giant sandworm");
+        name = ("giant sandworm");
 
         setDescription("This chitinous monstrosity is a giant sandworm, its looking to swallow you whole. ");
         setColor(128, 128, 63);
@@ -200,7 +200,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 7)
     {
         symbol = 'Z';
-        strcpy(name, "undead guard");
+        name = ("undead guard");
 
         setDescription("Just another of the undead set to guard what ever is in that chest. ");
 
@@ -226,7 +226,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 8)
     {
         symbol = 'M';
-        strcpy(name, "blind minotaur");
+        name = ("blind minotaur");
         setDescription("A sightless minotaur, yet somehow it can see you with out eyes. ");
 
         setColor(150, 0, 0);
@@ -245,7 +245,7 @@ int SpecialGuardians::createGuard(int level)
     else if (level == 9)
     {
         symbol = 'D';
-        strcpy(name, "dragon");
+        name = ("dragon");
         setDescription("Its a dragon, you have probably read descriptions about them before. ");
 
         setColor(255, 0, 0);

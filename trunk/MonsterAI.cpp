@@ -114,7 +114,7 @@ int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
                        RandomMove(monster);
                        move_done = 1;
                        if (!monster->isPlayer())
-                           WorldBuilder::textManager.newLine("%s is confused. ", monster->monster.name);
+                           WorldBuilder::textManager.newLine("%s is confused. ", monster->monster.name.c_str());
                        else
                            WorldBuilder::textManager.newLine("You are confused. ");
 
@@ -205,8 +205,18 @@ eMonsterState MonsterAI::UpdateMonsterState(monsterData* monster)
     {
         if (detect || monster->wasHit())
         {
-            state = waking;
-            WorldBuilder::textManager.newLine("The %s wakes up. ", monster->monster.name);
+            
+            int luck = WorldBuilder::monsterManager.Player()->Luck();
+
+            if (monster->wasHit() == false && Random::getInt(1, 8) + Random::getInt(1, 8) <= luck)
+            {
+                WorldBuilder::textManager.newLine("The %s snores loudly. ", monster->monster.name.c_str());
+            }
+            else
+            {
+                state = waking;
+                WorldBuilder::textManager.newLine("The %s wakes up. ", monster->monster.name.c_str());
+            }
         }
     }
     else if (state == sentry)
@@ -292,7 +302,7 @@ int MonsterAI::MagicAttackPlayer(monsterData* monster)
     int m_x = monster->pos.x;
     int m_y = monster->pos.y;
 
-    if (Random::getInt(10, 0) < 2 || (strcmp(monster->monster.name, "dragon") == 0 && Random::getInt(10, 0) < 5)) //no spells 20% of the time
+    if (Random::getInt(10, 0) < 2 || (monster->monster.name ==  "dragon" && Random::getInt(10, 0) < 5)) //no spells 20% of the time
     {
         return ChasePlayer(monster);
     }
@@ -637,9 +647,9 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
     int sight;
     if (current_monster->GetState() == asleep)
     {
-        sight = current_monster->monster.sight_range / 2;//current_monster->monster.asleep_sight_Range;
+        sight = current_monster->monster.sight_range / 2 + 1; // current_monster->monster.asleep_sight_Range;
         if (Random::getInt(10, 0) > 1) //20%
-            return 0; //could not wake up
+            return 0; // did not wake up
     }
     else
         sight = current_monster->monster.sight_range;

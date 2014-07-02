@@ -30,10 +30,10 @@ max_stamina(stamina),
 mLevelVariation(0),
 mLevel(0),
 type(0),
-description(0)
+description(0),
+name("")
 {
     setColor(255, 255, 255);
-    strcpy(name, "");
     if (descriptions.size() == 0)
         descriptions.push_back(std::string("This creature dwells deep within the mountain. "));
 
@@ -41,7 +41,7 @@ description(0)
 
 Monster::Monster(const Monster& rhs) :ResistanceBrands(rhs)
 {
-    strcpy(name, rhs.name);
+    name  = rhs.name;
     symbol = rhs.symbol;
     color1 = rhs.color1;
     color2 = rhs.color2;
@@ -102,8 +102,8 @@ int Monster::dead()
 int Monster::createPlayer()
 {
     symbol = '@';
-    strcpy(name, "Player");
-    setDescription("Our hero. This orc refuses to let you in, he has a key on his belt. This orc refuses to let you in, he has a key on his belt. This orc refuses to let you in, he has a key on his belt. ");
+    name = "Player";
+    setDescription("Our hero. ");
 
     color1 = 200;
     color2 = 200;
@@ -146,7 +146,7 @@ int Monster::createSpecial(int level)
     if (type < 10) //0
     {
         symbol = 'o';
-        strcpy(name, "orc sentry");
+        name = "orc sentry";
         setDescription("This orc refuses to let you in, he has a key on his belt. ");
         humanoid = true;
         type = 50;
@@ -159,7 +159,7 @@ int Monster::createSpecial(int level)
     else if (type < 20) //1
     {
         symbol = 's';
-        strcpy(name, "snake");
+        name = "snake";
         setDescription("A small aggressive snake. ");
         skill += 2;
         SetBrand(bPoison, 3);
@@ -172,7 +172,7 @@ int Monster::createSpecial(int level)
     else if (type < 30) //2
     {
         symbol = 'd';
-        strcpy(name, "dog");
+        name = ("dog");
         setDescription("A large mean dog. ");
         stamina = 8;
         skill = 8;
@@ -182,7 +182,7 @@ int Monster::createSpecial(int level)
     {
         symbol = 'o';
         humanoid = true;
-        strcpy(name, "orcish butcher");
+        name = ("orcish butcher");
         setDescription("This crazed orc is covered head-to-toe in blood and gore and so is its cleaver. ");
         stamina = 8;
         skill = 10;
@@ -191,7 +191,7 @@ int Monster::createSpecial(int level)
     else if (type < 50)
     {
         symbol = '@';
-        strcpy(name, "Boathouse Keeper");
+        name = ("Boathouse Keeper");
         setDescription("This large mean-looking man is calling for his dog. ");
         humanoid = true;
         stamina = 8;
@@ -201,7 +201,7 @@ int Monster::createSpecial(int level)
     else if (type < 60) // 5
     {
         symbol = 'z';
-        strcpy(name, "skeleton");
+        name = ("skeleton");
         setDescription("A clattering walking skeleton. ");
         humanoid = true;
 
@@ -217,7 +217,7 @@ int Monster::createSpecial(int level)
     else if (type < 70) //6
     {
         symbol = 'C';
-        strcpy(name, "iron cyclops");
+        name = ("iron cyclops");
         setDescription("A statue made of iron, but why is its head turning towards you? ");
 
         stamina = 15;
@@ -231,7 +231,7 @@ int Monster::createSpecial(int level)
     else if (type < 80)
     {
         symbol = 'V';
-        strcpy(name, "master vampire");
+        name = ("master vampire");
         setDescription("A master vampire, are then any other kind? ");
         SetBrand(bConfusion, 2);
         stamina = 11;
@@ -246,7 +246,7 @@ int Monster::createSpecial(int level)
     else if (type < 90)
     {
         symbol = 'M';
-        strcpy(name, "minotaur");
+        name = ("minotaur");
         humanoid = true;
         setDescription("A large bull-man monstrosity. His hooves pound and steam shoots from his nostrils. ");
 
@@ -273,7 +273,7 @@ int Monster::createBridgeMaster(bool wereRat)
     if (wereRat)
     {
         symbol = 'R';
-        strcpy(name, "FerryWereRat");
+        name = ("FerryWereRat");
         setDescription("A ferry-ware-rat, and you still don't have the money to pay him! ");
 
         skill++;
@@ -289,7 +289,7 @@ int Monster::createBridgeMaster(bool wereRat)
     else
     {
         symbol = '@';
-        strcpy(name, "Ferryman");
+        name = ("Ferryman");
         setDescription("A ferryman, too bad you don't have the money to pay him. ");
 
         setColor(200, 100, 200);
@@ -312,7 +312,7 @@ int Monster::createBridgeMaster(bool wereRat)
 int Monster::createWarlock()
 {
     symbol = '@';
-    strcpy(name, "Zagor");
+    name = ("Zagor");
     setDescription("A regular all-round evil wizard. His hands crackle with unknown magic. ");
 
     setColor(80, 40, 40);
@@ -360,7 +360,7 @@ int Monster::createOrc(int level)
 
     if (level == 0) //only create orcs;
     {
-        strcpy(name, "orc");
+        name = ("orc");
         setDescription("A basic orc whose only job is to stop people like you getting in the mountain. ");
 
         color2 = 200;
@@ -382,26 +382,26 @@ int Monster::createOrc(int level)
 
     if (varient < 2)
     {
-        strcpy(name, "orc servant"); 	color1 = 255;
+        name = ("orc servant"); 	color1 = 255;
         experience = 2;
         setDescription("An orcish servant looking to take out its long suffering on you. ");
     }
     else if (varient < 3)
     {
-        strcpy(name, "orc");
+        name = ("orc");
         setDescription("This orc wanders around the mountain depths causing trouble for people like you. ");
         experience = 4;
     }
     else if (varient < 5)
     {
-        strcpy(name, "orc archer"); color1 = 255; color2 = 128;
+        name = ("orc archer"); color1 = 255; color2 = 128;
         setDescription("This orc has some pointy friends that it wants to share with you. How nice! ");
         experience = 8;
         varient += 2;
     }
     else if (varient < 6)
     {
-        strcpy(name, "orc sentry"); color2 = 200;
+        name = ("orc sentry"); color2 = 200;
         setDescription("A slightly better equipped orc than most. He looks like he has been on guard duty a long time. ");
         experience = 6;
     }
@@ -414,7 +414,7 @@ int Monster::createOrc(int level)
 
     else if (varient < 10)
     {
-        strcpy(name, "orc warrior"); color1 = 237; color2 = 28; color3 = 36;
+        name = ("orc warrior"); color1 = 237; color2 = 28; color3 = 36;
         setDescription("A mean brute, looking to start some trouble. ");
         experience = 8;
         varient += 2;
@@ -422,13 +422,13 @@ int Monster::createOrc(int level)
     }
     else  if (varient == 10)
     {
-        strcpy(name, "chieftain's servant"); varient /= 2; color1 = 200;
+        name = ("chieftain's servant"); varient /= 2; color1 = 200;
         setDescription("Looks like he has just been beaten up by someone. ");
         experience = 10;
     }
     else
     {
-        strcpy(name, "orc chieftain"); varient += 2;	color1 = 0; color2= 128; color3 = 128;
+        name = ("orc chieftain"); varient += 2;	color1 = 0; color2= 128; color3 = 128;
         setDescription("A leader of orcs. Must be tough then. ");
         experience = 20;
         chief = true;

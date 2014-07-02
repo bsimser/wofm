@@ -241,6 +241,9 @@ int WorldBuilder::ToggleFullScreen(int width, int height)
 void WorldBuilder::Resize(WPARAM lParam, LPARAM wParam)
 {
     scene.ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));
+    
+    if (!first_update)
+        Run();
 }
 
 
@@ -274,7 +277,7 @@ void WorldBuilder::UpdateMap()
     MONSTERLIST::iterator player = monsterManager.monster_list.begin();
 
     char name[32];
-    sprintf(name, "%s  Level %d", player->monster.name, player->experience_level);
+    sprintf(name, "%s  Level %d", player->monster.name.c_str(), player->experience_level);
 
     //sprintf(line1,"%s Level %d Skill: %2d(%d)  Stamina: %2d     Turns: %4d  DL: %d XP: %d Mode %d",
     sprintf(line1, "%-20s  Skill: %2d(%d)  Stamina: %2d(%d)  Luck: %-2d(%d)   Dungeon Level:%d  Turns: %d", name,
@@ -394,7 +397,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
         if (ret == 0)
         {
             SetState(sNormal);
-            strcpy(monsterManager.Player()->monster.name, start.pName.c_str());
+            monsterManager.Player()->monster.name =  start.pName;
             //strcpy(monsterManager.Player()->monster.class,start.pClass.c_str());
         }
     }

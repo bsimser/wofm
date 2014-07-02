@@ -81,17 +81,6 @@ void Effects::ReduceEffect(eEffect effect, int reduce)
 }
 void Effects::RemoveEffect(eEffect effect)
 {
-    //EFFECTMAP::iterator it;
-
-    /*for(it = effectMap.begin();it !=effectMap.end();it++)
-    {
-    if(it->first == effect)
-    {
-    effectMap.erase(it);
-    break;
-    }
-    }*/
-
     EFFECTLIST::iterator eit;
     for (eit = effectList.begin(); eit != effectList.end(); eit++)
     {
