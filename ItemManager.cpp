@@ -219,8 +219,12 @@ void ItemManager::PrintItems()
 
     for (item = all_items.begin(); item != all_items.end(); item++)
     {
+        int id = item->identified;
+
+        item->identified = 1;
         ofile << item->GetName();
         ofile << std::endl;
+        item->identified = id;
     }
     ofile.close();
 

@@ -4,8 +4,16 @@ Warlock of Firetop Mountain (c) 2014 Corremn
 
 Change log
 
-version 0.2.X
+version 0.2.1b 3/07/2014
 ========================
+- fix bug in flood fill test
+- items cant be dropped on teleport or fountain
+- removed chance of empty chest upon opening
+- increased change of better items from chests
+
+
+version 0.2.1 1/07/2014
+=======================
 - Modified Maze 
 - Fixed name entering
 - Quality name prefix for armour and glowing prefix for magic items

@@ -943,7 +943,7 @@ int  UserCommand::UseItem(Item*item, int dir)
                             int item_boost = 0;
                             if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
                             {
-                                item_boost += 8;
+                                item_boost += 50;
                             }
 
                             int random_item = Random::getInt(5, 0);
@@ -961,23 +961,24 @@ int  UserCommand::UseItem(Item*item, int dir)
                                 WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
                                 new_it = WorldBuilder::itemManager.CreateRandomItem(WorldBuilder::GetCurrentLevel() + 20 + item_boost);
                                 WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
-
+                                new_it = WorldBuilder::itemManager.CreateRandomItem(WorldBuilder::GetCurrentLevel() + 20 + item_boost);
+                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             }
                         }
                         else
                         {
-                            int random_items = Random::getInt(5, 0);
+                            int random_items = Random::getInt(5, 2);
 
                             for (int i = 0; i < random_items; i++)
                             {
                                 int item_boost = 0; //lucky items
                                 if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
                                 {
-                                    item_boost += 5;
+                                    item_boost += 15;
 
                                     if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
                                     {
-                                        item_boost += 5;
+                                        item_boost += 15;
                                     }
                                 }
 
@@ -985,8 +986,6 @@ int  UserCommand::UseItem(Item*item, int dir)
                                 WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
                             }
                         }
-
-
                         return 1;
                     }
                     else
@@ -1050,7 +1049,6 @@ int  UserCommand::UseItem(Item*item, int dir)
                 WorldBuilder::textManager.newLine("Cant use that. ");
                 return 0;
             }
-
         }
     }
     WorldBuilder::textManager.newLine("Nothing to use. ");

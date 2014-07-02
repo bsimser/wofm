@@ -62,7 +62,7 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>bin</OutDir>
+    <OutDir>bin\</OutDir>
     <IntDir>bin\Debug\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)_d</TargetName>
@@ -112,6 +112,10 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -154,6 +158,10 @@
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PreLinkEvent>
+      <Command>
+      </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_non|Win32'">
     <Midl>
@@ -195,7 +203,11 @@
       <ProgramDatabaseFile>.\DemiseRL___Win32_Debug_non/DemiseRL.pdb</ProgramDatabaseFile>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalOptions>$(IntDir)$(TargetName).res %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <PreLinkEvent>
+      <Command>rc /nologo /fo"$(IntDir)%(Filename).res" $(InitDir)%(Filename).rs </Command>
+    </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FreeTypeFont.cpp">
