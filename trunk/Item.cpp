@@ -319,7 +319,7 @@ void Item::createWeapon(int level, int secondary_type)
                  switch (type2)
                  {
                  case 0: strcpy(name, "hand axe");    symbol = '/';    weight = 15; setColor(90, 90, 90); SetDice_h2h(2, 4); break;
-                 case 1: strcpy(name, "battle axe");    symbol = '/';    weight = 15; setColor(50, 50, 50); SetDice_h2h(2, 5); break;
+                 case 1: strcpy(name, "battle axe");    symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(2, 5); break;
                  }
                  break;
     }
@@ -382,7 +382,7 @@ void Item::createArmour(int level, int secondary_type)
         absorb_bonus = 4;  //absorb 1-3
         weight = 15;
 
-        AddResistance();
+        AddResistance(true);
         setColor(64, 64, 64);
 
         return;
@@ -467,14 +467,14 @@ char *Item::GetName()
         switch (type)
         {
         case armour:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix); break;
-        case weapon:            sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, h2hNumDice, postfix);
-            //sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
+        case weapon:            //sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, h2hNumDice, postfix);
+            sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
             break;
 
         case projectile:        if (itemNumber[1] > 1)    sprintf(id_name, "%d +%d %s%s%s%s", itemNumber[1], skill_bonus, prefix, name, itemNumber[1] > 1 ? "s" : nothing, postfix);
                                 else                sprintf(id_name, "+%d %s%s%s", skill_bonus, prefix, name, postfix); break;
-        case projectileWeapon:  sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, thrNumDice/*, thrSidesDice*/, postfix);    break;
-                                //sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
+        case projectileWeapon:  //sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, thrNumDice/*, thrSidesDice*/, postfix);    break;
+                                sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
         case shield:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix);    break;
         default:                sprintf(id_name, "%s", name); break;
         }
@@ -619,6 +619,9 @@ void Item::AddBrand(bool special)
 
 void Item::AddResistance(bool special)
 {
+    if (strlen(postfix) > 0)
+        return;
+
     special = true;
     int brandType = getInt(103, 0);
 

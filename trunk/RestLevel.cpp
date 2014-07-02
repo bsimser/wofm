@@ -35,8 +35,8 @@ void RestLevel::Rest(int level)
     {
         WorldBuilder::textManager.SetDisplayLine(3, "Peering into the gloom you see dark, slimy walls with pools of water on the stone floor.");
         WorldBuilder::textManager.SetDisplayLine(4, "The air is cold and dank. You light your lantern and step warily into the blackness.");
-        WorldBuilder::textManager.SetDisplayLine(4, "Far off you hear the scurrying of tiny feet: rats, most likely.");
-        WorldBuilder::textManager.SetDisplayLine(5, "You can choose to rest before you continue.");
+        WorldBuilder::textManager.SetDisplayLine(5, "Far off you hear the scurrying of tiny feet: rats, most likely.");
+        WorldBuilder::textManager.SetDisplayLine(7, "You can choose to rest before you continue.");
         restComplete[0] = 1;
     }
     if (level == 4)

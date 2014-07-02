@@ -497,8 +497,10 @@ int MonsterItems::DropItem(monsterData *monster, Item *item, int x, int y)
     }
 
     else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].getItem() ||
-        (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != dfloor
-        &&WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != bridge))
+             (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != dfloor &&
+              WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != bridge &&
+              std::string("a fountain") != WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name &&
+              std::string("a teleport") != WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name))
     {
         return 0;
     }

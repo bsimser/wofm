@@ -5,7 +5,7 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 0.2.1"
+#define VERSION "version 0.2.1b"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

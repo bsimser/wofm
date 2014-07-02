@@ -221,7 +221,7 @@ void OpenGLSceneGen::DrawBackgroundArea()
     glVertex3f(0.55f, -0.35f, -1.0f);				// Top Right
     glVertex3f(0.55f, -0.41f, -1.0f);				// Bottom Right
     glVertex3f(-0.55f, -0.41f, -1.0f);				// Bottom Left
-    glEnd();
+    glEnd(); 
 }
 
 void OpenGLSceneGen::CreateOffset(coord pos)
