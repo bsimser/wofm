@@ -58,7 +58,7 @@ struct font_data {
 //out text at window coordinates x,y, using the font ft_font.
 //The current modelview matrix will also be applied to the text. 
 void print(const font_data &ft_font, float x, float y, const char *fmt, ...) ;
-void qprint(const font_data &ft_font, float x, float y, const char c) ;
+void qprint(const font_data &ft_font, int x, int y, const char c) ;
 
 }
 

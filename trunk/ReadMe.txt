@@ -1,8 +1,8 @@
 Warlock Of Firetop Mountain RL (c) Corremn 2014
 ===============================================
 
-version 2.0 win32 7drl
-----------------------
+version 0.2 win32
+-----------------
 
 About
 =====
@@ -21,21 +21,67 @@ You character '@' starts outsite the mountains entrance with the goal of enterin
 Good luck!
 
 
+Winning
+-------
+You win the game by aquiring the warlocks treasure and escaping the mountain (walk off the edge of the map).
+
+Skill
+-----
+This is you skill in combat. The higher the more chance of hitting your target.
+
+Stamina
+-------
+This represents your health. When it reaches 0 you die. You can restore stamina from special resting stages and fountains.
+
+Luck
+----
+Luck is used to determine if special events are successful or not. These events include fleeing, sneaking past sleeping guards and even can save you from death.
+Luck can effect the quality of items found in chests too.
+
+Combat
+------
+When attacking your skill and weapon effect your chances of a successful hit as well as the skill and weapon values of your enemy. 
+Both the weapons base attack value (shown in the [x]) and and the bonus skill value (shown as +x) will be used for determining attacks.
+The higher values the better.
+
+Defence
+-------
+If you are wearing armour there is a chance that the attack will be deflected or blocked by your armour and no damage will be taken. 
+The armours defence value is shown in the [x] and the higher the better.
+
+
 Hints on how to play
 ====================
 
-Use help '?': about
+Use in game help '?': about
 
 
 Key Commands
 ============
-Use help '?': key bindings
+Use in game help '?': key bindings
+
+    move               - [arrow keys] or [numpad]
+    continuous move    - [.] + [dir]
+    wait               - [numpad 5]
+    fire ranged weapon - [numpad f]
+    flee               - [F]
+    pickup             - [g] or [,]
+    look               - [l] + [dir]
+    close              - [c]
+    unlock             - [u] + [dir]
+    use magic          - [z]
+    climb up           - [<]
+    climb down         - [>]
+    message history    - [ctrl-p]
+    view inventory     - [i]
+    view quipment      - [e]
+    toggle Full Screen - [F1]
 
 
 Acknowledgments
 ===============
 
-This game is based on the book "The Warlock Of Firestone Mountain" by Ian Livingstone & Steve Jackson (c) ~1982. (this book was also re-released in about 2002) 
+This game is based on the book "The Warlock Of Firestone Mountain" by Ian Livingstone & Steve Jackson (c) 1982.
 
 FreeType library
 Portions of this software are copyright © <2005> The FreeType
@@ -52,8 +98,3 @@ This game uses a version 0.1.4 of the DemiseRL engine.
 It uses openGL and the GNU FreeType library for anti-aliased true types fonts (try fullscreen 'F1'), 
 
 If you like this game and wish to see it continued please tell me, also any bugs, ideas, etc send my way.
-
-
-
-
- 

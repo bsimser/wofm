@@ -323,7 +323,7 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
     int attackStrength = attacker->AttackStrength();
     int defenceStrength = defender->DefendStrength();
 
-    attackStrength = attackStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
+    attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
     //WorldBuilder::textManager.newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
@@ -357,9 +357,8 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
                     }
                     if (defender->Name() == "Boathouse Keeper" && Random::getInt(5, 1) == 3)
                     {
-                        defender->monster.createBridgeMaster(true);
+                        defender->monster.createWerewolf();
                         WorldBuilder::textManager.newLine("The Boathouse Keeper transforms! ");
-                        defender->monster.name = "Werewolf";
                     }
                 }
             }

@@ -268,6 +268,20 @@ int Monster::createSpecial(int level)
     return 1;
 }
 
+int Monster::createWerewolf()
+{
+
+    symbol = 'W';
+    name = ("Werewolf");
+    setDescription("A large scruffy lythro...err,  lithra, no um, lycanothdo... werewolf. ");
+
+    skill++;
+    SetResistance(bPoison, 10);
+
+    stamina += 5;
+    skill += 2;
+    return 1;
+}
 int Monster::createBridgeMaster(bool wereRat)
 {
     if (wereRat)
@@ -395,7 +409,7 @@ int Monster::createOrc(int level)
     else if (varient < 5)
     {
         name = ("orc archer"); color1 = 255; color2 = 128;
-        setDescription("This orc has some pointy friends that it wants to share with you. How nice! ");
+        setDescription("This orc has some quarrelsome friends that it wants you to meet. How nice! ");
         experience = 8;
         varient += 2;
     }

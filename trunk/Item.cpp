@@ -19,8 +19,8 @@ defence_bonus(0),
 absorb_bonus(0),
 identified(0),
 equipped(0),
-stackable(0),
-wearable(0),
+mStackable(0),
+mWearable(0),
 type(no_type),
 secondaryType(no_type),
 symbol(0),
@@ -68,8 +68,8 @@ Item::Item(const Item& rhs) : ResistanceBrands(rhs)
     equipped = rhs.equipped;
 
     ref = rhs.ref;
-    wearable = rhs.wearable;
-    stackable = rhs.stackable;
+    mWearable = rhs.mWearable;
+    mStackable = rhs.mStackable;
 
     for (int i = 0; i < 3; i++)
         itemNumber[i] = rhs.itemNumber[i];
@@ -118,15 +118,15 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
 {
     switch (_type)
     {
-    case corpse:        createCorpse();             wearable = 0; break;
-    case weapon:        createWeapon(level, secondary_type);     wearable = 1; break;
-    case armour:        createArmour(level, secondary_type);     wearable = 1; break;
-    case key:            createKey(level);         wearable = 0; break;
-    case lockedChest:    createLockedChest(level); wearable = 0; break;
-    case openChest:        createOpenChest(level);     wearable = 0; break;
-    case gold:            createGold(level);         wearable = 0; break;
-    case shield:        createShield(level);     wearable = 1; break;
-    case cards:            createCards(level);         wearable = 0; break;
+    case corpse:        createCorpse();             mWearable = 0; break;
+    case weapon:        createWeapon(level, secondary_type);     mWearable = 1; break;
+    case armour:        createArmour(level, secondary_type);     mWearable = 1; break;
+    case key:            createKey(level);         mWearable = 0; break;
+    case lockedChest:    createLockedChest(level); mWearable = 0; break;
+    case openChest:        createOpenChest(level);     mWearable = 0; break;
+    case gold:            createGold(level);         mWearable = 0; break;
+    case shield:        createShield(level);     mWearable = 1; break;
+    case cards:            createCards(level);         mWearable = 0; break;
 
     default:     char err[128]; sprintf(err, "Invalid item type passed into item creator: %d", _type); throw std::exception(err);
     }
@@ -303,31 +303,48 @@ void Item::createWeapon(int level, int secondary_type)
 
     switch (varient)
     {
-    case sword: {
+    case sword: 
+    {
 
-                    int type1 = getInt(2, 0);
-                    switch (type1)
-                    {
-                    case 0: strcpy(name, "long sword");    symbol = '|';    weight = 12; setColor(90, 90, 90); SetDice_h2h(1, 8); break;
-                    case 1: strcpy(name, "short sword");    symbol = '|';    weight = 8; setColor(90, 90, 90); SetDice_h2h(1, 6); break;
-                    }
+        int type1 = getInt(2, 0);
+        if (level == 0)
+            type1 = 0; //no long 
+        switch (type1)
+        {
+        case 1: strcpy(name, "long sword");    symbol = '|';    weight = 12; setColor(90, 90, 90); SetDice_h2h(6, 8); break;
+        default: strcpy(name, "short sword");   symbol = '|';    weight = 8; setColor(90, 90, 90); SetDice_h2h(4, 6); break;
+        }
 
-                    break;
+        break;
     }
-    case axe:{
-                 int type2 = getInt(2, 0); if (level == 0) type2 = 0; //no battle 
-                 switch (type2)
-                 {
-                 case 0: strcpy(name, "hand axe");    symbol = '/';    weight = 15; setColor(90, 90, 90); SetDice_h2h(2, 4); break;
-                 case 1: strcpy(name, "battle axe");    symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(2, 5); break;
-                 }
-                 break;
+    case axe:
+    {
+        int type2 = getInt(2, 0); 
+        if (level == 0) 
+            type2 = 0; //no battle 
+        switch (type2)
+        {
+        case 1: strcpy(name, "battle axe");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(7, 5); break;
+        default: strcpy(name, "hand axe");   symbol = '/';    weight = 15; setColor(90, 90, 90);    SetDice_h2h(6, 4); break;
+        }
+        break;
     }
-    case mace:  strcpy(name, "club");    symbol = '/';    weight = 15; setColor(150, 70, 0); SetDice_h2h(2, 3); break;
-    case staff:  strcpy(name, "black staff");    symbol = '|';    weight = 15; setColor(70, 70, 70); SetDice_h2h(3, 3); break;
-    case cleaver:  strcpy(name, "cleaver");    symbol = '/';    weight = 15; setColor(200, 0, 0); SetDice_h2h(3, 4); break;
+    case mace:
+    {
+        int type = getInt(4, 0);
+        if (level == 1)
+            type = 0;
+        switch (type)
+        {
+        case 3: strcpy(name, "mace");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(7, 5); break;
+        default: strcpy(name, "club"); symbol = '/';    weight = 15; setColor(150, 70, 0);    SetDice_h2h(3, 3);    break;
+        }
+        break;
+    }
+    case staff:    strcpy(name, "black staff");  symbol = '|';    weight = 15; setColor(70, 70, 70);  SetDice_h2h(7, 3); break;
+    case cleaver:  strcpy(name, "cleaver");      symbol = '/';    weight = 15; setColor(200, 0, 0);   SetDice_h2h(8, 4); break;
 
-    default: strcpy(name, "orcish sword");    symbol = '|';    weight = 10; setColor(130, 130, 130); SetDice_h2h(2, 10); break;
+    default: strcpy(name, "orcish sword");    symbol = '|';    weight = 10; setColor(130, 130, 130); SetDice_h2h(9, 10); break;
     }
 
     if (level < 2)
@@ -467,15 +484,21 @@ char *Item::GetName()
         switch (type)
         {
         case armour:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix); break;
-        case weapon:            //sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, h2hNumDice, postfix);
-            sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
+
+        case weapon:            sprintf(id_name, "+%d %s%s [+%d]%s", skill_bonus, prefix, name, h2hNumDice, postfix);
+                                // sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
             break;
 
-        case projectile:        if (itemNumber[1] > 1)    sprintf(id_name, "%d +%d %s%s%s%s", itemNumber[1], skill_bonus, prefix, name, itemNumber[1] > 1 ? "s" : nothing, postfix);
-                                else                sprintf(id_name, "+%d %s%s%s", skill_bonus, prefix, name, postfix); break;
-        case projectileWeapon:  //sprintf(id_name, "+%d %s%s [%d]%s", skill_bonus, prefix, name, thrNumDice/*, thrSidesDice*/, postfix);    break;
-                                sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
+        case projectile:        if (itemNumber[1] > 1)    
+                                    sprintf(id_name, "%d +%d %s%s%s%s", itemNumber[1], skill_bonus, prefix, name, itemNumber[1] > 1 ? "s" : nothing, postfix);
+                                else                
+                                     sprintf(id_name, "+%d %s%s%s", skill_bonus, prefix, name, postfix); break;
+
+        case projectileWeapon:     sprintf(id_name, "+%d %s%s [+%d]%s", skill_bonus, prefix, name, thrNumDice/*, thrSidesDice*/, postfix);    break;
+                                // sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
+
         case shield:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix);    break;
+
         default:                sprintf(id_name, "%s", name); break;
         }
     }
@@ -514,30 +537,34 @@ void Item::SetDice_thr(int nDice, int sides)
 
 int Item::GetAttack_h2h()
 {
-    int attack = 0;
-    for (int i = 0; i < h2hNumDice; i++)
-        attack += getInt(h2hSidesDice + 1, 1);
+    //int attack = 0;
+   // for (int i = 0; i < h2hNumDice; i++)
+    //    attack += getInt(h2hSidesDice + 1, 1);
 
-    return attack + skill_bonus;
+   // return attack + skill_bonus;
+    return getInt(h2hNumDice + 1, 1) + skill_bonus;
 }
 
-float Item::getAverage_h2h()
+int Item::getAverage_h2h()
 {
-    return  ((float)h2hSidesDice * (float)h2hNumDice) / 2.0f + (float)skill_bonus;
+    return  h2hNumDice + skill_bonus; //((float)h2hSidesDice * (float)h2hNumDice) / 2.0f + (float)skill_bonus;
 }
 
-float Item::getAverage_thr()
+int Item::getAverage_thr()
 {
-    return  ((float)thrSidesDice * (float)thrNumDice) / 2.0f + (float)skill_bonus;
+    return  thrNumDice + skill_bonus;
+    //return  ((float)thrSidesDice * (float)thrNumDice) / 2.0f + (float)skill_bonus;
 }
 
 int Item::GetAttack_thr()
 {
-    int attack = 0;
+  /*  int attack = 0;
     for (int i = 0; i < thrNumDice; i++)
         attack += getInt(thrSidesDice + 1, 1);
 
-    return attack + skill_bonus;
+    return attack + skill_bonus;*/
+    return getInt(thrNumDice + 1, 1) + skill_bonus;
+
 }
 
 void Item::AddBrand(bool special)
@@ -548,8 +575,7 @@ void Item::AddBrand(bool special)
     {
         brandType = getInt(103, 92);
     }
-
-
+    
     if (brandType < 91)
         return;
     else if (brandType < 93)
@@ -622,7 +648,6 @@ void Item::AddResistance(bool special)
     if (strlen(postfix) > 0)
         return;
 
-    special = true;
     int brandType = getInt(103, 0);
 
     if (special)
@@ -698,4 +723,28 @@ void Item::AddResistance(bool special)
 
         setColor(128, 0, 128);
     }
+}
+
+Item& Item::wearable(bool rWearable)
+{
+    mWearable = rWearable;
+
+    return *this;
+}
+
+bool Item::wearable()
+{
+    return mWearable;
+}
+
+bool Item::stackable()
+{
+    return mStackable;
+}
+
+Item& Item::stackable(bool rStackable)
+{
+    mStackable = rStackable;
+
+    return *this;
 }

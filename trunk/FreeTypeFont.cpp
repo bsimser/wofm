@@ -300,7 +300,7 @@ namespace freetype {
         pop_projection_matrix();
     }
     //void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  {
-    void qprint(const font_data &ft_font, float x, float y, const char c)
+    void qprint(const font_data &ft_font, int x, int y, const char c)
     {
         // We want a coordinate system where things corresponding to window pixels.
         pushScreenCoordinateMatrix();
@@ -323,7 +323,7 @@ namespace freetype {
 
         glPushMatrix();
         glLoadIdentity();
-        glTranslatef(x, y, 0);
+        glTranslatef((GLfloat)x, (GLfloat)y, 0);
         glMultMatrixf(modelview_matrix);
 
         char ch[1]; ch[0] = c;

@@ -8,6 +8,7 @@
 
 #include "NumberGenerator.h"
 #include "LevelChange.h"
+#include <assert.h>
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -271,7 +272,7 @@ int UserCommand::Look(bool *keys, bool show_path)
     {
         if (level->map[look_pos.x][look_pos.y].terrain.light)
         {
-            if (level->map[look_pos.x][look_pos.y].getItem()->Stackable() && level->map[look_pos.x][look_pos.y].getItem()->itemNumber[1] > 1)
+            if (level->map[look_pos.x][look_pos.y].getItem()->stackable() && level->map[look_pos.x][look_pos.y].getItem()->itemNumber[1] > 1)
                 WorldBuilder::textManager.newLine("You see some %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName());
             else if (level->map[look_pos.x][look_pos.y].getItem()->identified)
                 WorldBuilder::textManager.newLine("You see a %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName());
@@ -486,7 +487,6 @@ int UserCommand::MoveCommand(int  dir)
 
     if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
     {
-
         if (dir != dWait)
             player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aMove, new_pos.x, new_pos.y));
         else
@@ -497,13 +497,36 @@ int UserCommand::MoveCommand(int  dir)
         {
             if (player->action.Type() == aMove)
             {
-                DungeonLevel* level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
-                if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->itemNumber[1] > 1)
-                    WorldBuilder::textManager.newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
-                else if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->identified)
-                    WorldBuilder::textManager.newLine("You see an %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
-                else
-                    WorldBuilder::textManager.newLine("You see an %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                Item * item = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem();
+                assert(item);
+
+                // auto projectile pickup
+                bool pickup = false;
+                if (item->type == projectile)
+                {
+                    Item* projectilePile = WorldBuilder::monsterManager.monsterItems.GetEquipment(player, projectile);
+                    if (projectilePile && projectilePile->secondaryType == item->secondaryType &&
+                        projectilePile->skill_bonus          == item->skill_bonus &&
+                        std::string(projectilePile->name)    == item->name &&
+                        std::string(projectilePile->prefix)  == item->prefix &&
+                        std::string(projectilePile->postfix) == item->postfix &&
+                        item->identified)
+                    {
+                        player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aPickup, new_pos.x, new_pos.y));
+                        pickup = true;
+                    }
+
+                }
+                if (!pickup)
+                {
+                    DungeonLevel* level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+                    if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->itemNumber[1] > 1)
+                        WorldBuilder::textManager.newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                    else if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->identified)
+                        WorldBuilder::textManager.newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                    else
+                        WorldBuilder::textManager.newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                }
             }
         }
         return 1;

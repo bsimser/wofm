@@ -55,11 +55,12 @@ int DungeonGenerator::Create(int _type)
     CreateMap();
     fixDoors();
 
+#ifdef _DEBUG
     int cX, cY;
     assert(findTerrainType(cX, cY, '>'));
 
     assert(type == lOutside || findTerrainType(cX, cY, '<'));
-
+#endif
     return type;
 }
 
