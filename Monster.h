@@ -30,7 +30,8 @@ public:
 	virtual int createOrc(int level);
 	virtual int createWarlock();
 	virtual int createSpecial(int level);
-	virtual int createBridgeMaster(bool wereRat = false);
+    virtual int createBridgeMaster(bool wereRat = false);
+    virtual int createWerewolf();
 
 	int dead();
 	int MaxStamina()    {return max_stamina; };

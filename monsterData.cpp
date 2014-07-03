@@ -388,9 +388,9 @@ int monsterData::AttackStrength()
         attack = (int)(attack + .5) / 2;
     else attack += Random::getInt(6 + (level > 9) ? level / 2 : level, 1 + level / 3); //animal
 
-    //attack is halved in deep water
+    //attack is reduced in deep water
     if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater)
-        attack -= 4;
+        attack -= 5;
 
     return attack;
 }

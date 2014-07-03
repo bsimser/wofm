@@ -225,7 +225,7 @@ int MonsterItems::EquipItem(monsterData *monster, int item)
     {
         if (i == item) //found
         {
-            if (!it->Wearable())
+            if (!it->wearable())
                 return 0; //can not be equipped
 
             if (it->equipped == 1) //unequip
@@ -383,7 +383,7 @@ int MonsterItems::PickupItem(monsterData *monster)
     //give item to monster
 
     //check if stackable and add to existing stack
-    if (item.Stackable())
+    if (item.stackable())
     {
         ITEMLIST::iterator it;
         bool stacked = false;
@@ -493,7 +493,7 @@ int MonsterItems::DropItem(monsterData *monster, Item *item, int x, int y)
     if (x <= 0 || y <= 0 || x >= (DUNGEON_SIZE_W - 1) || y >= (DUNGEON_SIZE_W - 1))
         return 0;
 
-    else if (item->Stackable())
+    else if (item->stackable())
     {
         return DropStackableItem(monster, item, x, y);
     }

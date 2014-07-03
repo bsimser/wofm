@@ -150,7 +150,7 @@ GLvoid OpenGLSceneGen::glwPrint(const wchar_t *fmt, ...)				// Custom GL "Print"
 
     if (fmt == NULL)					// If There's No Text
         return;							// Do Nothing
-
+    
     va_start(ap, fmt);					// Parses The String For Variables
     vswprintf(text, fmt, ap);			// And Converts Symbols To Actual Numbers
     va_end(ap);							// Results Are Stored In Text
@@ -232,7 +232,7 @@ void OpenGLSceneGen::CreateOffset(coord pos)
 
 int OpenGLSceneGen::calcX(int x)
 {
-    const float fontW = 9;
+    const int fontW = 9;
 
     return (x * fontW + x);
 }
@@ -301,7 +301,7 @@ void OpenGLSceneGen::DrawMap()
             {
                 Item * item = currentCell.getItem();
                 glColor3ub(item->color1, item->color2, item->color3);
-
+                
                 // update colour on screen if better than item held
                 if (!item->hasBrand() && !item->hasResistance())
                 {

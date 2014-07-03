@@ -42,7 +42,7 @@ void StartScreen::Display()
     WorldBuilder::textManager.SetDisplayLine(12, "treasure is stored in a chest with two locks, and that the keys are guarded by various");
     WorldBuilder::textManager.SetDisplayLine(13, "creatures within the dungeons. You approach the shadow of the great mountain.");
 
-    WorldBuilder::textManager.SetDisplayLine(15, "The local villages have warned you that the entrance is well guarded...");
+    WorldBuilder::textManager.SetDisplayLine(15, "The local villagers have warned you that the entrance is well guarded...");
     int i = 18;
     WorldBuilder::textManager.SetDisplayLine(++i, "                                         ");
     WorldBuilder::textManager.SetDisplayLine(++i, "                                         ");

@@ -15,6 +15,8 @@ version 0.2.1b 3/07/2014
 - Removed 0 strength resistances from list
 - Removed chance of no entry on level 6
 - Picking up items now use identified description message.
+- Removed combat dice on weapons and replaced with a to-hit value.
+- Auto-pickup of arrows/bolts
 
 
 version 0.2.1 1/07/2014

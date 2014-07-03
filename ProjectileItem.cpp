@@ -6,7 +6,7 @@ using namespace Random;
 
 ProjectileItem::ProjectileItem(void) : Item()
 {
-    wearable = 1;
+    wearable(true);
 }
 
 ProjectileItem::~ProjectileItem(void)
@@ -17,7 +17,7 @@ int ProjectileItem::CreateItem(eItemType _type, int level, int secondary_type)
 {
     type = _type;
     secondaryType = secondary_type;
-    wearable = 1; //equipable
+    wearable(true);
 
     switch (type)
     {
@@ -36,7 +36,7 @@ int ProjectileItem::createProjectile(int level, int secondary_type)
 
     switch (secondary_type)
     {
-    case arrow: symbol = '/';
+    case arrow: symbol = '\\';
         strcpy(name, "arrow");
         weight = 1;
         setColor(128, 64, 0);
@@ -44,7 +44,7 @@ int ProjectileItem::createProjectile(int level, int secondary_type)
         itemNumber[0] = bowArrow;
         break;
 
-    case bolt: symbol = '/';
+    case bolt: symbol = '\\';
         strcpy(name, "bolt");
         weight = 2;
         setColor(100, 100, 100);
@@ -58,7 +58,7 @@ int ProjectileItem::createProjectile(int level, int secondary_type)
     else if (skill_bonus > 70) skill_bonus = 1;
     else skill_bonus = 0;
 
-    stackable = 1;
+    stackable(true);
     itemNumber[1] = 1;
 
     AddBrand(0);
@@ -78,7 +78,7 @@ int ProjectileItem::createProjectileWeapon(int level, int secondary_type)
         identified = 0;
         weight = 100;
         setColor(128, 64, 0);
-        SetDice_thr(1, 6);
+        SetDice_thr(5, 6);
         itemNumber[0] = bowArrow;
         break;
 
@@ -88,7 +88,7 @@ int ProjectileItem::createProjectileWeapon(int level, int secondary_type)
         weight = 100;
         setColor(148, 64, 0);
         itemNumber[0] = bowArrow;
-        SetDice_thr(1, 8);
+        SetDice_thr(6, 8);
         break;
 
     case crossbow: 	symbol = '{';
@@ -97,7 +97,7 @@ int ProjectileItem::createProjectileWeapon(int level, int secondary_type)
         weight = 100;
         setColor(100, 100, 100);
         itemNumber[0] = crossbowBolts;
-        SetDice_thr(2, 5);
+        SetDice_thr(8, 5);
         break;
     }
 
@@ -113,7 +113,7 @@ int ProjectileItem::createProjectileWeapon(int level, int secondary_type)
 
 char *ProjectileItem::GetName()
 {
-    if (identified)
+  /*  if (identified)
     {
         int bonus = 0;
         switch (type)
@@ -140,6 +140,7 @@ char *ProjectileItem::GetName()
     //sprintf(id_name,"%s (equipped)",id_name);
 
 
+    return id_name;*/
     return id_name;
 
 }

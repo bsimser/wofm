@@ -58,8 +58,8 @@ public:
 	virtual int CreateItem(eItemType type,int level, int secondary_type=no_type);
 
 	void createCorpse();
-	void createArmour(int level,int secondary_type);
-	void createWeapon(int level,int secondary_type);
+	void createArmour(int level, int secondary_type);
+	void createWeapon(int level, int secondary_type);
 	void createKey(int level);
 	void createLockedChest(int level);
 	void createOpenChest(int level);
@@ -73,16 +73,18 @@ public:
 	void SetDice_h2h(int nDice, int sides);
 	void SetDice_thr(int nDice, int sides);
 
-	int GetAttack_h2h();
-	int GetAttack_thr();
-    float getAverage_h2h();
-    float getAverage_thr();
+	int  GetAttack_h2h();
+	int  GetAttack_thr();
+    int getAverage_h2h();
+    int getAverage_thr();
 
 	void AddBrand(bool special = false);
 	void AddResistance(bool special = false);
 
-	int Wearable(){return wearable;};
-	int Stackable(){return stackable;};;
+    Item& wearable(bool);
+    bool wearable();
+    bool stackable();
+    Item& stackable(bool);
 
 	char name[64];
 	char id_name[64];
@@ -98,39 +100,28 @@ public:
 
 	int weight;
 
-	short color1;
-    short color2;
-    short color3;
+	unsigned char color1;
+    unsigned char color2;
+    unsigned char color3;
 
 	int skill_bonus;
 	int defence_bonus;
 	int absorb_bonus;
 
 	int identified;
-
 	int equipped;
-
 	int ref;
-
-
 	int itemNumber[3];
 
-
-
-
-protected:
+private:
 	int h2hSidesDice;		//I.e 6 = 6 sided dice
 	int h2hNumDice;			//I.e 2 = 2 dice i.e Attack = (h2hNumDice)d(h2hSidesDice) +skill_bonus;
 
 	int thrSidesDice;		//I.e 6 = 6 sided dice
 	int thrNumDice;			//I.e 2 = 2 dice i.e Attack = (thrNumDice)d(thrSidesDice) +skill_bonus;
 	
-	int stackable;
-	int wearable;
-
-private:
-	
-
+	bool mStackable;
+	bool mWearable;
 };
 
 #endif // !defined(AFX_ITEM_H__B4B8BC25_65E3_47B9_A8D8_1ACF01097435__INCLUDED_)
