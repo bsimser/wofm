@@ -59,7 +59,7 @@ void SpellBase::createFlyingWeapon()
 void SpellBase::createTeleport()
 {
     strcpy(name, "Blink         ");
-    spell_desription = "Blinks to random destination";
+    spell_desription = "Teleports to random destination";
 
     target = spTarget;
     type = spPanic;

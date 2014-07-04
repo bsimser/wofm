@@ -32,6 +32,7 @@ public:
 	virtual int createSpecial(int level);
     virtual int createBridgeMaster(bool wereRat = false);
     virtual int createWerewolf();
+    virtual int createDigger();
 
 	int dead();
 	int MaxStamina()    {return max_stamina; };

@@ -99,20 +99,19 @@ int	CastMagic::Teleport(monsterData* caster)
     WorldBuilder::monsterManager.Player()->UpdateSightRange();
     return 0;
 }
-int	CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
-{
 
+int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
+{
     Monster *d = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].GetMonster();
     monsterData* defender = WorldBuilder::monsterManager.FindMonsterData(d);
 
     if (defender == NULL || d == NULL) return 0;
 
-    int attackStrength = caster->AttackStrength();
+    int attackStrength  = caster->AttackStrength();
     int defenceStrength = defender->DefendStrength();
 
-    attackStrength = attackStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
+    attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
-
 
     if (attackStrength > defenceStrength) //caster hits defender
     {

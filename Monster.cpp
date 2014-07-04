@@ -16,22 +16,22 @@ std::vector<std::string> Monster::descriptions;
 
 
 Monster::Monster() :
-stamina(10),
-skill(1),
-luck(1),
-sight_range(6),
-asleep_sight_Range(3),
-humanoid(false),
-special(false),
-undead(false),
-experience(10),
-speed(10),
-max_stamina(stamina),
-mLevelVariation(0),
-mLevel(0),
-type(0),
-description(0),
-name("")
+    stamina(10),
+    skill(1),
+    luck(1),
+    sight_range(6),
+    asleep_sight_Range(3),
+    humanoid(false),
+    special(false),
+    undead(false),
+    experience(10),
+    speed(10),
+    max_stamina(stamina),
+    mLevelVariation(0),
+    mLevel(0),
+    type(0),
+    description(0),
+    name("")
 {
     setColor(255, 255, 255);
     if (descriptions.size() == 0)
@@ -81,11 +81,12 @@ int Monster::Create(int _type, int level, int level_variation)
 
     switch (type)
     {
-    case mPlayer:   return createPlayer(); break;
-    case mOrc:      return createOrc(level); break;
-    case mWizard:   return createWarlock(); break;
-    case mBridgeMaster: return createBridgeMaster(); break;
-    case mSpecial:  return createSpecial(level); break;
+    case mPlayer:       return createPlayer();          break;
+    case mOrc:          return createOrc(level);        break;
+    case mWizard:       return createWarlock();         break;
+    case mSpecial:      return createSpecial(level);    break;
+    case mDigger:       return createDigger();          break;
+    case mBridgeMaster: return createBridgeMaster();    break;
 
     default: throw std::exception("Invalid monster type passed into monster creator"); break;
     }
@@ -185,7 +186,7 @@ int Monster::createSpecial(int level)
         name = ("orcish butcher");
         setDescription("This crazed orc is covered head-to-toe in blood and gore and so is its cleaver. ");
         stamina = 8;
-        skill = 10;
+        skill = 9;
         luck = 3;
     }
     else if (type < 50)
@@ -280,6 +281,26 @@ int Monster::createWerewolf()
 
     stamina += 5;
     skill += 2;
+    return 1;
+}
+
+
+int Monster::createDigger()
+{
+    symbol = '\\';
+    name = ("magical tools");
+
+    setDescription("A collection of digging tools, seemily controlled by invisible hands. ");
+
+    setColor(255, 128, 0);
+
+    SetResistance(bPoison, 10);
+    SetResistance(bFrost, 10);
+    SetResistance(bFire, 10);
+
+    stamina = 10;
+    skill   = 10;
+    sight_range = 1;
     return 1;
 }
 int Monster::createBridgeMaster(bool wereRat)

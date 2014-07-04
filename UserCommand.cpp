@@ -106,7 +106,16 @@ int UserCommand::Flee()
 
 int UserCommand::CastSpellAtTarget()
 {
+    WorldBuilder::textManager.clear();
+
     UnLook();
+
+    DungeonLevel & level = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    monsterData * monster = WorldBuilder::monsterManager.FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+
+    if (monster)
+        lastTarget = monster;
+
     return //WorldBuilder::actionManager.monsterAction.ThrowTarget(WorldBuilder::monsterManager.Player(),look_pos.x,look_pos.y);
         WorldBuilder::spellManager.CastCurrentSpell(WorldBuilder::monsterManager.Player(), look_pos.x, look_pos.y);
 }

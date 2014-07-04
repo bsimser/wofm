@@ -28,7 +28,6 @@ class DeathMessage
 {
 public:
 	DeathMessage();
-	virtual ~DeathMessage();
 
 	int ShowDeath(int success);
 

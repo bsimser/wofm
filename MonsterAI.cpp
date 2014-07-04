@@ -97,32 +97,36 @@ int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
     {
     case slowed:	if (monster->isPlayer())
     {
-                        monster->miss_turn = !monster->miss_turn;; return 0;
+        monster->miss_turn = !monster->miss_turn;; return 0;
     }
-                    monster->miss_turn = !monster->miss_turn;
-                    if (monster->miss_turn)
-                    {
-                        move_done = 1;
+    monster->miss_turn = !monster->miss_turn;
+    if (monster->miss_turn)
+    {
+        move_done = 1;
 
-                    }break; //skip every second move
+    }break; //skip every second move
+
     case paralysis: move_done = 2;
         if (monster->isPlayer())
             WorldBuilder::textManager.newLine("You cannot move. "); break;
 
     case confused: if (Random::getInt(10, 0) > 3 - strength)
     {
-                       RandomMove(monster);
-                       move_done = 1;
-                       if (!monster->isPlayer())
-                           WorldBuilder::textManager.newLine("%s is confused. ", monster->monster.name.c_str());
-                       else
-                           WorldBuilder::textManager.newLine("You are confused. ");
+        RandomMove(monster);
+        move_done = 1;
+        if (!monster->isPlayer() && monster->isSeen() == 1)
+            WorldBuilder::textManager.newLine("%s is confused. ", monster->monster.name.c_str());
+        else
+            WorldBuilder::textManager.newLine("You are confused. ");
 
     } break; //70%+10% for strength random move;
 
-    case teleportitus: if (Random::getInt(20, 0) < 0 + strength)
-    {/*Teleport();*/ move_done = 1;
-    }break;
+    case teleportitus: 
+        if (Random::getInt(20, 0) < 0 + strength)
+        {
+            /*Teleport();*/ move_done = 1;
+        }
+        break;
     }
     return  move_done;
 }
@@ -231,7 +235,6 @@ eMonsterState MonsterAI::UpdateMonsterState(monsterData* monster)
     monster->SetState(state);
 
     return monster->GetState();
-
 }
 
 void MonsterAI::DoNothing(monsterData* monster)
@@ -240,7 +243,6 @@ void MonsterAI::DoNothing(monsterData* monster)
     {
         monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aWait));
     }
-
 }
 
 int MonsterAI::RandomMove(monsterData* monster)
@@ -278,7 +280,6 @@ int MonsterAI::RandomMove(monsterData* monster)
         && dungeonLevel->map[new_pos.x][new_pos.y].GetMonster() == NULL
         && dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != deepWater)
     {
-
         //	if(monster->state != dead && dungeonLevel->map[pos->x][pos->y].terrain.type != deepWater) 
         {
             dungeonLevel->map[pos->x][pos->y].RemoveMonsterRef();
@@ -291,7 +292,15 @@ int MonsterAI::RandomMove(monsterData* monster)
         dungeonLevel->map[pos->x][pos->y].RemoveMonsterRef();
         monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
     }
-
+    else if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type == stone &&
+             monster->monster.GetType() == mDigger)
+    {
+        if (Random::getInt(3,0) == 1 && new_pos.x < DUNGEON_SIZE_W - 1 && new_pos.y < DUNGEON_SIZE_H - 1 && new_pos.x > 0 && new_pos.y > 0)
+        {
+            dungeonLevel->map[new_pos.x][new_pos.y].terrain.Create(dfloor);
+            monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
+        }
+    }
     return 1;
 }
 

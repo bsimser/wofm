@@ -22,8 +22,7 @@
 #include "SpecialGuardians.h"
 #include "RandomMonster.h"
 
-  
-#include <list>
+#include <vector>
 
 enum eMonsterMajorType
 {
@@ -36,10 +35,8 @@ enum eMonsterMajorType
 	mBridgeMaster,
 	mGuards,
     mRandom,
+    mDigger,
 };
-
-
-
 
 /*struct equipmmentSlots
 {
@@ -47,10 +44,7 @@ enum eMonsterMajorType
 	Item * weapon;
 };*/
 
-
-
-typedef std::list<monsterData> MONSTERLIST;
-
+typedef std::vector<monsterData> MONSTERLIST;
 
 class MonsterManager  
 {

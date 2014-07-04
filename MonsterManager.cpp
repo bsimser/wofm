@@ -47,7 +47,7 @@ monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     case mGuards:{	SpecialGuardians guard; guard.Create(minor_type, level); new_monster.monster = guard; }break;
     case mUndead:{	UndeadMonster undead; undead.Create(minor_type, level); new_monster.monster = undead; }break;
     case mOrc:		new_monster.monster.Create(mOrc, level, 0); break;
-    case mSpecial: new_monster.monster.Create(mSpecial, level); break;
+    case mSpecial:  new_monster.monster.Create(mSpecial, level); break;
     case mWizard:	new_monster.monster.Create(mSpecial, level); break;
     case mPlayer:	new_monster.monster.Create(mPlayer, level); break;
     case mBridgeMaster:	new_monster.monster.Create(mBridgeMaster, level); break; //special case
@@ -204,7 +204,8 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
             r_it = monster_list.erase(r_it); //remove from list
 
         }
-        else r_it++;
+        else 
+            r_it++;
     }
 
     //update monster/player with new positions
@@ -336,8 +337,6 @@ void MonsterManager::RunEffects(monsterData * monster)
     {
     effectManager.RunEffect(monster,it->first, it->second);
     }*/
-
-
 }
 
 void MonsterManager::PrintMonsters()
