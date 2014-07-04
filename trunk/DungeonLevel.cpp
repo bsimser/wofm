@@ -541,7 +541,31 @@ return &tempPos;
 
 }*/
 
-coord * DungeonLevel::NewItemPosition()
+int DungeonLevel::getAdjacentFreeSpaces(int x, int y)
+{
+    int spaces = 0;
+
+    if (map[x+1][y].terrain.type == dfloor)
+        spaces++;
+    if (map[x-1][y].terrain.type == dfloor)
+        spaces++;
+    if (map[x][y+1].terrain.type == dfloor)
+        spaces++;
+    if (map[x][y-1].terrain.type == dfloor)
+        spaces++;
+    if (map[x-1][y-1].terrain.type == dfloor)
+        spaces++;
+    if (map[x-1][y+1].terrain.type == dfloor)
+        spaces++;
+    if (map[x+1][y-1].terrain.type == dfloor)
+        spaces++;
+    if (map[x+1][y+1].terrain.type == dfloor)
+        spaces++;
+
+    return spaces;
+}
+
+coord * DungeonLevel::NewItemPosition(bool space)
 {
     //
     COORDLIST posList;
@@ -553,6 +577,13 @@ coord * DungeonLevel::NewItemPosition()
         {
             if (map[w][h].getItem() == NULL && map[w][h].GetMonster() == NULL && map[w][h].terrain.type == dfloor)
             {
+                if (space)
+                {
+                    if (getAdjacentFreeSpaces(w, h) < 4)
+                    {
+                        continue;
+                    }
+                }
                 coord pos; pos.x = w; pos.y = h;
                 posList.push_back(pos);
             }

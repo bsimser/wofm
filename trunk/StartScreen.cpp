@@ -5,7 +5,7 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 0.2.1b"
+#define VERSION "version 0.2.1c"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -15,7 +15,7 @@ StartScreen::StartScreen():
     state(sIntro),
     length(0),
     pName(""),
-    pClass("")
+    pClass("Adventurer")
 {
 }
 
@@ -73,6 +73,7 @@ void StartScreen::Display()
 
     WorldBuilder::textManager.SetDisplayLine(32, "Based on the book by Ian Livingstone & Steve Jackson - 1982.");
     WorldBuilder::textManager.SetDisplayLine(33, "Press '?' to get help on commands. Good Luck!");
+    WorldBuilder::textManager.SetDisplayLine(34, "Press 'F1' for fullscreen.");
 
     WorldBuilder::textManager.SetDisplayLine(39, "[space] to Start");
 }
@@ -84,28 +85,33 @@ void StartScreen::GetPlayerInfo()
     WorldBuilder::textManager.SetDisplayLine(0, "The Warlock of Firetop Mountain");
     WorldBuilder::textManager.SetDisplayLine(1, "===============================");
 
-    char sbuf[128];
-    sprintf(sbuf, "Name: %s_", pName.c_str());
-    WorldBuilder::textManager.SetDisplayLine(4, sbuf);
+    if (state == sName)
+    {
+        char sbuf[128];
+        sprintf(sbuf, "  Name: %s_", pName.c_str());
+        WorldBuilder::textManager.SetDisplayLine(4, sbuf);
 
-    WorldBuilder::textManager.SetDisplayLine(39, "Enter Name  %s", (length > 12) ? "(Max length!!!)":"");
-
+        WorldBuilder::textManager.SetDisplayLine(39, "Enter Name  %s", (length > 12) ? "(Max length!!!)":"");
+    }
     if (state == sClass)
     {
-        WorldBuilder::textManager.SetDisplayLine(7, "Choose Class (not implemented)");
-        WorldBuilder::textManager.SetDisplayLine(9, "1: Warrior");
-        WorldBuilder::textManager.SetDisplayLine(10, "2: Priest");
-        WorldBuilder::textManager.SetDisplayLine(11, "3: Thief");
-        WorldBuilder::textManager.SetDisplayLine(12, "4: Wizard");
+        WorldBuilder::textManager.SetDisplayLine(4, "  Choose Class:");
+        WorldBuilder::textManager.SetDisplayLine(6, "    1: Adventurer");
+        WorldBuilder::textManager.SetDisplayLine(7, "    2: Warlock");
 
-        WorldBuilder::textManager.SetDisplayLine(39, "Enter [1-4]");
-
+        WorldBuilder::textManager.SetDisplayLine(39, "Choose Class [1-2]");
     }
     else if (state == sComplete)
     {
-        pClass = "Adventurer";
+        WorldBuilder::textManager.SetDisplayLine(4, "  Welcome %s the %s.", pName.c_str(), pClass.c_str());
 
-        WorldBuilder::textManager.SetDisplayLine(4, "Welcome %s the %s.", pName.c_str(), pClass.c_str());
+        if (pClass == "Warlock")
+        {
+            if (fopen("Zagor", "r") || fopen("Warlock", "r"))
+            {
+                WorldBuilder::textManager.SetDisplayLine(6, "  Press 'z' in game to access your spells. ");
+            }
+        }
         WorldBuilder::textManager.SetDisplayLine(39, "[space] to begin");
     }
 }
@@ -116,7 +122,12 @@ int StartScreen::PassInput(bool *keys)
     {
         if (keys[VK_SPACE])
         {
-            state = sName;
+            if (fopen("warlock", "r"))
+            {
+                state = sClass;
+            }
+            else
+                state = sName;
             GetPlayerInfo();
         }
         return 1;
@@ -134,13 +145,15 @@ int StartScreen::PassInput(bool *keys)
             GetPlayerInfo();
         }
         return 1;
-    }/*
-    else if(state ==sClass)
+    }
+    else if(state == sClass)
     {
-    if(GetClass(keys))
-    state = sComplete;
-    GetPlayerInfo();
-    }*/
+        if (GetClass(keys))
+        {
+            state = sName;
+        }
+        GetPlayerInfo();
+    }
     else if (state == sComplete)
     {
         if (keys[VK_SPACE] || keys[VK_ESCAPE])
@@ -158,10 +171,10 @@ int StartScreen::GetClass(bool *keys)
             int gogo = i - 48;
             switch (i - 48)
             {
-            case 1: pClass = "Warrior"; break;
-            case 2: pClass = "Priest"; break;
-            case 3: pClass = "Thief"; break;
-            case 4: pClass = "Wizard"; break;
+            case 1: pClass = "Adventurer"; break;
+            //case 2: pClass = "Priest"; break;
+            //case 3: pClass = "Thief"; break;
+            case 2: pClass = "Warlock"; break;
             }
             return 1;
         }

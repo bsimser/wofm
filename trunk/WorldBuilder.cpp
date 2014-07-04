@@ -87,7 +87,6 @@ int WorldBuilder::Initialise(const char* title)
 
         bool sucess = false;
 
-
         dungeonManager.BuildCompleteDungeon(max_num_levels); //creates and populates the dungeon
 
         //////////////////
@@ -109,29 +108,21 @@ int WorldBuilder::Initialise(const char* title)
         scene.ShadowStrength(0.5f);
         dungeonManager.PrintDungeons();
         monsterManager.PrintMonsters();
-
-
     }
     catch (const std::exception & ex)
     {
         MessageBox(NULL, ex.what(), "Exception", MB_ICONEXCLAMATION);
         dungeonManager.PrintDungeons();
         return 0;
-
     }
     catch (...)
     {
-
         MessageBox(NULL, "Unknown error encounted initialising scene", "Exception", MB_ICONEXCLAMATION);
         return 0;
-
     }
 
     return 1;
 }
-
-
-
 
 // from this function 
 int WorldBuilder::Run()
@@ -177,9 +168,7 @@ int WorldBuilder::Run()
         MessageBox(NULL, "Unknown error encounted updating scene", "Exception", MB_ICONEXCLAMATION);
         SetState(sNormal);
     }
-
     return 1;
-
 }
 
 int WorldBuilder::CompleteUserCommands()
@@ -207,9 +196,7 @@ int WorldBuilder::CompleteUserCommands()
             monsterManager.Player()->UpdateSightRange();
             state = sNormal;
         }
-
     }
-
 
     return 1;
 }
@@ -220,7 +207,6 @@ int WorldBuilder::Stop()
 
     scene.KillGLWindow();									// Kill The Window
     return 1;
-
 }
 
 ///////////////// DISPLAY SPECIFIC //////////////////////////////
@@ -246,10 +232,7 @@ void WorldBuilder::Resize(WPARAM lParam, LPARAM wParam)
         Run();
 }
 
-
-
 //////////////////////////////////////////////////////////////
-
 
 void WorldBuilder::UpdateMap()
 {
@@ -295,7 +278,6 @@ void WorldBuilder::UpdateMap()
         GetCurrentLevel(),
         turns);
 
-
     //GetCurrentLevel(),		
     //player->experience,
     //State());
@@ -306,9 +288,7 @@ void WorldBuilder::UpdateMap()
         textManager.display_line1 = "";
     else
         textManager.display_line1 = line1;
-
 }
-
 
 void WorldBuilder::ProcessCommand(bool *keys)
 {
@@ -397,8 +377,12 @@ void WorldBuilder::ProcessCommand(bool *keys)
         if (ret == 0)
         {
             SetState(sNormal);
-            monsterManager.Player()->monster.name =  start.pName;
-            //strcpy(monsterManager.Player()->monster.class,start.pClass.c_str());
+            monsterManager.Player()->monster.name = start.pName;
+            //strcpy(monsterManager.Player()->monster.class,);
+            if (start.pClass == "Warlock")
+            {
+                player->inventory.push_back(*WorldBuilder::itemManager.CreateItem(0, cards, 0));
+            }
         }
     }
 
@@ -517,7 +501,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
     }
     else if (State() == sTargetSpell)
     {
-        if (keys[VK_SPACE]) //target acquired
+        if (keys[VK_SPACE] || keys[VK_A] || keys[VK_B] || keys[VK_C] || keys[VK_D]) //target acquired
         {
             if (command.CastSpellAtTarget())
                 turns++;
@@ -530,7 +514,6 @@ void WorldBuilder::ProcessCommand(bool *keys)
         else
             return; //clear all keys
         dungeonManager.CurrentLevel()->ClearPath();
-
     }
 
     //SHIFT COMMANDS FIRST
@@ -567,8 +550,14 @@ void WorldBuilder::ProcessCommand(bool *keys)
                 state = sFlee;
             keys[VK_F] = false;
         }
+        else if (keys[VK_Q])
+        {
+            monsterManager.Player()->monster.stamina = 0;
+            WorldBuilder::deathMessage.SetDeathMessage("gave up. ");
+            turns++;
+            keys[VK_Q] = false;
+        }
     }
-
 
     //END SHIFT
 
@@ -635,7 +624,6 @@ void WorldBuilder::ProcessCommand(bool *keys)
 
     else if (keys[VC_COMMA] || keys[VC_G]) //pickup
     {
-
         if (dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
         {
             player->NextAction(actionManager.UpdateAction(&player->action, aPickup, 0));
@@ -703,7 +691,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
         monsterManager.Player()->monster.stamina = 0;
         WorldBuilder::deathMessage.SetDeathMessage("commited suicide because of a hidden suicide key, sorry. ");
         turns++;
-        keys[VC_G] = false;
+        keys[VK_T] = false;
     }
 #endif
 
@@ -712,5 +700,5 @@ void WorldBuilder::ProcessCommand(bool *keys)
         monsterManager.Player()->UpdateSightRange();
         monsterManager.Player()->Heal();
     }
-    //WorldBuilder::dungeonManager.CurrentLevel()->ClearPath();
+
 }

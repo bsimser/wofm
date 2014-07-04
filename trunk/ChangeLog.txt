@@ -4,6 +4,12 @@ Warlock of Firetop Mountain (c) 2014 Corremn
 
 Change log
 
+version x.x.x xx/xx/2014
+========================
+- added 1 extra monster.
+- bonus for winning game.
+- Chests and keys now generate mostly in rooms.
+
 version 0.2.1b 3/07/2014
 ========================
 - Fix bug in flood fill test

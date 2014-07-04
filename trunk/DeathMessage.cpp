@@ -22,14 +22,8 @@ DeathMessage::DeathMessage()
     done.zagor = 0;
 }
 
-DeathMessage::~DeathMessage()
-{
-
-}
-
 int DeathMessage::ShowDeath(int success)
 {
-
     bool has_curse = false;
 
     ITEMLIST::iterator it;
@@ -44,8 +38,10 @@ int DeathMessage::ShowDeath(int success)
         //	death_message = "later died of the Curse of Zagor. ";
         //}
         if (it->type == gold)
+        {
             done.gold = 1;
-
+            fopen("warlock", "w");
+        }
     }
 
     WorldBuilder::textManager.ClearDisplayLines();
@@ -74,7 +70,6 @@ int DeathMessage::ShowDeath(int success)
     WorldBuilder::textManager.SetDisplayLine(8, "Skill: %d, Stamina: %d, Luck: %d ", WorldBuilder::monsterManager.Player()->monster.skill, WorldBuilder::monsterManager.Player()->monster.MaxStamina(), WorldBuilder::monsterManager.Player()->monster.luck);
 
     print_lines = 9;
-
 
     if (success)
     {

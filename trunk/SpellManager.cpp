@@ -36,7 +36,7 @@ int SpellManager::CallSpellRoutine(monsterData* caster, int spell) //call spell 
 
     if (caster->spellList.size() == 0)
     {
-        throw std::exception("Cant cast spell");
+        //throw std::exception("Cant cast spell");
         return 0;
     }
 
@@ -49,17 +49,28 @@ int SpellManager::CallSpellRoutine(monsterData* caster, int spell) //call spell 
     }
 
     currentSpell = spNone;
-    throw std::exception("Cant cast spell");
+    //throw std::exception("Cant cast spell");
+    return 0;
 }
 
 int SpellManager::AddMonsterSpell(monsterData* caster, eSpellList spell)
 {
     SPELLLIST::iterator sp;
 
+    // check spell exists
     for (sp = all_spells.begin(); sp != all_spells.end(); sp++)
     {
         if (sp->GetSpell() == spell)
-            caster->spellList.push_back(&(*sp));
+        {
+            bool allreadyHasit = false;
+            for (MONSTERSPELLLIST::iterator it = caster->spellList.begin(); it != caster->spellList.end(); it++)
+            {
+                if ((*it)->GetSpell() == spell)
+                    allreadyHasit = true;
+            }
+            if (!allreadyHasit)
+                caster->spellList.push_back(&(*sp));
+        }
     }
     return 1;
 }
@@ -87,11 +98,13 @@ int SpellManager::CastSpell(monsterData* caster, int spell)
             SpellText(caster, "casts magic missile at you");
         currentSpell = spFlyingWeapon;
         return SELECT_TARGET;
+
     case spSlowEnemies:
         if (!caster->isPlayer())
             SpellText(caster, "points at you and curses");
         s.SlowEnemies(caster);  	currentSpell = spSlowEnemies;
         return NORMAL;
+
     case spRepelMissiles:
         if (!caster->isPlayer())
         {
@@ -103,14 +116,21 @@ int SpellManager::CastSpell(monsterData* caster, int spell)
 
         s.RepelMissiles(caster);    currentSpell = spRepelMissiles;
         return NORMAL;
-    case spTeleport:  if (!caster->isPlayer())SpellText(caster, "blinks");
-                      else
-                          WorldBuilder::textManager.newLine("You blink. ");
+
+    case spTeleport:  
+        if (!caster->isPlayer())
+            SpellText(caster, "blinks");
+        else
+            WorldBuilder::textManager.newLine("You blink. ");
         s.Teleport(caster); currentSpell = spTeleport;
         return NORMAL;
-    case spDragonFire:  if (!caster->isPlayer())SpellText(caster, "breaths fire at you");
-                        else
-                            WorldBuilder::textManager.newLine("You breath fire. ");
+
+    case spDragonFire:  
+        if (!caster->isPlayer())
+            SpellText(caster, "breaths fire at you");
+        else
+            WorldBuilder::textManager.newLine("You breath fire. ");
+
         currentSpell = spDragonFire;
         return SELECT_TARGET;
     }

@@ -221,7 +221,7 @@ int monsterData::isSeen()
     if (level != WorldBuilder::GetCurrentLevel())
         return 0;
 
-    int r = (int)sqrt((float)(pos.x - player->pos.x)*(pos.x - player->pos.x) + (player->pos.y - pos.y)*(player->pos.y - pos.y)) + getInt(3, 0);
+    int r = (int)sqrt((float)(pos.x - player->pos.x)*(pos.x - player->pos.x) + (player->pos.y - pos.y)*(player->pos.y - pos.y));/// +getInt(3, 0);
 
     int sightRange = player->monster.sight_range;
     if (level == 0)
@@ -265,6 +265,9 @@ void monsterData::XP()
                 WorldBuilder::textManager.newLine("You gain a level. ");
             monster.stamina++;
             monster.max_stamina++;
+            WorldBuilder::spellManager.AddMonsterSpell(this, spRepelMissiles);
+
+
         }
     }
 
@@ -277,6 +280,8 @@ void monsterData::XP()
                 WorldBuilder::textManager.newLine("You gain a level. ");
             monster.stamina++;
             monster.max_stamina++;
+            WorldBuilder::spellManager.AddMonsterSpell(this, spSlowEnemies);
+
         }
     }
 
@@ -291,6 +296,8 @@ void monsterData::XP()
             monster.skill++;
             monster.stamina++;
             monster.max_stamina++;
+            WorldBuilder::spellManager.AddMonsterSpell(this, spTeleport);
+
         }
     }
 

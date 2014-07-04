@@ -127,12 +127,20 @@ int DungeonManager::AddItems(int lev)
         //level[lev].map[pos->x][pos->y].getItem() = WorldBuilder::itemManager.CreateRandomItem(lev);
         int item_test = getInt(10, 0);
         if (item_test == 0)
+        {
+            coord* pos = level[lev].NewItemPosition(true);
             level[lev].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(lev, lockedChest));
+        }
         else if (getInt(10, 0) < 2)
+        {
+            coord* pos = level[lev].NewItemPosition(true);
             level[lev].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(lev, openChest));
-
+        }
         else
+        {
+            coord* pos = level[lev].NewItemPosition();
             level[lev].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(lev, corpse));
+        }
     }
 
     /*	if(lev==1)
@@ -157,11 +165,20 @@ int DungeonManager::PopulateDungeon(int lev)
         coord *start = level[lev].getStartPos(); //get starting point (up stairs)
         monsterData* player = WorldBuilder::monsterManager.CreateMonster(mPlayer, sub_type, 0, start->x, start->y);
 
-        WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
-        WorldBuilder::spellManager.AddMonsterSpell(player, spRepelMissiles);
-        WorldBuilder::spellManager.AddMonsterSpell(player, spSlowEnemies);
-        WorldBuilder::spellManager.AddMonsterSpell(player, spTeleport);
-        //WorldBuilder::spellManager.AddMonsterSpell(player,spDragonFire);
+        if (fopen("Zagor", "r"))
+        {
+            WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
+            WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
+            WorldBuilder::spellManager.AddMonsterSpell(player, spRepelMissiles);
+            WorldBuilder::spellManager.AddMonsterSpell(player, spSlowEnemies);
+            WorldBuilder::spellManager.AddMonsterSpell(player, spTeleport);
+            WorldBuilder::spellManager.AddMonsterSpell(player, spTeleport);
+        }
+        else
+            WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
+        
+        //WorldBuilder::spellManager.AddMonsterSpell(player, spDragonFire);
+
     }
 
     //add monsters
@@ -209,7 +226,6 @@ int DungeonManager::PopulateDungeon(int lev)
 
     else if (lev == 20) //encounter level
     {
-
         int player_level = WorldBuilder::restLevel.GetOldLevel();
 
         int max_monsters = Random::getInt(3 + player_level, 1);
@@ -232,7 +248,20 @@ int DungeonManager::PopulateDungeon(int lev)
 
             coord *pos = NewMonsterPosition(lev); //??
             WorldBuilder::monsterManager.CreateMonster(type, sub_type, lev, pos->x, pos->y);
+
         }
+        // create digger
+        if (lev != 8 && lev > 1 && Random::getInt(10, 0) == 0)
+        {
+            static int count = 0;
+            count++;
+            if (count < 3)
+            {
+                coord *pos = NewMonsterPosition(lev);
+                WorldBuilder::monsterManager.CreateMonster(mDigger, sub_type, lev, pos->x, pos->y);
+            }
+        }
+
         coord *pos = NewMonsterPosition(lev); //??
         if (lev != 9)
             monsterData * special = WorldBuilder::monsterManager.CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
@@ -244,7 +273,6 @@ int DungeonManager::PopulateDungeon(int lev)
         if (pos == NULL)
             throw std::exception("no bridge master, Game halted");
         WorldBuilder::monsterManager.CreateMonster(mBridgeMaster, sub_type, lev, pos->x, pos->y);
-
     }
 
     if (lev == 9) //end level
@@ -618,7 +646,7 @@ int DungeonManager::AddKeysToDungeon()
         }
         try
         {
-            coord* pos = level[rand_level].NewItemPosition();
+            coord* pos = level[rand_level].NewItemPosition(true); // put keys in rooms
             if (pos == NULL)
                 throw std::exception("Could not create keys");
 

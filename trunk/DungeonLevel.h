@@ -102,7 +102,8 @@ public:
     coord * getStartPos();
     coord * GetEndPosition();
     coord * NewBridgePosition();
-    coord * NewItemPosition();
+    coord * NewItemPosition(bool space = false);
+    int     getAdjacentFreeSpaces(int x, int y);
     coord * NewSpecialItemPosition();
     coord * FreeTerrainPosition(eTerrainType type);
     coord * FreeTerrainPosition(const std::string & name);
