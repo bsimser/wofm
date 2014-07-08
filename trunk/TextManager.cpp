@@ -7,8 +7,6 @@
 #include "TextManager.h"
 #include "WorldBuilder.h"
 
-
-
 #define STEP 90	//max characters on screen before the -more- is used
 
 //////////////////////////////////////////////////////////////////////
@@ -89,7 +87,7 @@ int  TextManager::More()
     int	step = m_step*STEP;
     display_line1.erase();
 
-    eDisplayState preState = WorldBuilder::State();
+    eDisplayState preState = World.State();
     if (preState == sMore)
         preState = sNormal;
 
@@ -101,18 +99,18 @@ int  TextManager::More()
         display_line1.append(tt, STEP);
         display_line1 += " -more-";
 
-        WorldBuilder::SetState(sMore);
+        World.SetState(sMore);
     }
     else if (display_line.size() != count && count > 0) //last line after more
     {
         display_line.copy(tt, count, 0 + step);
         display_line1.append(tt, count);
-        WorldBuilder::SetState(preState);
+        World.SetState(preState);
     }
     else	//no need to use more
     {
         display_line1 = display_line;
-        WorldBuilder::SetState(preState);
+        World.SetState(preState);
         m_step = 0;
     }
 
@@ -152,7 +150,7 @@ void TextManager::ShowMessages()
 {
     STRINGLIST::iterator it;
 
-    WorldBuilder::textManager.ClearDisplayLines();
+    World.getTextManager().ClearDisplayLines();
 
     SetDisplayLine(0, "Previous Messages");
     SetDisplayLine(1, "=================");

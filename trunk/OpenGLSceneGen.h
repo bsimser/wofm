@@ -60,7 +60,7 @@ public:
 
 	//symbol and colour map
 
-	void CreateOffset(coord pos);
+	void CreateOffset(Coord pos);
 	
 
 private:
@@ -78,7 +78,7 @@ private:
 	int height_scr_offset;
 
 
-	coord offset; //base offset for large maps (fit portion of map into screen) //this is generally players position
+	Coord offset; //base offset for large maps (fit portion of map into screen) //this is generally players position
 
 
 	//fonts

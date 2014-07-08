@@ -21,15 +21,15 @@ LevelChange::~LevelChange()
 int LevelChange::ClimbSpecial(int dir)
 {
 
-    monsterData* player = WorldBuilder::monsterManager.Player();
-    coord * pos = player->getPosition();
-    DungeonLevel *current_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    monsterData* player = World.getMonsterManager().Player();
+    Coord * pos = player->getPosition();
+    DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     if (dir == dUp && current_lev->map[pos->x][pos->y].terrain.type == specialUp)
     {
-        WorldBuilder::UpSpecialLevel(); //up 10 levels
+        World.UpSpecialLevel(); //up 10 levels
 
-        DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+        DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
         if (!new_lev)
             throw std::exception("invalid level move, up command");
@@ -37,14 +37,14 @@ int LevelChange::ClimbSpecial(int dir)
         //remove reference to player on current level map
         current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-        //get start coords on new map
-        coord* start_pos = new_lev->FreeTerrainPosition(specialOpen);
+        //get start Coords on new map
+        Coord* start_pos = new_lev->FreeTerrainPosition(specialOpen);
 
         //place player on new map
         new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
         player->pos.x = start_pos->x;
         player->pos.y = start_pos->y;
-        player->level = WorldBuilder::GetCurrentLevel();
+        player->level = World.GetCurrentLevel();
         return 1;
     }
     else if (dir == dDown)
@@ -56,7 +56,7 @@ int LevelChange::ClimbSpecial(int dir)
 
             if (current_lev->map[pos->x][pos->y].terrain.type == specialLocked) //move down
             {
-                WorldBuilder::textManager.newLine("The gate is locked. ");
+                World.getTextManager().newLine("The gate is locked. ");
                 return 0;
             }
             //The below code is an automatic door open code - left incase someone wants it
@@ -64,12 +64,12 @@ int LevelChange::ClimbSpecial(int dir)
             {
 
             ITEMLIST::iterator it;
-            ITEMLIST *inventory = &WorldBuilder::monsterManager.Player()->inventory;
-            int level = WorldBuilder::GetCurrentLevel();
+            ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
+            int level = World.GetCurrentLevel();
 
             char buf[64];
 
-            sprintf(buf,"key labelled %d", WorldBuilder::itemManager.KeySpecial[level]);
+            sprintf(buf,"key labelled %d", World.getItemManager().KeySpecial[level]);
 
             int match = 0;
 
@@ -81,27 +81,27 @@ int LevelChange::ClimbSpecial(int dir)
 
             if(match == 0)
             {
-            WorldBuilder::textManager.newLine("The gate is locked.");
+            World.getTextManager().newLine("The gate is locked.");
             return 0;
             }
             else
             {
-            WorldBuilder::textManager.newLine("You unlock the gate and you decend into the darkness. ");
+            World.getTextManager().newLine("You unlock the gate and you decend into the darkness. ");
             current_lev->map[pos->x][pos->y].terrain.Create(specialOpen);
             }
 
             }
-            WorldBuilder::DownSpecialLevel();
+            World.DownSpecialLevel();
 
-            int new_level = WorldBuilder::GetCurrentLevel();
+            int new_level = World.GetCurrentLevel();
 
-            if(new_level>WorldBuilder::GetMaxLevels() -1)
+            if(new_level>World.GetMaxLevels() -1)
             {
-            WorldBuilder::textManager.newLine("Hmm, this goes nowhere. ");
+            World.getTextManager().newLine("Hmm, this goes nowhere. ");
             return 0;
             }
 
-            DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+            DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
             if(!new_lev)
             throw std::exception("invalid level move, down command");
@@ -109,8 +109,8 @@ int LevelChange::ClimbSpecial(int dir)
             //remove reference to player on current level map
             current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-            //get start coords on new map
-            coord* start_pos = new_lev->getStartPos();
+            //get start Coords on new map
+            Coord* start_pos = new_lev->getStartPos();
 
             //place player on new map
             new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
@@ -121,11 +121,11 @@ int LevelChange::ClimbSpecial(int dir)
         }
         if (current_lev->map[pos->x][pos->y].terrain.type == specialOpen)
         {
-            WorldBuilder::DownSpecialLevel();
+            World.DownSpecialLevel();
 
-            int new_level = WorldBuilder::GetCurrentLevel();
+            int new_level = World.GetCurrentLevel();
 
-            DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+            DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
             if (!new_lev)
                 throw std::exception("invalid level move, down command");
@@ -133,14 +133,14 @@ int LevelChange::ClimbSpecial(int dir)
             //remove reference to player on current level map
             current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-            //get start coords on new map
-            coord* start_pos = new_lev->FreeTerrainPosition(specialUp);//new_lev->getSpecialStartPos();
+            //get start Coords on new map
+            Coord* start_pos = new_lev->FreeTerrainPosition(specialUp);//new_lev->getSpecialStartPos();
             //place player on new map
             new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
 
             player->pos.x = start_pos->x;
             player->pos.y = start_pos->y;
-            player->level = WorldBuilder::GetCurrentLevel();
+            player->level = World.GetCurrentLevel();
             return 1;
         }
     }
@@ -151,25 +151,25 @@ int LevelChange::ClimbNormal(int dir)
 {
     if (dir == dUp)
     {
-        monsterData* player = WorldBuilder::monsterManager.Player();
+        monsterData* player = World.getMonsterManager().Player();
 
-        coord * pos = player->getPosition();
+        Coord * pos = player->getPosition();
 
-        DungeonLevel *current_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+        DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
         if (current_lev->map[pos->x][pos->y].terrain.type == upStairs) //move up
         {
-            WorldBuilder::UpLevel();
+            World.UpLevel();
 
-            if (WorldBuilder::GetCurrentLevel() == -1) //escape dungeon
+            if (World.GetCurrentLevel() == -1) //escape dungeon
             {
-                WorldBuilder::textManager.newLine("A voice says: \"Dungeon exit under construction. Sorry for any inconvenience.\"");
-                WorldBuilder::DownLevel();
-                //WorldBuilder::monsterManager.PlayerEscape();
+                World.getTextManager().newLine("A voice says: \"Dungeon exit under construction. Sorry for any inconvenience.\"");
+                World.DownLevel();
+                //World.getMonsterManager().PlayerEscape();
                 return 2;
             }
 
-            DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+            DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
             if (!new_lev)
                 throw std::exception("invalid level move, up command");
@@ -177,8 +177,8 @@ int LevelChange::ClimbNormal(int dir)
             //remove reference to player on current level map
             current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-            //get start coords on new map
-            coord* start_pos = new_lev->FreeTerrainPosition(openStairs);
+            //get start Coords on new map
+            Coord* start_pos = new_lev->FreeTerrainPosition(openStairs);
 
             //place player on new map
             new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
@@ -189,11 +189,11 @@ int LevelChange::ClimbNormal(int dir)
     }
     if (dir == dDown)
     {
-        monsterData* player = WorldBuilder::monsterManager.Player();
+        monsterData* player = World.getMonsterManager().Player();
 
-        coord * pos = player->getPosition();
+        Coord * pos = player->getPosition();
 
-        DungeonLevel *current_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+        DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
         if (current_lev->map[pos->x][pos->y].terrain.type == lockedStairs) //locked
         {
@@ -202,24 +202,24 @@ int LevelChange::ClimbNormal(int dir)
 
             if (current_lev->map[pos->x][pos->y].terrain.type == lockedStairs) //locked)
             {
-                WorldBuilder::textManager.newLine("The gate is locked. ");
+                World.getTextManager().newLine("The gate is locked. ");
                 return 0;
             }
         }
         if (current_lev->map[pos->x][pos->y].terrain.type == openStairs)//move down
         {
-            WorldBuilder::DownLevel();
+            World.DownLevel();
 
-            int new_level = WorldBuilder::GetCurrentLevel();
+            int new_level = World.GetCurrentLevel();
 
             if (new_level == 10)
             {
-                WorldBuilder::textManager.newLine("Hmm, this goes nowhere. ");
-                WorldBuilder::UpLevel();
+                World.getTextManager().newLine("Hmm, this goes nowhere. ");
+                World.UpLevel();
                 return 0;
             }
 
-            DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+            DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
             if (!new_lev)
                 throw std::exception("invalid level move, down command");
@@ -227,15 +227,15 @@ int LevelChange::ClimbNormal(int dir)
             //remove reference to player on current level map
             current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-            //get start coords on new map
-            coord* start_pos = new_lev->getStartPos();
+            //get start Coords on new map
+            Coord* start_pos = new_lev->getStartPos();
 
             //place player on new map
             new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
 
             player->pos.x = start_pos->x;
             player->pos.y = start_pos->y;
-            player->level = WorldBuilder::GetCurrentLevel();
+            player->level = World.GetCurrentLevel();
             return 1;
         }
     }
@@ -247,30 +247,30 @@ int LevelChange::ClimbEncounter(int dir)
 
     if (dir == dUp) //cannot escape
     {
-        WorldBuilder::textManager.newLine("An unseen force stops you from escaping back up. You hear distant laughing. ");
+        World.getTextManager().newLine("An unseen force stops you from escaping back up. You hear distant laughing. ");
         return 1;
 
     }
     if (dir == dDown)
     {
-        monsterData* player = WorldBuilder::monsterManager.Player();
+        monsterData* player = World.getMonsterManager().Player();
 
-        coord * pos = player->getPosition();
+        Coord * pos = player->getPosition();
 
-        DungeonLevel *current_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+        DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
         if (current_lev->map[pos->x][pos->y].terrain.type == lockedStairs) //locked
         {
-            WorldBuilder::textManager.newLine("The gate is locked. ");
+            World.getTextManager().newLine("The gate is locked. ");
             return 0;
         }
         else if (current_lev->map[pos->x][pos->y].terrain.type == openStairs)//move down
         {
-            WorldBuilder::SetDungeonLevel(WorldBuilder::restLevel.GetOldLevel());
+            World.SetDungeonLevel(World.getRestLevel().GetOldLevel());
 
-            int new_level = WorldBuilder::GetCurrentLevel();
+            int new_level = World.GetCurrentLevel();
 
-            DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+            DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
             if (!new_lev)
                 throw std::exception("invalid level move, down command");
@@ -278,15 +278,15 @@ int LevelChange::ClimbEncounter(int dir)
             //remove reference to player on current level map
             current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-            //get start coords on new map
-            coord* start_pos = new_lev->getStartPos();
+            //get start Coords on new map
+            Coord* start_pos = new_lev->getStartPos();
 
             //place player on new map
             new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
 
             player->pos.x = start_pos->x;
             player->pos.y = start_pos->y;
-            player->level = WorldBuilder::GetCurrentLevel();
+            player->level = World.GetCurrentLevel();
             return 1;
         }
     }
@@ -295,11 +295,11 @@ int LevelChange::ClimbEncounter(int dir)
 
 int LevelChange::ChangeLevel(int dir, monsterData * monster)
 {
-    DungeonLevel *current_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
-    monsterData* player = WorldBuilder::monsterManager.Player();
-    coord * pos = player->getPosition();
+    DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    monsterData* player = World.getMonsterManager().Player();
+    Coord * pos = player->getPosition();
 
-    if (WorldBuilder::GetCurrentLevel() == 20) //encounter level
+    if (World.GetCurrentLevel() == 20) //encounter level
     {
         if (current_lev->map[pos->x][pos->y].terrain.type == upStairs ||
             current_lev->map[pos->x][pos->y].terrain.type == lockedStairs ||
@@ -322,14 +322,14 @@ int LevelChange::ChangeLevel(int dir, monsterData * monster)
     {
         if (ClimbNormal(dir))
         {
-            int level = WorldBuilder::GetCurrentLevel();
-            if ((level == 1 && !WorldBuilder::restLevel.restComplete[0])
-                || (level == 4 && !WorldBuilder::restLevel.restComplete[1])
-                || (level == 7 && !WorldBuilder::restLevel.restComplete[2])
-                || (level == 10 && !WorldBuilder::restLevel.restComplete[3]))
+            int level = World.GetCurrentLevel();
+            if ((level == 1 && !World.getRestLevel().restComplete[0])
+                || (level == 4 && !World.getRestLevel().restComplete[1])
+                || (level == 7 && !World.getRestLevel().restComplete[2])
+                || (level == 10 && !World.getRestLevel().restComplete[3]))
             {
-                WorldBuilder::restLevel.Rest(level);
-                WorldBuilder::SetState(sRest);
+                World.getRestLevel().Rest(level);
+                World.SetState(sRest);
             }
             return 1;
         }
@@ -343,28 +343,31 @@ int LevelChange::ChangeLevel(int dir, monsterData * monster)
 void LevelChange::DebugLevel(int dir)
 {
 
-    DungeonLevel *current_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
-    monsterData* player = WorldBuilder::monsterManager.Player();
-    coord * pos = player->getPosition();
+    DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    monsterData* player = World.getMonsterManager().Player();
+    Coord * pos = player->getPosition();
 
     if (dir == 1)
-        WorldBuilder::DownLevel();
+        World.DownLevel();
     else if (dir == 2)
-        WorldBuilder::UpLevel();
+        World.UpLevel();
     else return;
 
-
-    int new_level = WorldBuilder::GetCurrentLevel();
-
+    int new_level = World.GetCurrentLevel();
 
     if (new_level == 20)
     {
-        WorldBuilder::textManager.newLine("Hmm, this goes nowhere. ");
-        WorldBuilder::UpLevel();
+        World.getTextManager().newLine("Hmm, this goes nowhere. ");
+        World.UpLevel();
         return;
     }
-
-    DungeonLevel *new_lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    else if (new_level < 0)
+    {
+        World.getTextManager().newLine("Hmm, can't do that. ");
+        World.DownLevel();
+        return;
+    }
+    DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     if (!new_lev)
         throw std::exception("invalid level move, down command");
@@ -372,8 +375,8 @@ void LevelChange::DebugLevel(int dir)
     //remove reference to player on current level map
     current_lev->map[pos->x][pos->y].RemoveMonsterRef();
 
-    //get start coords on new map
-    coord* start_pos;
+    //get start Coords on new map
+    Coord* start_pos;
 
     if (new_level < 10)
     {

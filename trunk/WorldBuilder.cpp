@@ -8,28 +8,9 @@
 #include "MagicScreen.h"
 #include "MonsterAI.h"
 
-
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
-
-//static items
-DungeonManager WorldBuilder::dungeonManager;
-MonsterManager WorldBuilder::monsterManager;
-ActionManager WorldBuilder::actionManager;
-TextManager WorldBuilder::textManager;
-ItemManager WorldBuilder::itemManager;
-InventoryManager WorldBuilder::inventoryManager;
-eDisplayState WorldBuilder::state;
-DeathMessage WorldBuilder::deathMessage;
-StartScreen WorldBuilder::start;
-RestLevel WorldBuilder::restLevel;
-
-int WorldBuilder::current_level;
-int WorldBuilder::max_num_levels;
-
 
 WorldBuilder::WorldBuilder() :
 first_update(true),
@@ -37,12 +18,6 @@ Title("Warlock of Firetop Mountain RL (c) 2014 Corremn")
 {
     max_num_levels = MAX_DUNGEON_LEVELS;
     turns = 0;
-    Random::reseed();
-}
-
-WorldBuilder::~WorldBuilder()
-{
-
 }
 
 int WorldBuilder::Initialise(const char* title)
@@ -143,13 +118,7 @@ int WorldBuilder::Run()
 
         UpdateMap(); //update scene (items,map,npc,pc etc) ??
 
-        if (State() != sMap)
-            scene.CreateOffset(monsterManager.Player()->pos);
-        else
-            scene.CreateOffset(map_coord);
-
-        scene.DrawGLScene();					// Draw The Scene
-        scene.SwapBuffers();				// Swap Buffers (Double Buffering)
+        Render();
 
         if (monsterManager.Player()->miss_turn == 1)
         {
@@ -161,7 +130,7 @@ int WorldBuilder::Run()
     {
         MessageBox(NULL, ex.what(), "Exception", MB_ICONEXCLAMATION);
         SetState(sNormal);
-        //WorldBuilder::textManager.newLine((char*)ex.what());
+        //World.getTextManager().newLine((char*)ex.what());
     }
     catch (...)
     {
@@ -229,21 +198,16 @@ void WorldBuilder::Resize(WPARAM lParam, LPARAM wParam)
     scene.ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));
     
     if (!first_update)
+    {
         Run();
+        Render();
+    }
 }
 
 //////////////////////////////////////////////////////////////
 
 void WorldBuilder::UpdateMap()
 {
-    //update monsters -> allow actions
-
-    //if(monsterManager.Player()->miss_turn==1)
-    //{
-    //	turns++;
-    //	monsterManager.Player()->miss_turn = 0;
-    //	}
-
     if ((old_turns < turns || first_update) && (state != sStart || state != sRest || state != sResting))
     {
         monsterManager.UpdateMonsters(&dungeonManager.level[GetCurrentLevel()], &actionManager);
@@ -252,11 +216,13 @@ void WorldBuilder::UpdateMap()
     }
     old_turns = turns;
 
-    scene.dLevel = &dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    scene.dLevel = &dungeonManager.level[World.GetCurrentLevel()];
+}
 
+void WorldBuilder::UpdateStatusBar()
+{
     //add text lines
     char line1[128];
-
     MONSTERLIST::iterator player = monsterManager.monster_list.begin();
 
     char name[32];
@@ -288,6 +254,19 @@ void WorldBuilder::UpdateMap()
         textManager.display_line1 = "";
     else
         textManager.display_line1 = line1;
+}
+
+void WorldBuilder::Render()
+{
+    if (State() != sMap)
+        scene.CreateOffset(monsterManager.Player()->pos);
+    else
+        scene.CreateOffset(map_Coord);
+
+    UpdateStatusBar();
+
+    scene.DrawGLScene();					// Draw The Scene
+    scene.SwapBuffers();				// Swap Buffers (Double Buffering)
 }
 
 void WorldBuilder::ProcessCommand(bool *keys)
@@ -332,10 +311,10 @@ void WorldBuilder::ProcessCommand(bool *keys)
     {
         if (keys[VK_Y])
         {
-            WorldBuilder::deathMessage.SetDeathMessage(" left the great mountain. ");
-            WorldBuilder::deathMessage.ShowDeath(1);
+            World.getDeathMessage().SetDeathMessage(" left the great mountain. ");
+            World.getDeathMessage().ShowDeath(1);
             Sleep(1000);
-            WorldBuilder::SetState(sDeath);
+            World.SetState(sDeath);
         }
         else SetState(sNormal);
     }
@@ -381,7 +360,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
             //strcpy(monsterManager.Player()->monster.class,);
             if (start.pClass == "Warlock")
             {
-                player->inventory.push_back(*WorldBuilder::itemManager.CreateItem(0, cards, 0));
+                player->inventory.push_back(*World.getItemManager().CreateItem(0, cards, 0));
             }
         }
     }
@@ -553,7 +532,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
         else if (keys[VK_Q])
         {
             monsterManager.Player()->monster.stamina = 0;
-            WorldBuilder::deathMessage.SetDeathMessage("gave up. ");
+            World.getDeathMessage().SetDeathMessage("gave up. ");
             turns++;
             keys[VK_Q] = false;
         }
@@ -619,12 +598,12 @@ void WorldBuilder::ProcessCommand(bool *keys)
     {
         state = sClosing;
         keys[VK_C] = false;
-        WorldBuilder::textManager.newLine("Close what?[dir] - [x] to cancel. ");
+        World.getTextManager().newLine("Close what?[dir] - [x] to cancel. ");
     }
 
     else if (keys[VC_COMMA] || keys[VC_G]) //pickup
     {
-        if (dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
+        if (dungeonManager.level[World.GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
         {
             player->NextAction(actionManager.UpdateAction(&player->action, aPickup, 0));
             turns++;
@@ -653,7 +632,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
     }
     else if (keys[VK_Z]) //no spell cast
     {
-        if (WorldBuilder::monsterManager.monsterItems.GetInventoryItem(player, cards) != NULL)
+        if (World.getMonsterManager().monsterItems.GetInventoryItem(player, cards) != NULL)
         {
             MagicScreen spell;
             spell.Display();
@@ -678,7 +657,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
         static bool showall = false;
         showall = !showall;
         scene.ShowAll(showall);
-        WorldBuilder::textManager.newLine("God view toggled. ");
+        World.getTextManager().newLine("God view toggled. ");
         keys[VK_S] = false;
     }
     else if (keys[VK_3])
@@ -689,7 +668,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
     else if (keys[VK_T]) //transfer soul
     {
         monsterManager.Player()->monster.stamina = 0;
-        WorldBuilder::deathMessage.SetDeathMessage("commited suicide because of a hidden suicide key, sorry. ");
+        World.getDeathMessage().SetDeathMessage("commited suicide because of a hidden suicide key, sorry. ");
         turns++;
         keys[VK_T] = false;
     }

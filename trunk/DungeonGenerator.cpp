@@ -8,22 +8,19 @@
 #include <math.h>
 #include <vector>
 #include <cassert>
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 using namespace Random;
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 DungeonGenerator::DungeonGenerator()
 {
     getInt(10, 3);
 }
 
-DungeonGenerator::~DungeonGenerator()
-{
-
-}
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::Create(int _type)
 {
@@ -55,6 +52,8 @@ int DungeonGenerator::Create(int _type)
     CreateMap();
     fixDoors();
 
+    DumpDungeon();
+
 #ifdef _DEBUG
     int cX, cY;
     assert(findTerrainType(cX, cY, '>'));
@@ -63,6 +62,8 @@ int DungeonGenerator::Create(int _type)
 #endif
     return type;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::CreateMap()
 {
@@ -94,6 +95,7 @@ int DungeonGenerator::CreateMap()
             DumpDungeon();
             return CreateMap();
         }
+        addSpecialRoom();
     }
     else if (type == lSpecial)
     {
@@ -170,12 +172,18 @@ int DungeonGenerator::CreateMap()
     if (!findTerrainType(cX, cY, '>'))
     {
         if (!findTerrainType(cX, cY, '.'))
+        {
+            DumpDungeon();
+
             throw std::exception("Failed to create exit for level");
+        }
         dmap[cX][cY] = '>';
     }
 
 #ifdef _DEBUG
-    //printf dungeon
+    DumpDungeon();
+
+   /* //printf dungeon
     std::ofstream ofile;
 
     ofile.open("Debug Files\\last_dungeon.txt");
@@ -191,12 +199,14 @@ int DungeonGenerator::CreateMap()
         ofile << std::endl;
     }
 
-    ofile.close();
+    ofile.close();*/
 
 #endif
     return 1;
-
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::DumpDungeon()
 {
 #ifdef _DEBUG
@@ -226,6 +236,8 @@ int DungeonGenerator::DumpDungeon()
     return 1;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::makeEncounterDungeon()
 {
     //while(!createUndeadRoom(getInt(20,35),15));
@@ -251,7 +263,11 @@ int DungeonGenerator::makeEncounterDungeon()
             break;
         }
     }
-    if (!created) throw std::exception("Cound not add exit to encounter dungeon");
+    if (!created)
+    {
+        DumpDungeon();
+        throw std::exception("Cound not add exit to encounter dungeon");
+    }
 
     created = 0;
 
@@ -266,10 +282,17 @@ int DungeonGenerator::makeEncounterDungeon()
         }
     }
     if (!created)
+    {
+        DumpDungeon();
+
         throw std::exception("Could not add entrance to encounter dungeon");
+    }
 
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::makeUndeadDungeon()
 {
     //create dungeon
@@ -308,19 +331,21 @@ int DungeonGenerator::makeUndeadDungeon()
         makeTomb(w, h);
     };
 
-    return 1;
+   return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 bool DungeonGenerator::findTerrainType(int &x, int &y, const char terrain)
 {
-    std::vector<coord> terrainCoords;
+    std::vector<Coord> terrainCoords;
     for (int h = 0; h < DUNGEON_SIZE_H; h++)
     {
         for (int w = 0; w < DUNGEON_SIZE_W; w++)
         {
             if (dmap[w][h] == terrain)
             {
-                coord newCoord;
+                Coord newCoord;
                 newCoord.x = w;
                 newCoord.y = h;
                 terrainCoords.push_back(newCoord);
@@ -338,6 +363,8 @@ bool DungeonGenerator::findTerrainType(int &x, int &y, const char terrain)
 
     return false;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::makeCavernDungeon()
 {
@@ -543,6 +570,8 @@ int DungeonGenerator::makeCavernDungeon()
     return 0;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::makeOutSideDungeon()
 {
     int h, w;
@@ -607,10 +636,14 @@ int DungeonGenerator::makeOutSideDungeon()
     return 0;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 void DungeonGenerator::SafetyReset()
 {
     safety = 0;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::Safety(char * message, int test)
 {
@@ -621,6 +654,8 @@ int DungeonGenerator::Safety(char * message, int test)
     }
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeMountain()
 {
@@ -679,6 +714,8 @@ int DungeonGenerator::makeRiverDungeon()
     return 1;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::makeMazeDungeon()
 {
     //create dungeon
@@ -709,6 +746,9 @@ int DungeonGenerator::makeMazeDungeon()
 
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::makeNormalDungeon()
 {
     //create dungeon
@@ -745,6 +785,21 @@ int DungeonGenerator::makeNormalDungeon()
 
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
+void DungeonGenerator::makeBoatHouse()
+{
+    makeSpecialDungeon();
+    addLoops(2);
+
+    makeRiver(getInt(10, 0) + 30, 0);
+    makeBridge();
+    makeBridge();
+    makeBridge();
+}
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::makeSpecialDungeon()
 {
@@ -785,8 +840,8 @@ int DungeonGenerator::makeSpecialDungeon()
             if (dmap[w][h] == '.' && dmap[w + 1][h] == '.' && dmap[w - 1][h] == '.' && dmap[w][h + 1] == '.' && dmap[w][h - 1] == '.'
                 && dmap[w + 1][h + 1] == '.' && dmap[w - 1][h + 1] == '.' && dmap[w - 1][h - 1] == '.' && dmap[w + 1][h - 1] == '.')
             {
-                coord new_coord; new_coord.x = w; new_coord.y = h;
-                specialSpotCoords.push_back(new_coord);
+                Coord new_Coord; new_Coord.x = w; new_Coord.y = h;
+                specialSpotCoords.push_back(new_Coord);
             }
         }
     }
@@ -819,6 +874,8 @@ int DungeonGenerator::makeSpecialDungeon()
 
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::createRuin(int x, int y, int max_w, int min_w, int max_h, int min_h)
 {
@@ -857,9 +914,10 @@ int DungeonGenerator::createRuin(int x, int y, int max_w, int min_w, int max_h, 
     if (getInt(2, 0))
         dmap[x - w_size / 2 - 1][y + h_size / 2 + 1] = 'r';
 
-
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::createRoom(int roomCount, const int maxRooms, int x, int y, int max_w, int min_w, int max_h, int min_h)
 {
@@ -909,6 +967,8 @@ int DungeonGenerator::createRoom(int roomCount, const int maxRooms, int x, int y
     return 1;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 void DungeonGenerator::buildRoom(int x, int y, int w_size, int h_size, int type)
 {
     switch (type)
@@ -927,6 +987,8 @@ void DungeonGenerator::buildRoom(int x, int y, int w_size, int h_size, int type)
         }
     }
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::validRoomPos(int x, int y, int w_size, int h_size)
 {
@@ -952,6 +1014,8 @@ int DungeonGenerator::validRoomPos(int x, int y, int w_size, int h_size)
     return 1; //valid position
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::createDoor(int x, int y, int chance)
 {
     int random = getInt(100, 0);
@@ -969,6 +1033,8 @@ int DungeonGenerator::createDoor(int x, int y, int chance)
 
     return 1;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 //this would have to be the worst path finder routine ever. Hell it works! (most of the time)
 int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
@@ -1022,7 +1088,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
         //starting point found make path
         do //make path in x axis
         {
-            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                 dmap[x1][y1] = '.';
 
             if (dir1 == dWest) x1--;
@@ -1031,7 +1097,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
             //if(dmap[x1][y1] == '.') //another path encountered
             if (isNearWall(x1, y1))
             {
-                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                     dmap[x1][y1] = '.';
                 TraceMsg("another path encountered going W/E");
                 createDoor(x1, y1, 100);
@@ -1049,7 +1115,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
 
         while (y1 != y2) //make path in y axis
         {
-            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                 dmap[x1][y1] = '.';
 
             if (dir2 == dNorth) y1++;
@@ -1058,7 +1124,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
             //if(dmap[x1][y1] == '.')
             if (isNearWall(x1, y1)) //another path encountered
             {
-                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                     dmap[x1][y1] = '.';
                 TraceMsg("another path encountered going N/S");
                 createDoor(x1, y1, 100);
@@ -1075,7 +1141,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                 TraceMsg("Fixing");
                 while (x1 != x2)
                 {
-                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                         dmap[x1][y1] = '.';
                     if (dir1 == dEast) x1--;	//reverse direction
                     else if (dir1 == dWest) x1++;
@@ -1083,7 +1149,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                     if (dmap[x1][y1] == '.')//another path encountered
                     {
                         createDoor(x1, y1, 100);
-                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                             dmap[x1][y1] = '.';
                         return 0;
                     }
@@ -1095,14 +1161,14 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                 TraceMsg("Fixing");
                 while (x1 != x2)
                 {
-                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                         dmap[x1][y1] = '.';
                     if (dir1 == dEast) x1--;	//reverse direction
                     else if (dir1 == dWest) x1++;
 
                     if (dmap[x1][y1] == '.')//another path encountered
                     {
-                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                             dmap[x1][y1] = '.';
                         createDoor(x1, y1, 100);
                         return 0;
@@ -1110,9 +1176,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                     Safety("Fixing in x axis");
                 }
             }
-
         }
-
     }
 
     else if (start_dir == 2) //use dir 1 to start;
@@ -1127,7 +1191,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
 
         do
         {
-            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                 dmap[x1][y1] = '.';
 
             if (dir2 == dNorth) y1++;
@@ -1136,7 +1200,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
             //if(dmap[x1][y1] == '.') //another path encountered
             if (isNearWall(x1, y1))
             {
-                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                     dmap[x1][y1] = '.';
                 createDoor(x1, y1, 100);
                 return 0;
@@ -1152,7 +1216,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
 
         while (x1 != x2)
         {
-            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+            if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                 dmap[x1][y1] = '.';
             if (dir1 == dWest) x1--;
             else if (dir1 == dEast) x1++;
@@ -1160,7 +1224,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
             //if(dmap[x1][y1] == '.') //another path encountered
             if (isNearWall(x1, y1))
             {
-                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                     dmap[x1][y1] = '.';
                 createDoor(x1, y1, 100);
                 return 0;
@@ -1176,14 +1240,14 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                 TraceMsg("Fixing");
                 while (y1 != y2)
                 {
-                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                         dmap[x1][y1] = '.';
                     if (dir2 == dNorth) y1--;	//reverse direction
                     else if (dir2 == dSouth) y1++;
 
                     if (dmap[x1][y1] == '.') //another path encountered
                     {
-                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                             dmap[x1][y1] = '.';
                         createDoor(x1, y1, 100);
                         return 0;
@@ -1196,14 +1260,14 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
                 TraceMsg("Fixing");
                 while (y1 != y2)
                 {
-                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                    if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                         dmap[x1][y1] = '.';
                     if (dir2 == dNorth) y1--;	//reverse direction
                     else if (dir2 == dSouth) y1++;
 
                     if (dmap[x1][y1] == '.') //another path encountered
                     {
-                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>')
+                        if (dmap[x1][y1] != '<' && dmap[x1][y1] != '>' && dmap[x1][y1] != 'i' && dmap[x1][y1] != ')'  && dmap[x1][y1] != '(')
                             dmap[x1][y1] = '.';
                         createDoor(x1, y1, 100);
                         return 0;
@@ -1241,6 +1305,8 @@ int DungeonGenerator::findwall(int *x, int *y)
     return 0; //never reach
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::createCorridor(int *x, int *y, int dir1)
 {
 
@@ -1257,30 +1323,10 @@ int DungeonGenerator::createCorridor(int *x, int *y, int dir1)
             dmap[i + 2][15] = '.';
     }
 
-
-    /*
-        dmap[w][h] = '.';
-
-        int distance = getInt(15,3);
-
-        for(int i=0;i<distance;i++)
-        {
-        switch(dir)
-        {
-        case dNorth: h++; break;
-        case dEast:  w++; break;
-        case dSouth: h--; break;
-        case dWest:  w--; break;
-        }
-        if(h==0 || h==DUNGEON_SIZE_H || w==0 || w==DUNGEON_SIZE_W )
-        return 0;
-
-        dmap[w][h] = '.';
-        *x = w; *y = h;
-        }*/
     return 1;
-
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::isNearWall(int x, int y)
 {
@@ -1295,10 +1341,12 @@ int DungeonGenerator::isNearWall(int x, int y)
     if (dmap[x][y - 1] != '#')
         found++;
 
-    if (found > 1) return 1;
+    if (found > 1) 
+        return 1;
     return 0;
-
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::OpenTrace(bool open)
 {
@@ -1310,6 +1358,8 @@ void DungeonGenerator::OpenTrace(bool open)
 
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 void DungeonGenerator::TraceMsg(char * msg)
 {
     //char id[1];
@@ -1319,6 +1369,7 @@ void DungeonGenerator::TraceMsg(char * msg)
 
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeRiver(int top, int size)
 {
@@ -1358,33 +1409,38 @@ void DungeonGenerator::makeRiver(int top, int size)
 
         //make water
         for (int w = 0; w < width; w++)
+        {
             makeWater(top - (width / 2) + w, h);
-
-
+        }
     }
-
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeWater(int x, int y)
 {
     if (x >= DUNGEON_SIZE_W || y >= DUNGEON_SIZE_H || x < 0 || y < 0)
         return;
 
-    if (dmap[x][y] != '>' && dmap[x][y] != '<')
+    if (dmap[x][y] != '>' && dmap[x][y] != '<' || dmap[x][y] == '(' || dmap[x][y] == 'i' || dmap[x][y] == ')')
         dmap[x][y] = '=';
 
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeSand(int x, int y)
 {
     if (x >= DUNGEON_SIZE_W || y >= DUNGEON_SIZE_H || x < 0 || y < 0) return;
 
-    if (dmap[x][y] == '>' || dmap[x][y] == '<' || dmap[x][y] == '=' || dmap[x][y] == 'w')
+    if (dmap[x][y] == '>' || dmap[x][y] == '<' || dmap[x][y] == '=' || dmap[x][y] == 'w' || dmap[x][y] == '(' || dmap[x][y] == 'i' || dmap[x][y] == ')' )
         return;
     else
         dmap[x][y] = 's';
 
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeTomb(int x, int y)
 {
@@ -1392,8 +1448,10 @@ void DungeonGenerator::makeTomb(int x, int y)
 
     if (dmap[x][y] == '.')
         dmap[x][y] = 'u';
-
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
 void DungeonGenerator::makeFloor(int x, int y)
 {
     if (x >= DUNGEON_SIZE_W - 1 || y >= DUNGEON_SIZE_H - 1 || x <= 0 || y <= 0)return;
@@ -1402,6 +1460,7 @@ void DungeonGenerator::makeFloor(int x, int y)
 
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeGrass(int x, int y)
 {
@@ -1409,6 +1468,8 @@ void DungeonGenerator::makeGrass(int x, int y)
 
     dmap[x][y] = 'g';
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeTree(int x, int y)
 {
@@ -1420,6 +1481,7 @@ void DungeonGenerator::makeTree(int x, int y)
     dmap[x][y] = 'T';
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::makeBridge()
 {
@@ -1447,6 +1509,7 @@ void DungeonGenerator::makeBridge()
     dmap[x + 1][y] = 'b';
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::createUndeadRoom(int rooms, const int max_rooms, int x, int y, int max_w, int min_w, int max_h, int min_h)
 {
@@ -1485,6 +1548,7 @@ int DungeonGenerator::createUndeadRoom(int rooms, const int max_rooms, int x, in
     return 1;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::AddTeleport()
 {
@@ -1499,10 +1563,10 @@ int DungeonGenerator::AddTeleport()
             {
                 if (dmap[x][y] == '.')
                 {
-                    coord new_coord;
-                    new_coord.x = x;
-                    new_coord.y = y;
-                    free_spaces.push_back(new_coord);
+                    Coord new_Coord;
+                    new_Coord.x = x;
+                    new_Coord.y = y;
+                    free_spaces.push_back(new_Coord);
                 }
             }
         }
@@ -1523,6 +1587,8 @@ int DungeonGenerator::AddTeleport()
     return 0;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 int DungeonGenerator::AddFountain()
 {
     //fountain chance
@@ -1536,10 +1602,10 @@ int DungeonGenerator::AddFountain()
             {
                 if (dmap[x][y] == '.')
                 {
-                    coord new_coord;
-                    new_coord.x = x;
-                    new_coord.y = y;
-                    free_spaces.push_back(new_coord);
+                    Coord new_Coord;
+                    new_Coord.x = x;
+                    new_Coord.y = y;
+                    free_spaces.push_back(new_Coord);
                 }
             }
         }
@@ -1560,6 +1626,8 @@ int DungeonGenerator::AddFountain()
     return 0;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 bool DungeonGenerator::FloodTest()
 {
     COORDLIST free_spaces;
@@ -1574,10 +1642,10 @@ bool DungeonGenerator::FloodTest()
             flood_test[x][y] = '#';
             if (dmap[x][y] == '.')
             {
-                coord new_coord;
-                new_coord.x = x;
-                new_coord.y = y;
-                free_spaces.push_back(new_coord);
+                Coord new_Coord;
+                new_Coord.x = x;
+                new_Coord.y = y;
+                free_spaces.push_back(new_Coord);
             }
         }
     }
@@ -1620,6 +1688,7 @@ bool DungeonGenerator::FloodTest()
     return (original_count == flood_count) ? true : false;
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 void DungeonGenerator::FloodFill(int x, int y)
 {
@@ -1644,13 +1713,15 @@ void DungeonGenerator::FloodFill(int x, int y)
     FloodFill(x + 1, y + 1);
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
+
 void DungeonGenerator::addLoops(int nLoops)
 {
     int loops = nLoops; // Random::getInt(nLoops + 1, 1);
 
     do
     {
-        coord c1, c2;
+        Coord c1, c2;
 
         do
         {
@@ -1681,6 +1752,7 @@ void DungeonGenerator::addLoops(int nLoops)
     } while (--loops);
 }
 
+//---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::fixDoors()
 {
@@ -1701,3 +1773,54 @@ int DungeonGenerator::fixDoors()
     }
     return 0;
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------
+
+bool DungeonGenerator::addSpecialRoom()
+{
+    // find 5x5
+    COORDLIST coords;
+
+    for (int y = 5; y < DUNGEON_SIZE_H - 6; y++)
+    {
+        for (int x = 5; x < DUNGEON_SIZE_W - 6; x++)
+        {
+            bool good = true;
+            if (dmap[x][y] == '.' && dmap[x + 1][y] == '.' && dmap[x - 1][y] == '.' && dmap[x][y + 1] == '.' && dmap[x][y - 1] == '.' &&
+                dmap[x - 1][y - 1] == '.' && dmap[x - 1][y + 1] == '.' && dmap[x + 1][y - 1] == '.' && dmap[x + 1][y + 1] == '.' &&
+                dmap[x - 2][y - 2] == '.' && dmap[x - 2][y - 1] == '.' && dmap[x - 2][y] == '.' && dmap[x - 2][y + 1] == '.' && dmap[x - 2][y + 2] == '.' &&
+                dmap[x + 2][y - 2] == '.' && dmap[x + 2][y - 1] == '.' && dmap[x + 2][y] == '.' && dmap[x + 2][y + 1] == '.' && dmap[x + 2][y + 2] == '.' &&
+                dmap[x - 1][y - 2] == '.' && dmap[x][y - 2] == '.' && dmap[x + 1][y - 2] == '.' &&
+                dmap[x - 1][y + 2] == '.' && dmap[x][y + 2] == '.' && dmap[x + 1][y + 2] == '.')
+            {
+                coords.push_back(Coord(x, y));
+            }
+        }
+    }
+
+    if (coords.size() > 0)
+    {
+        unsigned int vChoice = Random::getInt(coords.size(), 0);
+        int & X = coords[vChoice].x;
+        int & Y = coords[vChoice].y;
+
+        dmap[X][Y] = 'S';
+
+        int randomDoor = Random::getInt(4, 0);
+        // door
+        dmap[X + 1][Y] = (randomDoor == 0) ? '+' :'#';
+        dmap[X - 1][Y] = (randomDoor == 1) ? '+' : '#';
+        dmap[X][Y + 1] = (randomDoor == 2) ? '+' : '#';
+        dmap[X][Y - 1] = (randomDoor == 3) ? '+' : '#';
+
+        dmap[X + 1][Y - 1] = '#';
+        dmap[X + 1][Y + 1] = '#';
+        dmap[X - 1][Y - 1] = '#';
+        dmap[X - 1][Y + 1] = '#';
+
+    }
+
+    return true;
+}   
+
+//---------------------------------------------------------------------------------------------------------------------------------

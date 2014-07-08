@@ -384,7 +384,6 @@ void Terrain::makeSpecialItem()
     symbol = '@';
 
     strcpy(name, "dungeon floor");
-
 }
 
 

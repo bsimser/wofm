@@ -1,7 +1,7 @@
 #pragma once
 
 #include "itemmanager.h" 
-#include "coord.h"
+#include "Coord.h"
 #include "action.h"
 #include "monster.h"
 #include "spellmanager.h"
@@ -69,26 +69,26 @@ public:
 	void	SetState(eMonsterState newState){state=newState;};
 	void	XP();
 	eMonsterState	GetState() {return state;};
-	coord * getPosition()	{return &pos;};
+	Coord * getPosition()	{return &pos;};
 
 	//the monster
 	Monster monster; //should be private - check: should this be a pointer??
 
 	//monster data
-	int				last_stamina;
-	int				experience;
-	int				experience_level;
-	Action			action;
+	signed char             last_stamina;
+    unsigned char             experience;
+    unsigned char             experience_level;
+	Action          action;
 	//equipmmentSlots	slots;
-	coord			pos;
-	int				level;
-	int				ref;
+	Coord           pos;
+    unsigned char             level;
+    unsigned char             ref;
 	ITEMLIST		inventory;
 	MONSTERSPELLLIST	spellList;
 
-	coord go_to;
-	int is_archer;
-	int is_magic;
+	Coord go_to;
+	bool is_archer;
+	bool is_magic;
 	int TestArcher();
 	bool miss_turn;
 
@@ -97,7 +97,6 @@ public:
 	int flee_count;
 	int luck_penalty;
 	int luck_counter;
-
 
 private:	
 	int kills;

@@ -563,6 +563,7 @@
     <Text Include="bin\Debug Files\keys.txt" />
     <Text Include="bin\Debug Files\last_dungeon.txt" />
     <Text Include="bin\Debug Files\spells.txt" />
+    <Text Include="bin\seed.txt" />
     <Text Include="ChangeLog.txt" />
     <Text Include="ReadMe.txt" />
     <Text Include="TaskList.txt" />

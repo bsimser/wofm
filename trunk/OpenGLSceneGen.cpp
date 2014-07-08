@@ -13,8 +13,6 @@
 
 //#define SHOW_ALL 
 
-long WorldBuilder::turns;
-
 #define _UNICODE
 #define UNICODE
 
@@ -170,7 +168,7 @@ int OpenGLSceneGen::DrawGLScene(GLvoid)				// Here's Where We Do All The Drawing
 
     if (drawMap)
     {
-        //if(WorldBuilder::State()!=sMap)
+        //if(World.State()!=sMap)
         DrawMap();
         //else
         //	DrawBigMap();
@@ -192,17 +190,17 @@ void OpenGLSceneGen::DrawTextDisplay()
     glPushMatrix();
     glLoadIdentity();
     //skip space 0
-    freetype::print(our_font, 5, height_scr_offset - (1 * 14.0f), WorldBuilder::textManager.GetDisplayLine(0)->c_str());
-    freetype::print(our_font, 5, height_scr_offset - (2 * 14.0f), WorldBuilder::textManager.GetDisplayLine(1)->c_str());
+    freetype::print(our_font, 5, height_scr_offset - (1 * 14.0f), World.getTextManager().GetDisplayLine(0)->c_str());
+    freetype::print(our_font, 5, height_scr_offset - (2 * 14.0f), World.getTextManager().GetDisplayLine(1)->c_str());
 
     glColor3ub(0xff, 0xff, 64);
     for (int i = 2; i < 39; i++)
     {
-        freetype::print(our_font, 5.0f, height_scr_offset - ((i + 1)*14.0f), WorldBuilder::textManager.GetDisplayLine(i)->c_str());
+        freetype::print(our_font, 5.0f, height_scr_offset - ((i + 1)*14.0f), World.getTextManager().GetDisplayLine(i)->c_str());
     }
 
     glColor3ub(0xff, 0, 0);
-    freetype::print(our_font, 5.0f, 56.0f, WorldBuilder::textManager.GetDisplayLine(39)->c_str());
+    freetype::print(our_font, 5.0f, 56.0f, World.getTextManager().GetDisplayLine(39)->c_str());
 
     glPopMatrix();
 }
@@ -224,7 +222,7 @@ void OpenGLSceneGen::DrawBackgroundArea()
     glEnd(); 
 }
 
-void OpenGLSceneGen::CreateOffset(coord pos)
+void OpenGLSceneGen::CreateOffset(Coord pos)
 {
     offset.x = pos.x;
     offset.y = pos.y;
@@ -284,20 +282,33 @@ void OpenGLSceneGen::DrawMap()
         {
             cell & currentCell = dLevel->map[w + W_MOD][h + h_MOD];
 
-            /*if (WorldBuilder::GetCurrentLevel() == 0) // show all level
+            /*if (World.GetCurrentLevel() == 0) // show all level
                 ;
             else*/ if (!showAll && !currentCell.terrain.found) //don't show
                 continue;
 
-            if ((currentCell.GetMonster() && currentCell.terrain.light)  //display creature if lit
-                || (currentCell.GetMonster() && showAll))
+            //display extra symbol if lit
+            if ((currentCell.getSymbol() && currentCell.terrain.light) || (currentCell.getSymbol() && showAll))
+            {
+                Symbol* symbol = currentCell.getSymbol();
+                glColor3ub(symbol->mColour1, symbol->mColour2, symbol->mColour3);
+
+                freetype::qprint(map_font, calcX(w), calcY(h), symbol->mSymbol);
+            }
+            //display creature if lit
+            else if ((currentCell.GetMonster() && currentCell.terrain.light) || (currentCell.GetMonster() && showAll))
             {
                 Monster* monster = currentCell.GetMonster();
                 glColor3ub(monster->color1, monster->color2, monster->color3);
 
                 freetype::qprint(map_font, calcX(w), calcY(h), monster->symbol);
+
+                if (World.getMonsterManager().FindMonsterData(monster)->GetState() == asleep && World.getMonsterManager().FindMonsterData(monster)->Name() != "Ghoul")
+                    freetype::qprint(map_font, calcX(w), calcY(h), '-');
+
             }
-            else if (currentCell.getItem() && (addShadows || currentCell.terrain.light)) //display items
+            //display items
+            else if (currentCell.getItem() && (addShadows || currentCell.terrain.light))
             {
                 Item * item = currentCell.getItem();
                 glColor3ub(item->color1, item->color2, item->color3);
@@ -307,8 +318,8 @@ void OpenGLSceneGen::DrawMap()
                 {
                     if (item->type == weapon)
                     {
-                        monsterData* player = WorldBuilder::monsterManager.Player();
-                        Item * w = WorldBuilder::monsterManager.monsterItems.GetEquipment(player, weapon);
+                        monsterData* player = World.getMonsterManager().Player();
+                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, weapon);
 
                         if (!w || item->getAverage_h2h() > w->getAverage_h2h())
                         {
@@ -317,8 +328,8 @@ void OpenGLSceneGen::DrawMap()
                     }
                     else if (item->type == armour)
                     {
-                        monsterData* player = WorldBuilder::monsterManager.Player();
-                        Item * w = WorldBuilder::monsterManager.monsterItems.GetEquipment(player, armour);
+                        monsterData* player = World.getMonsterManager().Player();
+                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, armour);
 
                         if (!w || item->absorb_bonus > w->absorb_bonus)
                         {
@@ -327,8 +338,8 @@ void OpenGLSceneGen::DrawMap()
                     }
                     else if (item->type == shield)
                     {
-                        monsterData* player = WorldBuilder::monsterManager.Player();
-                        Item * w = WorldBuilder::monsterManager.monsterItems.GetEquipment(player, shield);
+                        monsterData* player = World.getMonsterManager().Player();
+                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, shield);
 
                         if (!w || item->absorb_bonus > w->absorb_bonus)
                         {
@@ -337,15 +348,14 @@ void OpenGLSceneGen::DrawMap()
                     }
                     else if (item->type == projectileWeapon)
                     {
-                        monsterData* player = WorldBuilder::monsterManager.Player();
-                        Item * w = WorldBuilder::monsterManager.monsterItems.GetEquipment(player, projectileWeapon);
+                        monsterData* player = World.getMonsterManager().Player();
+                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, projectileWeapon);
 
                         if (!w || item->getAverage_thr() > w->getAverage_thr())
                         {
                             glColor3ub(0, 128, 255);
                         }
                     }
-
                 }
                 freetype::qprint(map_font, calcX(w), calcY(h), currentCell.getItem()->symbol);
             }
@@ -356,7 +366,7 @@ void OpenGLSceneGen::DrawMap()
                 //special water  effect
                 if (currentCell.terrain.type == deepWater && currentCell.terrain.light) //make water flow
                 {
-                    int flow = WorldBuilder::GetTurns();
+                    int flow = World.GetTurns();
 
                     if ((h + flow) % 3 == 0)
                         glColor3ub(0, 64, 128);
@@ -447,8 +457,8 @@ void OpenGLSceneGen::DrawTextLines()
     glPushMatrix();
     glLoadIdentity(); //22,5
 
-    freetype::print(our_font, 5, 28, WorldBuilder::textManager.display_line1.c_str());
-    freetype::print(our_font, 5, 8, WorldBuilder::textManager.GetMessageLine(0)->c_str());
+    freetype::print(our_font, 5, 28, World.getTextManager().display_line1.c_str());
+    freetype::print(our_font, 5, 8, World.getTextManager().GetMessageLine(0)->c_str());
 
     glPopMatrix();
 }

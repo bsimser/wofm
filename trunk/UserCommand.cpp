@@ -14,14 +14,14 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-coord UserCommand::look_pos;
+Coord UserCommand::look_pos;
 int UserCommand::run_dir;
 monsterData * UserCommand::lastTarget = NULL;
 
-coord UserCommand::autoTarget()
+Coord UserCommand::autoTarget()
 {
-    monsterData * player = WorldBuilder::monsterManager.Player();
-    DungeonLevel * level = WorldBuilder::dungeonManager.Level(player->level);
+    monsterData * player = World.getMonsterManager().Player();
+    DungeonLevel * level = World.getDungeonManager().Level(player->level);
 
     int pX = player->pos.x;
     int pY = player->pos.y;
@@ -34,7 +34,7 @@ coord UserCommand::autoTarget()
 
     if (lastTarget == NULL) // find closest monster
     {
-        MONSTERLIST & monsters = WorldBuilder::monsterManager.monster_list;
+        MONSTERLIST & monsters = World.getMonsterManager().monster_list;
 
         float range = 100;
         MONSTERLIST::iterator it = ++monsters.begin();// ignore player
@@ -59,9 +59,9 @@ coord UserCommand::autoTarget()
 int UserCommand::ThrowItem()
 {
     UnLook();
-    if (!WorldBuilder::monsterManager.monsterItems.GetEquipment(WorldBuilder::monsterManager.Player(), projectile))
+    if (!World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), projectile))
     {
-        WorldBuilder::textManager.newLine("Nothing to fire. ");
+        World.getTextManager().newLine("Nothing to fire. ");
         return 0;
     }
     look_pos = autoTarget();
@@ -69,55 +69,55 @@ int UserCommand::ThrowItem()
     bool keys[256] = { 0 };
     Look(keys, true);
 
-    WorldBuilder::textManager.newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
+    World.getTextManager().newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
     return 1;
 }
 
 int UserCommand::ThrowTarget(eAction action)
 {
-    WorldBuilder::textManager.clear();
+    World.getTextManager().clear();
 
     UnLook();
     // set auto target
 
-    DungeonLevel & level = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
-    monsterData * monster = WorldBuilder::monsterManager.FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
+    monsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
 
     if (monster)
         lastTarget = monster;
     //else
     //    lastTarget = NULL;
 
-     return WorldBuilder::actionManager.monsterAction.ThrowTarget(WorldBuilder::monsterManager.Player(), look_pos.x, look_pos.y, action);
+     return World.getActionManager().monsterAction.ThrowTarget(World.getMonsterManager().Player(), look_pos.x, look_pos.y, action);
 }
 
 int UserCommand::Flee()
 {
-    monsterData * player = WorldBuilder::monsterManager.Player();
+    monsterData * player = World.getMonsterManager().Player();
     if (player->fleeing == true)
     {
-        WorldBuilder::textManager.newLine("You are already fleeing. ");
+        World.getTextManager().newLine("You are already fleeing. ");
         return 0;
     }
 
-    WorldBuilder::textManager.newLine("Flee which direction[dir], [x] to cancel. ");
+    World.getTextManager().newLine("Flee which direction[dir], [x] to cancel. ");
     return 1;
 }
 
 int UserCommand::CastSpellAtTarget()
 {
-    WorldBuilder::textManager.clear();
+    World.getTextManager().clear();
 
     UnLook();
 
-    DungeonLevel & level = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
-    monsterData * monster = WorldBuilder::monsterManager.FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
+    monsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
 
     if (monster)
         lastTarget = monster;
 
-    return //WorldBuilder::actionManager.monsterAction.ThrowTarget(WorldBuilder::monsterManager.Player(),look_pos.x,look_pos.y);
-        WorldBuilder::spellManager.CastCurrentSpell(WorldBuilder::monsterManager.Player(), look_pos.x, look_pos.y);
+    return //World.getActionManager().monsterAction.ThrowTarget(World.getMonsterManager().Player(),look_pos.x,look_pos.y);
+        World.getSpellManager().CastCurrentSpell(World.getMonsterManager().Player(), look_pos.x, look_pos.y);
 }
 
 int UserCommand::ClimbStairs(int dir)
@@ -127,18 +127,18 @@ int UserCommand::ClimbStairs(int dir)
         LevelChange change;
         ret = change.ChangeLevel(dir, NULL);
 
-        int cur_level = WorldBuilder::GetCurrentLevel();
+        int cur_level = World.GetCurrentLevel();
 
         if (cur_level == 1)
-            WorldBuilder::deathMessage.done.entered = 1;
+            World.getDeathMessage().done.entered = 1;
         if (cur_level == 11)
-            WorldBuilder::deathMessage.done.barracks = 1;
+            World.getDeathMessage().done.barracks = 1;
         if (cur_level == 5)
-            WorldBuilder::deathMessage.done.river = 1;
+            World.getDeathMessage().done.river = 1;
         if (cur_level == 6)
-            WorldBuilder::deathMessage.done.undead = 1;
+            World.getDeathMessage().done.undead = 1;
         if (cur_level == 8)
-            WorldBuilder::deathMessage.done.maze = 1;
+            World.getDeathMessage().done.maze = 1;
     }
     catch (const std::exception & ex)
     {
@@ -149,14 +149,14 @@ int UserCommand::ClimbStairs(int dir)
 
 int UserCommand::UnLook()
 {
-    DungeonLevel *level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
     level->map[look_pos.x][look_pos.y].show_target = 0;
     return 1;
 }
 
 int UserCommand::Look(bool *keys, bool show_path)
 {
-    DungeonLevel *level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
     UnLook();
 
     if (keys[VC_X] || keys[VK_ESC])
@@ -168,7 +168,7 @@ int UserCommand::Look(bool *keys, bool show_path)
 
     if (!show_path && keys[VK_M] && level->map[look_pos.x][look_pos.y].GetMonster())
     {
-        WorldBuilder::SetState(sLookMore);
+        World.SetState(sLookMore);
         keys[VK_M] = false;
     }
     else
@@ -190,10 +190,10 @@ int UserCommand::Look(bool *keys, bool show_path)
         default: 
             if (show_path)
             {
-                monsterData * player = WorldBuilder::monsterManager.Player();
+                monsterData * player = World.getMonsterManager().Player();
                 int p_x = player->pos.x;
                 int p_y = player->pos.y;
-                DungeonLevel *lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+                DungeonLevel *lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
                 lev->HighLightPath(p_x, p_y, look_pos.x, look_pos.y);
             }
@@ -205,19 +205,19 @@ int UserCommand::Look(bool *keys, bool show_path)
         if (look_pos.y < 0) look_pos.y = 0;
         if (look_pos.y > DUNGEON_SIZE_H - 1) look_pos.y = DUNGEON_SIZE_H - 1;
 
-        if (WorldBuilder::State() == sThrow || WorldBuilder::State() == sTargetSpell) //throwing not looking
+        if (World.State() == sThrow || World.State() == sTargetSpell) //throwing not looking
         {
             if (show_path)
             {
-                monsterData * player = WorldBuilder::monsterManager.Player();
+                monsterData * player = World.getMonsterManager().Player();
                 int p_x = player->pos.x;
                 int p_y = player->pos.y;
-                DungeonLevel *lev = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+                DungeonLevel *lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
                 lev->HighLightPath(p_x, p_y, look_pos.x, look_pos.y);
                 level->map[look_pos.x][look_pos.y].show_target = 1;
 
-                //WorldBuilder::textManager.newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
+                //World.getTextManager().newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
             }
             return 1;
         }
@@ -227,13 +227,13 @@ int UserCommand::Look(bool *keys, bool show_path)
 
     if (!level->map[look_pos.x][look_pos.y].terrain.found ) //dont show
     {
-        WorldBuilder::textManager.newLine("You have not been here yet. ");
+        World.getTextManager().newLine("You have not been here yet. ");
     }
     else if (level->map[look_pos.x][look_pos.y].GetMonster() && level->map[look_pos.x][look_pos.y].terrain.light) //display monsters
     {
-        monsterData * monster = WorldBuilder::monsterManager.FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster());
+        monsterData * monster = World.getMonsterManager().FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster());
 
-        if (WorldBuilder::State() == sLookMore)
+        if (World.State() == sLookMore)
         {
             MonsterInfo info;
             info.ShowMonsterInfo(monster);
@@ -243,7 +243,7 @@ int UserCommand::Look(bool *keys, bool show_path)
         float max_stamina = (float)level->map[look_pos.x][look_pos.y].GetMonster()->MaxStamina();
         float cur_stamina = (float)level->map[look_pos.x][look_pos.y].GetMonster()->stamina;
 
-        int state = WorldBuilder::monsterManager.FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster())->GetState();
+        int state = World.getMonsterManager().FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster())->GetState();
 
         float wounded = (max_stamina - cur_stamina) / max_stamina * 100;
         char health[32];
@@ -273,38 +273,38 @@ int UserCommand::Look(bool *keys, bool show_path)
         }
 
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("This is %s. %s. You are %s. [m]ore.", monster->Name().c_str(), status, health);
+            World.getTextManager().newLine("This is %s. %s. You are %s. [m]ore.", monster->Name().c_str(), status, health);
         else
-            WorldBuilder::textManager.newLine("You see a %s. %s. It looks %s. [m]ore.", monster->Name().c_str(), status, health);
+            World.getTextManager().newLine("You see a %s. %s. It looks %s. [m]ore.", monster->Name().c_str(), status, health);
     }
     else if (level->map[look_pos.x][look_pos.y].getItem()) //display items
     {
         if (level->map[look_pos.x][look_pos.y].terrain.light)
         {
             if (level->map[look_pos.x][look_pos.y].getItem()->stackable() && level->map[look_pos.x][look_pos.y].getItem()->itemNumber[1] > 1)
-                WorldBuilder::textManager.newLine("You see some %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName());
+                World.getTextManager().newLine("You see some %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName().c_str());
             else if (level->map[look_pos.x][look_pos.y].getItem()->identified)
-                WorldBuilder::textManager.newLine("You see a %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName());
+                World.getTextManager().newLine("You see a %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName().c_str());
             else
-                WorldBuilder::textManager.newLine("You see an %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName());
+                World.getTextManager().newLine("You see an %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName().c_str());
         }
         else
-            WorldBuilder::textManager.newLine("Last time you looks this was a %s.", level->map[look_pos.x][look_pos.y].getItem()->name);
+            World.getTextManager().newLine("Last time you looks this was a %s.", level->map[look_pos.x][look_pos.y].getItem()->BaseName().c_str());
     }
     else //display terrain
     {
         if (level->map[look_pos.x][look_pos.y].terrain.type == lockedStairs)
         {
-            WorldBuilder::textManager.newLine("This is %s (%d).", level->map[look_pos.x][look_pos.y].terrain.name,
-                WorldBuilder::itemManager.keyLabels[WorldBuilder::GetCurrentLevel()]);
+            World.getTextManager().newLine("This is %s (%d).", level->map[look_pos.x][look_pos.y].terrain.name,
+                World.getItemManager().keyLabels[World.GetCurrentLevel()]);
         }
         else if (level->map[look_pos.x][look_pos.y].terrain.type == specialLocked)
         {
-            WorldBuilder::textManager.newLine("This is %s (%d).", level->map[look_pos.x][look_pos.y].terrain.name,
-                WorldBuilder::itemManager.KeySpecial[WorldBuilder::GetCurrentLevel()]);
+            World.getTextManager().newLine("This is %s (%d).", level->map[look_pos.x][look_pos.y].terrain.name,
+                World.getItemManager().KeySpecial[World.GetCurrentLevel()]);
         }
         else
-            WorldBuilder::textManager.newLine("This is %s.", level->map[look_pos.x][look_pos.y].terrain.name);
+            World.getTextManager().newLine("This is %s.", level->map[look_pos.x][look_pos.y].terrain.name);
     }
 
     return 1;
@@ -312,11 +312,11 @@ int UserCommand::Look(bool *keys, bool show_path)
 
 int UserCommand::Look()
 {
-    WorldBuilder::textManager.newLine("Use direction keys to look[dir]. [x] to cancel. ");
+    World.getTextManager().newLine("Use direction keys to look[dir]. [x] to cancel. ");
 
-    monsterData * player = WorldBuilder::monsterManager.Player();
+    monsterData * player = World.getMonsterManager().Player();
 
-    coord * pos = player->getPosition();
+    Coord * pos = player->getPosition();
 
     look_pos.x = pos->x;
     look_pos.y = pos->y;
@@ -397,17 +397,17 @@ int UserCommand::GetDirection(bool *keys)
 
 int UserCommand::FleeCommand(int  dir)
 {
-    monsterData * player = WorldBuilder::monsterManager.Player();
+    monsterData * player = World.getMonsterManager().Player();
 
 
     if (player->fleeing == true)
     {
-        WorldBuilder::textManager.newLine("You are already fleeing. ");
+        World.getTextManager().newLine("You are already fleeing. ");
         return 0;
     }
 
-    coord * pos = player->getPosition();
-    coord new_pos;
+    Coord * pos = player->getPosition();
+    Coord new_pos;
     new_pos.x = pos->x;
     new_pos.y = pos->y;
 
@@ -429,28 +429,28 @@ int UserCommand::FleeCommand(int  dir)
     }
 
     //can more there
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
     {
         //check if occupied
-        if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].getMonster())
+        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].getMonster())
         {
-            WorldBuilder::textManager.newLine("You cant flee that way. ");
+            World.getTextManager().newLine("You cant flee that way. ");
 
             return 0;
         }
 
-        if (player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aMove, new_pos.x, new_pos.y)))
+        if (player->NextAction(World.getActionManager().UpdateAction(&player->action, aMove, new_pos.x, new_pos.y)))
         {
             //FleeTest
             if (Random::getInt(7, 1) + Random::getInt(7, 1) > player->Luck())
             {
-                WorldBuilder::textManager.newLine("You fail to flee. ");
+                World.getTextManager().newLine("You fail to flee. ");
                 return 1;
             }
 
             player->fleeing = true;
             player->flee_count += 10;
-            WorldBuilder::textManager.newLine("You flee. ");
+            World.getTextManager().newLine("You flee. ");
 
             player->monster.color1 = 255;
             player->monster.color2 = 128;
@@ -464,17 +464,17 @@ int UserCommand::FleeCommand(int  dir)
         }
     }
     else
-        WorldBuilder::textManager.newLine("You cant flee that way. ");
+        World.getTextManager().newLine("You cant flee that way. ");
 
     return 0;
 }
 
 int UserCommand::MoveCommand(int  dir)
 {
-    monsterData * player = WorldBuilder::monsterManager.Player();
+    monsterData * player = World.getMonsterManager().Player();
 
-    coord * pos = player->getPosition();
-    coord new_pos;
+    Coord * pos = player->getPosition();
+    Coord new_pos;
     new_pos.x = pos->x;
     new_pos.y = pos->y;
 
@@ -494,47 +494,47 @@ int UserCommand::MoveCommand(int  dir)
 
     }
 
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
     {
         if (dir != dWait)
-            player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aMove, new_pos.x, new_pos.y));
+            player->NextAction(World.getActionManager().UpdateAction(&player->action, aMove, new_pos.x, new_pos.y));
         else
-            player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aWait));
+            player->NextAction(World.getActionManager().UpdateAction(&player->action, aWait));
 
         //move over item mesage 
-        if (dir != dWait  && WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
+        if (dir != dWait  && World.getDungeonManager().level[World.GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
         {
             if (player->action.Type() == aMove)
             {
-                Item * item = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem();
+                Item * item = World.getDungeonManager().level[World.GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem();
                 assert(item);
 
                 // auto projectile pickup
                 bool pickup = false;
                 if (item->type == projectile)
                 {
-                    Item* projectilePile = WorldBuilder::monsterManager.monsterItems.GetEquipment(player, projectile);
+                    Item* projectilePile = World.getMonsterManager().monsterItems.GetEquipment(player, projectile);
                     if (projectilePile && projectilePile->secondaryType == item->secondaryType &&
-                        projectilePile->skill_bonus          == item->skill_bonus &&
-                        std::string(projectilePile->name)    == item->name &&
-                        std::string(projectilePile->prefix)  == item->prefix &&
-                        std::string(projectilePile->postfix) == item->postfix &&
+                        projectilePile->skill_bonus     == item->skill_bonus  &&
+                        projectilePile->BaseName()      == item->BaseName()   &&
+                        projectilePile->getPrefix()     == item->getPrefix()  &&
+                        projectilePile->getPostfix()    == item->getPostfix() &&
                         item->identified)
                     {
-                        player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aPickup, new_pos.x, new_pos.y));
+                        player->NextAction(World.getActionManager().UpdateAction(&player->action, aPickup, new_pos.x, new_pos.y));
                         pickup = true;
                     }
 
                 }
                 if (!pickup)
                 {
-                    DungeonLevel* level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+                    DungeonLevel* level = &World.getDungeonManager().level[World.GetCurrentLevel()];
                     if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->itemNumber[1] > 1)
-                        WorldBuilder::textManager.newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                        World.getTextManager().newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
                     else if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->identified)
-                        WorldBuilder::textManager.newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                        World.getTextManager().newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
                     else
-                        WorldBuilder::textManager.newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName());
+                        World.getTextManager().newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
                 }
             }
         }
@@ -557,14 +557,14 @@ int UserCommand::Close(bool *keys)
 
     if (dir == dNone) //invalid key press
     {
-        WorldBuilder::textManager.newLine("Invalid direction! Close What?[dir] - [x] to cancel. ");
+        World.getTextManager().newLine("Invalid direction! Close What?[dir] - [x] to cancel. ");
         return -1;
     }
 
-    monsterData * player = WorldBuilder::monsterManager.Player();
+    monsterData * player = World.getMonsterManager().Player();
 
-    coord * pos = player->getPosition();
-    coord new_pos;
+    Coord * pos = player->getPosition();
+    Coord new_pos;
     new_pos.x = pos->x;
     new_pos.y = pos->y;
 
@@ -584,30 +584,30 @@ int UserCommand::Close(bool *keys)
 
     }
 
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type == openDoor) //open door
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type == openDoor) //open door
     {
 
-        if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].getItem() ||
-            WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster())
+        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].getItem() ||
+            World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster())
         {
-            WorldBuilder::textManager.newLine("The door is blocked. ");
+            World.getTextManager().newLine("The door is blocked. ");
             return 0;
         }
 
-        WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.Create(closedDoor);//makeclosedDoor();
-        WorldBuilder::textManager.newLine("You close the door. ");
+        World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.Create(closedDoor);//makeclosedDoor();
+        World.getTextManager().newLine("You close the door. ");
         return 1;
     }
 
 
-    WorldBuilder::textManager.newLine("There is nothing there to close. ");
+    World.getTextManager().newLine("There is nothing there to close. ");
     return 0;
 }
 
 int UserCommand::InitRun()
 {
 
-    WorldBuilder::textManager.newLine("Run which direction[dir]?. [x] to cancel. ");
+    World.getTextManager().newLine("Run which direction[dir]?. [x] to cancel. ");
 
     run_dir = -1;
     return 1;
@@ -625,10 +625,10 @@ int UserCommand::RunDirection(int dir)
 int UserCommand::Run()
 {
 
-    monsterData *player = WorldBuilder::monsterManager.Player();
+    monsterData *player = World.getMonsterManager().Player();
 
-    coord * pos = player->getPosition();
-    coord new_pos;
+    Coord * pos = player->getPosition();
+    Coord new_pos;
     new_pos.x = pos->x;
     new_pos.y = pos->y;
 
@@ -649,14 +649,14 @@ int UserCommand::Run()
     }
 
 
-    DungeonLevel *level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     if (run_dir == dNone)
         return 2;
 
-    for (MONSTERLIST::iterator it = WorldBuilder::monsterManager.monster_list.begin(); it != WorldBuilder::monsterManager.monster_list.end(); it++)
+    for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
     { //is this too slow? seems OK to me
-        if (it->level == WorldBuilder::GetCurrentLevel() && !it->isPlayer())
+        if (it->level == World.GetCurrentLevel() && !it->isPlayer())
         if (it->isSeen() == 1)
             return 0;
     }
@@ -695,7 +695,7 @@ int UserCommand::HaltRun(int x, int y, int oldx, int oldy)
     if (x == oldx && y == oldy)
         return 0;
 
-    DungeonLevel *level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     if (level->map[x][y].GetMonster() == NULL)
 
@@ -708,7 +708,7 @@ int UserCommand::HaltRunFeature(int x, int y, int oldx, int oldy)
     if (x == oldx && y == oldy)
         return 0;
 
-    DungeonLevel *level = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     if (level->map[x][y].GetMonster() == NULL
         && level->map[x][y].terrain.type != closedDoor
@@ -722,40 +722,40 @@ int UserCommand::HaltRunFeature(int x, int y, int oldx, int oldy)
 
 int UserCommand::DisplayHelpAbout()
 {
-    WorldBuilder::textManager.ClearDisplayLines();
+    World.getTextManager().ClearDisplayLines();
 
-    WorldBuilder::textManager.SetDisplayLine(0, "The Warlock of Firetop Mountain Roguelike (c) 2014 Corremn");
-    WorldBuilder::textManager.SetDisplayLine(1, "==========================================================");
-    WorldBuilder::textManager.SetDisplayLine(3, "http://sites.google.com/site/corremn/");
-    WorldBuilder::textManager.SetDisplayLine(4, "mailto:corremn@gmail.com");
+    World.getTextManager().SetDisplayLine(0, "The Warlock of Firetop Mountain Roguelike (c) 2014 Corremn");
+    World.getTextManager().SetDisplayLine(1, "==========================================================");
+    World.getTextManager().SetDisplayLine(3, "http://sites.google.com/site/corremn/");
+    World.getTextManager().SetDisplayLine(4, "mailto:corremn@gmail.com");
 
-    WorldBuilder::textManager.SetDisplayLine(5, "This game was originally created for the 2007 seven-day roguelike competition. ");
-    WorldBuilder::textManager.SetDisplayLine(5, "See changelog.txt for recent developments. ");
+    World.getTextManager().SetDisplayLine(5, "This game was originally created for the 2007 seven-day roguelike competition. ");
+    World.getTextManager().SetDisplayLine(5, "See changelog.txt for recent developments. ");
 
-    WorldBuilder::textManager.SetDisplayLine(9,  "You are seeking the Warlock Zagor's Treasure. In your way are the inhabitants");
-    WorldBuilder::textManager.SetDisplayLine(10, "of the mountain, underground rivers, locked gates and of course the warlock himself.");
-    WorldBuilder::textManager.SetDisplayLine(11, "Of course you will find plenty of items within the mountain to help you in your quest.");
+    World.getTextManager().SetDisplayLine(9,  "You are seeking the Warlock Zagor's Treasure. In your way are the inhabitants");
+    World.getTextManager().SetDisplayLine(10, "of the mountain, underground rivers, locked gates and of course the warlock himself.");
+    World.getTextManager().SetDisplayLine(11, "Of course you will find plenty of items within the mountain to help you in your quest.");
 
-    WorldBuilder::textManager.SetDisplayLine(14, "HINTS");
-    WorldBuilder::textManager.SetDisplayLine(15, "Skill represents your skill with the current weapon, Stamina is your hit points.");
-    WorldBuilder::textManager.SetDisplayLine(16, "Luck helps you escape damage and find better items, especially from chests. Higher the better.");
-    WorldBuilder::textManager.SetDisplayLine(17, "Armour quality is based on the AC value [x]. The higher the better. ");
-    WorldBuilder::textManager.SetDisplayLine(18, "Most damage taken is 1-2 points. Shields can reduce damage from hits. ");
-    WorldBuilder::textManager.SetDisplayLine(19, "You can attempt to flee combat at the cost of a luck point.");
+    World.getTextManager().SetDisplayLine(14, "HINTS");
+    World.getTextManager().SetDisplayLine(15, "Skill represents your skill with the current weapon, Stamina is your hit points.");
+    World.getTextManager().SetDisplayLine(16, "Luck helps you escape damage and find better items, especially from chests. Higher the better.");
+    World.getTextManager().SetDisplayLine(17, "Armour quality is based on the AC value [x]. The higher the better. ");
+    World.getTextManager().SetDisplayLine(18, "Most damage taken is 1-2 points. Shields can reduce damage from hits. ");
+    World.getTextManager().SetDisplayLine(19, "You can attempt to flee combat at the cost of a luck point.");
 
-    WorldBuilder::textManager.SetDisplayLine(20, "Creatures are weaker in water.");
-    WorldBuilder::textManager.SetDisplayLine(21, "Locked gates and chests can be opened with the correct key.");
-    WorldBuilder::textManager.SetDisplayLine(22, "To unlock something use the [u]se command or enter it.");
-    WorldBuilder::textManager.SetDisplayLine(23, "The same key may have more than one use, so dont throw them away.");
-    WorldBuilder::textManager.SetDisplayLine(24, "To access Zagor's treasure you will need multiple keys.");
-    WorldBuilder::textManager.SetDisplayLine(25, "Archers are more accurate over short distances.");
-    //WorldBuilder::textManager.SetDisplayLine(25, "Resting between levels can be dangerous.");
-    WorldBuilder::textManager.SetDisplayLine(26, "Items will change to blue if it is better than your current one.");
-    WorldBuilder::textManager.SetDisplayLine(29, "Fountains need to be [u]sed.");
+    World.getTextManager().SetDisplayLine(20, "Creatures are weaker in water.");
+    World.getTextManager().SetDisplayLine(21, "Locked gates and chests can be opened with the correct key.");
+    World.getTextManager().SetDisplayLine(22, "To unlock something use the [u]se command or enter it.");
+    World.getTextManager().SetDisplayLine(23, "The same key may have more than one use, so dont throw them away.");
+    World.getTextManager().SetDisplayLine(24, "To access Zagor's treasure you will need multiple keys.");
+    World.getTextManager().SetDisplayLine(25, "Archers are more accurate over short distances.");
+    //World.getTextManager().SetDisplayLine(25, "Resting between levels can be dangerous.");
+    World.getTextManager().SetDisplayLine(26, "Items will change to blue if it is better than your current one.");
+    World.getTextManager().SetDisplayLine(29, "Fountains need to be [u]sed.");
 
-    WorldBuilder::textManager.SetDisplayLine(30, "Contact the author to support the continuing development of this game.");
+    World.getTextManager().SetDisplayLine(30, "Contact the author to support the continuing development of this game.");
 
-    WorldBuilder::textManager.SetDisplayLine(39, "[k] key bindings, [x] to exit");
+    World.getTextManager().SetDisplayLine(39, "[k] key bindings, [x] to exit");
 
     return 1;
 }
@@ -763,42 +763,42 @@ int UserCommand::DisplayHelpAbout()
 int UserCommand::DisplayHelp()
 {
 
-    WorldBuilder::textManager.ClearDisplayLines();
+    World.getTextManager().ClearDisplayLines();
 
-    WorldBuilder::textManager.SetDisplayLine(0, "Help");
-    WorldBuilder::textManager.SetDisplayLine(1, "====");
-    WorldBuilder::textManager.SetDisplayLine(2, "");
+    World.getTextManager().SetDisplayLine(0, "Help");
+    World.getTextManager().SetDisplayLine(1, "====");
+    World.getTextManager().SetDisplayLine(2, "");
 
-    WorldBuilder::textManager.SetDisplayLine(3, "Commands");
+    World.getTextManager().SetDisplayLine(3, "Commands");
 
-    WorldBuilder::textManager.SetDisplayLine(5, " move               - [arrow keys] or [numpad]");
-    WorldBuilder::textManager.SetDisplayLine(6, " continuous move    - [.] + [dir]");
-    WorldBuilder::textManager.SetDisplayLine(7, " wait               - [numpad 5]");
-    WorldBuilder::textManager.SetDisplayLine(8, " fire ranged weapon - [numpad f]");
-    WorldBuilder::textManager.SetDisplayLine(9, " flee               - [F]");
-    WorldBuilder::textManager.SetDisplayLine(10, " pickup             - [g] or [,]");
-    WorldBuilder::textManager.SetDisplayLine(11, " look               - [l] + [dir]");
-    WorldBuilder::textManager.SetDisplayLine(12, " close              - [c]");
-    WorldBuilder::textManager.SetDisplayLine(13, " unlock             - [u] + [dir]");
-    WorldBuilder::textManager.SetDisplayLine(14, " use magic          - [z]");
-    WorldBuilder::textManager.SetDisplayLine(15, " climb up           - [<]");
-    WorldBuilder::textManager.SetDisplayLine(16, " climb down         - [>]");
+    World.getTextManager().SetDisplayLine(5, " move               - [arrow keys] or [numpad]");
+    World.getTextManager().SetDisplayLine(6, " continuous move    - [.] + [dir]");
+    World.getTextManager().SetDisplayLine(7, " wait               - [numpad 5]");
+    World.getTextManager().SetDisplayLine(8, " fire ranged weapon - [numpad f]");
+    World.getTextManager().SetDisplayLine(9, " flee               - [F]");
+    World.getTextManager().SetDisplayLine(10, " pickup             - [g] or [,]");
+    World.getTextManager().SetDisplayLine(11, " look               - [l] + [dir]");
+    World.getTextManager().SetDisplayLine(12, " close              - [c]");
+    World.getTextManager().SetDisplayLine(13, " unlock             - [u] + [dir]");
+    World.getTextManager().SetDisplayLine(14, " use magic          - [z]");
+    World.getTextManager().SetDisplayLine(15, " climb up           - [<]");
+    World.getTextManager().SetDisplayLine(16, " climb down         - [>]");
 
-    WorldBuilder::textManager.SetDisplayLine(18, " message history    - [ctrl-p]");
-    WorldBuilder::textManager.SetDisplayLine(19, " view inventory     - [i]");
-    WorldBuilder::textManager.SetDisplayLine(20, " view quipment      - [e]");
+    World.getTextManager().SetDisplayLine(18, " message history    - [ctrl-p]");
+    World.getTextManager().SetDisplayLine(19, " view inventory     - [i]");
+    World.getTextManager().SetDisplayLine(20, " view quipment      - [e]");
 
-    WorldBuilder::textManager.SetDisplayLine(21, " toggle Full Screen - [F1]");
+    World.getTextManager().SetDisplayLine(21, " toggle Full Screen - [F1]");
 
 #ifdef _DEBUG
-    WorldBuilder::textManager.SetDisplayLine(23, "Debug commands");
-    WorldBuilder::textManager.SetDisplayLine(24, " God view            - [s]");
-    WorldBuilder::textManager.SetDisplayLine(25, " suicide             - [t]");
-    WorldBuilder::textManager.SetDisplayLine(26, " Dungeon Level Down  - [1]     Dungeon Level Up  - [2]");
-    WorldBuilder::textManager.SetDisplayLine(27, " Max Health          - [3]");
+    World.getTextManager().SetDisplayLine(23, "Debug commands");
+    World.getTextManager().SetDisplayLine(24, " God view            - [s]");
+    World.getTextManager().SetDisplayLine(25, " suicide             - [t]");
+    World.getTextManager().SetDisplayLine(26, " Dungeon Level Down  - [1]     Dungeon Level Up  - [2]");
+    World.getTextManager().SetDisplayLine(27, " Max Health          - [3]");
 #endif
 
-    WorldBuilder::textManager.SetDisplayLine(39, "[a] about game, [x] to exit");
+    World.getTextManager().SetDisplayLine(39, "[a] about game, [x] to exit");
     return 1;
 }
 
@@ -832,7 +832,7 @@ int UserCommand::HelpCommand(bool *keys)
 
 int UserCommand::UseItem()
 {
-    WorldBuilder::textManager.newLine("What direction[dir]?");
+    World.getTextManager().newLine("What direction[dir]?");
     return 0;
 }
 int UserCommand::UseItem(bool *keys)
@@ -849,11 +849,11 @@ int UserCommand::UseItem(bool *keys)
 
 int  UserCommand::UseItem(Item*item, int dir)
 {
-    DungeonLevel *dlevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
-    monsterData * player = WorldBuilder::monsterManager.Player();
+    DungeonLevel *dlevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    monsterData * player = World.getMonsterManager().Player();
 
-    coord * pos = player->getPosition();
-    coord new_pos;
+    Coord * pos = player->getPosition();
+    Coord new_pos;
     new_pos.x = pos->x;
     new_pos.y = pos->y;
 
@@ -870,7 +870,7 @@ int  UserCommand::UseItem(Item*item, int dir)
     case dNorthWest: new_pos.x--; new_pos.y--; break;
 
     case dWait: break;
-    default: WorldBuilder::textManager.newLine("Invalid direction. "); return 0;
+    default: World.getTextManager().newLine("Invalid direction. "); return 0;
 
     }
 
@@ -879,27 +879,27 @@ int  UserCommand::UseItem(Item*item, int dir)
         if (dlevel->map[new_pos.x][new_pos.y].terrain.type == lockedStairs)
         {
             ITEMLIST::iterator it;
-            ITEMLIST *inventory = &WorldBuilder::monsterManager.Player()->inventory;
-            int level = WorldBuilder::GetCurrentLevel();
+            ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
+            int level = World.GetCurrentLevel();
 
             char buf[64];
-            sprintf(buf, "key labelled %d", WorldBuilder::itemManager.keyLabels[level]);
+            sprintf(buf, "key labelled %d", World.getItemManager().keyLabels[level]);
 
             int match = 0;
 
             for (it = inventory->begin(); it != inventory->end(); it++)
             {
-                if (!strcmp(it->name, buf))
+                if (it->BaseName() ==  buf)
                     match = 1;
             }
             if (match == 0)
             {
-                WorldBuilder::textManager.newLine("You do not have the correct key. ");
+                World.getTextManager().newLine("You do not have the correct key. ");
                 return 1;
             }
             else
             {
-                WorldBuilder::textManager.newLine("You unlock the gate. ");
+                World.getTextManager().newLine("You unlock the gate. ");
                 dlevel->map[new_pos.x][new_pos.y].terrain.Create(openStairs);
                 return 1;
             }
@@ -907,41 +907,41 @@ int  UserCommand::UseItem(Item*item, int dir)
         else if (dlevel->map[new_pos.x][new_pos.y].terrain.type == specialLocked)
         {
             ITEMLIST::iterator it;
-            ITEMLIST *inventory = &WorldBuilder::monsterManager.Player()->inventory;
-            int level = WorldBuilder::GetCurrentLevel();
+            ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
+            int level = World.GetCurrentLevel();
 
             char buf[64];
-            sprintf(buf, "key labelled %d", WorldBuilder::itemManager.KeySpecial[level]);
+            sprintf(buf, "key labelled %d", World.getItemManager().KeySpecial[level]);
 
             int match = 0;
 
             for (it = inventory->begin(); it != inventory->end(); it++)
             {
-                if (!strcmp(it->name, buf))
+                if (it->BaseName() == buf)
                     match = 1;
             }
             if (match == 0)
             {
-                WorldBuilder::textManager.newLine("You do not have the correct key. ");
+                World.getTextManager().newLine("You do not have the correct key. ");
                 return 0;
             }
             else
             {
-                WorldBuilder::textManager.newLine("You unlock the gate. You hear mad laughing. ");
+                World.getTextManager().newLine("You unlock the gate. You hear mad laughing. ");
                 dlevel->map[new_pos.x][new_pos.y].terrain.Create(specialOpen);
                 return 1;
             }
         }
         if (strcmp(dlevel->map[new_pos.x][new_pos.y].terrain.name, "a teleport") == 0)
         {
-            WorldBuilder::textManager.newLine("Walk into it! ");
+            World.getTextManager().newLine("Walk into it! ");
             return 0;
         }
         if (strcmp(dlevel->map[new_pos.x][new_pos.y].terrain.name, "a fountain") == 0)
         {
             player->monster.stamina = player->monster.MaxStamina();
 
-            WorldBuilder::textManager.newLine("You drink from the fountain. You feel healthier. ");
+            World.getTextManager().newLine("You drink from the fountain. You feel healthier. ");
             dlevel->map[new_pos.x][new_pos.y].terrain.Create(dryFountain);
 
             return 1;
@@ -951,11 +951,11 @@ int  UserCommand::UseItem(Item*item, int dir)
             if (dlevel->map[new_pos.x][new_pos.y].getItem()->type == lockedChest)
             {
                 ITEMLIST::iterator it;
-                ITEMLIST *inventory = &WorldBuilder::monsterManager.Player()->inventory;
+                ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
 
                 int match = 0;
 
-                if (WorldBuilder::GetCurrentLevel() != 19)
+                if (World.GetCurrentLevel() != 19)
                 {
                     for (it = inventory->begin(); it != inventory->end(); it++)
                     {
@@ -967,10 +967,10 @@ int  UserCommand::UseItem(Item*item, int dir)
                     }
                     if (match)
                     {
-                        dlevel->map[new_pos.x][new_pos.y].getItem()->CreateItem(openChest, WorldBuilder::GetCurrentLevel());
-                        WorldBuilder::textManager.newLine("You open the chest. ");
+                        dlevel->map[new_pos.x][new_pos.y].getItem()->CreateItem(openChest, World.GetCurrentLevel());
+                        World.getTextManager().newLine("You open the chest. ");
 
-                        if (WorldBuilder::GetCurrentLevel() > 9) //create special item
+                        if (World.GetCurrentLevel() > 9) //create special item
                         {
                             int item_boost = 0;
                             if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
@@ -982,19 +982,19 @@ int  UserCommand::UseItem(Item*item, int dir)
                             Item *new_it;
                             switch (random_item)
                             {
-                            case 0: new_it = WorldBuilder::itemManager.CreateItem(20 + item_boost, armour, platemail);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
-                            case 1: new_it = WorldBuilder::itemManager.CreateItem(20 + item_boost, weapon, axe);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                            case 0: new_it = World.getItemManager().CreateItem(20 + item_boost, armour, platemail);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                            case 1: new_it = World.getItemManager().CreateItem(20 + item_boost, weapon, axe);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             case 2:;
-                            case 3: new_it = WorldBuilder::itemManager.CreateItem(20 + item_boost, shield);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
-                            default:  new_it = WorldBuilder::itemManager.CreateRandomItem(WorldBuilder::GetCurrentLevel() + 20 + item_boost);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
-                                new_it = WorldBuilder::itemManager.CreateRandomItem(WorldBuilder::GetCurrentLevel() + 20 + item_boost);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
-                                new_it = WorldBuilder::itemManager.CreateRandomItem(WorldBuilder::GetCurrentLevel() + 20 + item_boost);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                            case 3: new_it = World.getItemManager().CreateItem(20 + item_boost, shield);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                            default:  new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + 20 + item_boost);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
+                                new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + 20 + item_boost);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                                new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + 20 + item_boost);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             }
                         }
                         else
@@ -1014,15 +1014,15 @@ int  UserCommand::UseItem(Item*item, int dir)
                                     }
                                 }
 
-                                Item *new_it = WorldBuilder::itemManager.CreateRandomItem(WorldBuilder::GetCurrentLevel() + item_boost);
-                                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
+                                Item *new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + item_boost);
+                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
                             }
                         }
                         return 1;
                     }
                     else
                     {
-                        WorldBuilder::textManager.newLine("You do not have the correct key. ");
+                        World.getTextManager().newLine("You do not have the correct key. ");
                         return 1;
                     }
                 }
@@ -1037,26 +1037,26 @@ int  UserCommand::UseItem(Item*item, int dir)
                     }
                     if (match == 3)
                     {
-                        dlevel->map[new_pos.x][new_pos.y].getItem()->CreateItem(openChest, WorldBuilder::GetCurrentLevel());
-                        WorldBuilder::textManager.newLine("Click, Click, Click! You open the chest. <insert trumpet sounds here>");
-                        Item *new_it = WorldBuilder::itemManager.CreateItem(WorldBuilder::GetCurrentLevel(), gold);
-                        WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
+                        dlevel->map[new_pos.x][new_pos.y].getItem()->CreateItem(openChest, World.GetCurrentLevel());
+                        World.getTextManager().newLine("Click, Click, Click! You open the chest. <insert trumpet sounds here>");
+                        Item *new_it = World.getItemManager().CreateItem(World.GetCurrentLevel(), gold);
+                        World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
 
                         return 1;
                     }
                     else if (match == 2)
                     {
-                        WorldBuilder::textManager.newLine("Click, Click, Damn!! You do not have all the keys. ");
+                        World.getTextManager().newLine("Click, Click, Damn!! You do not have all the keys. ");
                         return 1;
                     }
                     else if (match == 1)
                     {
-                        WorldBuilder::textManager.newLine("Click, Umm, Hmmm!! You do not have all the keys. ");
+                        World.getTextManager().newLine("Click, Umm, Hmmm!! You do not have all the keys. ");
                         return 1;
                     }
                     else
                     {
-                        WorldBuilder::textManager.newLine("You do not have any of the correct keys. ");
+                        World.getTextManager().newLine("You do not have any of the correct keys. ");
                         return 1;
                     }
 
@@ -1065,25 +1065,25 @@ int  UserCommand::UseItem(Item*item, int dir)
             }
             else if (dlevel->map[new_pos.x][new_pos.y].getItem()->type == openChest)
             {
-                WorldBuilder::textManager.newLine("All ready open. ");
+                World.getTextManager().newLine("All ready open. ");
                 return 0;
             }
             else if (dlevel->map[new_pos.x][new_pos.y].getItem()->type == corpse)
             {
                 if (Random::getInt(2, 0))
-                    WorldBuilder::textManager.newLine("It says 'Hello my name's Frank, whats yours?'. Come on, its a corpse!");
+                    World.getTextManager().newLine("It says 'Hello my name's Frank, whats yours?'. Come on, its a corpse!");
                 else
-                    WorldBuilder::textManager.newLine("It appears to be smiling at you! ");
+                    World.getTextManager().newLine("It appears to be smiling at you! ");
                 return 0;
             }
             else //nothing to use
             {
-                WorldBuilder::textManager.newLine("Cant use that. ");
+                World.getTextManager().newLine("Cant use that. ");
                 return 0;
             }
         }
     }
-    WorldBuilder::textManager.newLine("Nothing to use. ");
+    World.getTextManager().newLine("Nothing to use. ");
     return 0;
 
 }

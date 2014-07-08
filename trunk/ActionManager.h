@@ -17,9 +17,6 @@
 class ActionManager  
 {
 public:
-	ActionManager();
-	virtual ~ActionManager();
-
 	Action* CreateAction(eAction type, int param1=1,int param2=0, int param3=0, int param4=0);
 	Action* UpdateAction(Action* action,eAction type,int param1=0,int param2=0, int param3=0, int param4=0);
 

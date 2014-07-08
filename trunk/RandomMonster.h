@@ -15,7 +15,6 @@ class RandomMonster : public Monster
 {
 public:
 	RandomMonster();
-	virtual ~RandomMonster();
 
 	int Create(int level);
 

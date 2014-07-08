@@ -9,43 +9,42 @@
 #include <string>
 
 using namespace Random;
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item::Item() :
-skill_bonus(0),
-defence_bonus(0),
-absorb_bonus(0),
-identified(0),
-equipped(0),
-mStackable(0),
-mWearable(0),
-type(no_type),
-secondaryType(no_type),
-symbol(0),
-weight(0),
-ref(-1)
+    skill_bonus(0),
+    defence_bonus(0),
+    absorb_bonus(0),
+    identified(0),
+    equipped(0),
+    mStackable(0),
+    mWearable(0),
+    type(no_type),
+    secondaryType(no_type),
+    symbol(0),
+    weight(0),
+    ref(-1),
+    name(""),
+    prefix(""),
+    postfix("")
 {
     for (int i = 0; i < 3; i++)
+    {
         itemNumber[i] = 0;
+    }
 
     setColor(255, 255, 255);
 
     SetDice_h2h(1, 1);
     SetDice_thr(1, 1);
-
-    strcpy(postfix, "");
-    strcpy(prefix, "");
-    strcpy(nothing, "");
-    strcpy(id_name, "");
-    strcpy(name, "");
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item::Item(const Item& rhs) : ResistanceBrands(rhs)
 {
-    strcpy(name, rhs.name);
-    strcpy(id_name, rhs.id_name);
+    name = rhs.name;
 
     type = rhs.type;
     secondaryType = rhs.secondaryType;
@@ -80,14 +79,17 @@ Item::Item(const Item& rhs) : ResistanceBrands(rhs)
     thrSidesDice = rhs.thrSidesDice;
     thrNumDice   = rhs.thrNumDice;
 
-    strcpy(postfix, rhs.postfix);
-    strcpy(prefix, rhs.prefix);
-    strcpy(nothing, rhs.nothing);
+    postfix = rhs.postfix;
+    prefix =  rhs.prefix;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item::~Item()
 {
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 bool Item::operator< (const Item & rhs)
 {
@@ -114,19 +116,25 @@ bool Item::operator< (const Item & rhs)
     return (rhs.ref < this->ref) ? false : true;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int Item::CreateItem(eItemType _type, int level, int secondary_type)
 {
     switch (_type)
     {
-    case corpse:        createCorpse();             mWearable = 0; break;
-    case weapon:        createWeapon(level, secondary_type);     mWearable = 1; break;
-    case armour:        createArmour(level, secondary_type);     mWearable = 1; break;
-    case key:            createKey(level);         mWearable = 0; break;
-    case lockedChest:    createLockedChest(level); mWearable = 0; break;
-    case openChest:        createOpenChest(level);     mWearable = 0; break;
-    case gold:            createGold(level);         mWearable = 0; break;
-    case shield:        createShield(level);     mWearable = 1; break;
-    case cards:            createCards(level);         mWearable = 0; break;
+    case corpse:        createCorpse();                         mWearable = 0; break;
+    case weapon:        createWeapon(level, secondary_type);    mWearable = 1; break;
+    case armour:        createArmour(level, secondary_type);    mWearable = 1; break;
+    case key:           createKey(level);                       mWearable = 0; break;
+    case lockedChest:   createLockedChest(level);               mWearable = 0; break;
+    case openChest:     createOpenChest(level);                 mWearable = 0; break;
+    case gold:          createGold(level);                      mWearable = 0; break;
+    case shield:        createShield(level);                    mWearable = 1; break;
+    case cards:         createCards(level);                     mWearable = 0; break;
+    case ration:        createRation();                         mWearable = 0; break;
+    case gem:           createGem();                            mWearable = 0; break;
+    case stake:         createStake();                          mWearable = 0; break;
+    case cheese:        createCheese();                         mWearable = 0; break;
 
     default:     char err[128]; sprintf(err, "Invalid item type passed into item creator: %d", _type); throw std::exception(err);
     }
@@ -135,6 +143,45 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
 
     return 0;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+void Item::createRation()
+{
+    symbol = '[';
+    setColor(50, 50, 50);
+    identified = 1;
+    name = ("tower shield");
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+void Item::createGem()
+{
+    symbol = '*';
+    setColor(255, 50, 50);
+    name = ("tower shield");
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+void Item::createStake()
+{
+    symbol = '*';
+    setColor(255, 50, 50);
+    name = ("tower shield");
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+void Item::createCheese()
+{
+    symbol = '*';
+    setColor(255, 50, 50);
+    name = ("tower shield");
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createShield(int level)
 {
@@ -148,45 +195,46 @@ void Item::createShield(int level)
 
     if (size == 4 && level > 9)
     {
-        sprintf(name, "tower shield");
+        name = ("tower shield");
         absorb_bonus = 4;
     }
 
     else if (size == 3 && level > 9)
     {
-        sprintf(name, "large shield");
+        name = ("large shield");
         absorb_bonus = 3;
     }
     else if (size == 2 && level > 3)
     {
-        sprintf(name, "medium shield");
+        name = ("medium shield");
         absorb_bonus = 2;
     }
     else
     {
-        sprintf(name, "small shield");
+        name = ("small shield");
         absorb_bonus = 1;
     }
-
-
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createKey(int level)
 {
     symbol = '}';
+    char keyName[32];
 
     if (level > 9)
     {
         itemNumber[0] = ItemManager::KeySpecial[level - 10];
-        sprintf(name, "key labelled %d", itemNumber[0]);
-
+        sprintf(keyName, "key labelled %d", itemNumber[0]);
     }
 
     else
     {
         itemNumber[0] = ItemManager::keyLabels[level];
-        sprintf(name, "key labelled %d", itemNumber[0]);
+        sprintf(keyName, "key labelled %d", itemNumber[0]);
     }
+    name = keyName;
 
     identified = 1;
     weight = 1;
@@ -194,12 +242,12 @@ void Item::createKey(int level)
     setColor(255, 255, 0);
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createOpenChest(int level)
 {
     symbol = '&';
-
-    sprintf(name, "chest (empty)");
+    name= ("chest (empty)");
 
     identified = 1;
     weight = 100;
@@ -207,8 +255,12 @@ void Item::createOpenChest(int level)
     setColor(128, 128, 128);
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 void Item::createLockedChest(int level)
 {
+    char chestName[32];
+
     symbol = '&';
 
     if (level == 19)
@@ -227,14 +279,12 @@ void Item::createLockedChest(int level)
         key2 = ItemManager::KeySpecial[key2];
         key3 = ItemManager::KeySpecial[key3];
 
-
-        sprintf(name, "large chest (%d) (%d) (%d)", key1, key2, key3);
+        sprintf(chestName, "large chest (%d) (%d) (%d)", key1, key2, key3);
         weight = 1000;
         setColor(255, 255, 0);
         itemNumber[0] = key1;
         itemNumber[1] = key2;
         itemNumber[2] = key3;
-
     }
 
     else
@@ -244,42 +294,50 @@ void Item::createLockedChest(int level)
         else
             itemNumber[0] = ItemManager::KeySpecial[level];
 
-        sprintf(name, "chest (%d)", itemNumber[0]);
+        sprintf(chestName, "chest (%d)", itemNumber[0]);
         weight = 100;
         setColor(128, 128, 20);
     }
 
+    name = chestName;
     identified = 1;
-
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createCorpse()
 {
     symbol = 'c';
-    strcpy(name, "rotting corpse");
+    name = ("rotting corpse");
     identified = 0;
     weight = 15;
     setColor(128, 128, 128);
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 void Item::createGold(int level)
 {
     symbol = '$';
-    strcpy(name, "Zagor's gold");
+    name = ("Zagor's gold");
     identified = 0;
     weight = 100;
     setColor(255, 255, 0);
     identified = 1;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 void Item::createCards(int level)
 {
     symbol = '+';
-    strcpy(name, "pack of cards");
-    identified = 0;
+    name = ("pack of cards");
+    identified = 1;
     weight = 100;
     setColor(128, 255, 0);
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createWeapon(int level, int secondary_type)
 {
@@ -311,8 +369,8 @@ void Item::createWeapon(int level, int secondary_type)
             type1 = 0; //no long 
         switch (type1)
         {
-        case 1: strcpy(name, "long sword");    symbol = '|';    weight = 12; setColor(90, 90, 90); SetDice_h2h(6, 8); break;
-        default: strcpy(name, "short sword");   symbol = '|';    weight = 8; setColor(90, 90, 90); SetDice_h2h(4, 6); break;
+        case 1: name = ("long sword");    symbol = '|';    weight = 12; setColor(90, 90, 90); SetDice_h2h(3, 8); break;
+        default: name = ("short sword");   symbol = '|';    weight = 8; setColor(90, 90, 90); SetDice_h2h(2, 6); break;
         }
 
         break;
@@ -324,27 +382,27 @@ void Item::createWeapon(int level, int secondary_type)
             type2 = 0; //no battle 
         switch (type2)
         {
-        case 1: strcpy(name, "battle axe");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(7, 5); break;
-        default: strcpy(name, "hand axe");   symbol = '/';    weight = 15; setColor(90, 90, 90);    SetDice_h2h(6, 4); break;
+        case 1: name = ("battle axe");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(4, 5); break;
+        default: name = ("hand axe");   symbol = '/';    weight = 15; setColor(90, 90, 90);    SetDice_h2h(3, 4); break;
         }
         break;
     }
     case mace:
     {
         int type = getInt(4, 0);
-        if (level == 1)
+        if (level < 2)
             type = 0;
         switch (type)
         {
-        case 3: strcpy(name, "mace");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(7, 5); break;
-        default: strcpy(name, "club"); symbol = '/';    weight = 15; setColor(150, 70, 0);    SetDice_h2h(3, 3);    break;
+        case 3:  name = ("mace");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(4, 5); break;
+        default: name = ("club"); symbol = '/';    weight = 15; setColor(150, 70, 0);    SetDice_h2h(2, 3);    break;
         }
         break;
     }
-    case staff:    strcpy(name, "black staff");  symbol = '|';    weight = 15; setColor(70, 70, 70);  SetDice_h2h(7, 3); break;
-    case cleaver:  strcpy(name, "cleaver");      symbol = '/';    weight = 15; setColor(200, 0, 0);   SetDice_h2h(8, 4); break;
+    case staff:    name = ("black staff");  symbol = '|';    weight = 15; setColor(70, 70, 70);  SetDice_h2h(4, 3); break;
+    case cleaver: name = ("cleaver");      symbol = '/';    weight = 15; setColor(200, 0, 0);   SetDice_h2h(5, 4); break;
 
-    default: strcpy(name, "orcish sword");    symbol = '|';    weight = 10; setColor(130, 130, 130); SetDice_h2h(9, 10); break;
+    default: name = ("orcish sword");    symbol = '|';    weight = 10; setColor(130, 130, 130); SetDice_h2h(6, 10); break;
     }
 
     if (level < 2)
@@ -352,11 +410,10 @@ void Item::createWeapon(int level, int secondary_type)
 
     if (getInt(100, 0) == 99 && skill_bonus > 2)
     {
-        strcpy(postfix, " of Pain");
+        postfix = " of Pain";
         setColor(230, 230, 230);
         skill_bonus = 5;
     }
-
     else
     {
         AddBrand();
@@ -364,6 +421,8 @@ void Item::createWeapon(int level, int secondary_type)
 
     //setColor(50,50,50);
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createArmour(int level, int secondary_type)
 {
@@ -393,7 +452,7 @@ void Item::createArmour(int level, int secondary_type)
     if (varient == 200)
     {
 
-        strcpy(name, "black cloak");
+        name="black cloak";
         symbol = ']';
 
         absorb_bonus = 4;  //absorb 1-3
@@ -406,7 +465,7 @@ void Item::createArmour(int level, int secondary_type)
     }
     else if (varient == 201)
     {
-        strcpy(name, "bloody apron");
+        name = "bloody apron";
         symbol = ']';
         setColor(233, 64, 64);
 
@@ -416,12 +475,12 @@ void Item::createArmour(int level, int secondary_type)
     }
     else if (varient < 70)
     {
-        strcpy(name, "leather armour");
+        name = "leather armour";
 
         if(absorb_bonus == 0)
-            strcpy(prefix, "crude ");
+            prefix, "crude ";
         else if(absorb_bonus == 2)
-            strcpy(prefix, "quality ");
+            prefix, "quality ";
 
         symbol = ']';
         setColor(128, 64, 0);
@@ -431,12 +490,12 @@ void Item::createArmour(int level, int secondary_type)
     }
     else if (varient < 90 || level == 0)
     {
-        strcpy(name, "chainmail");
+        name = "chainmail";
 
         if(absorb_bonus == 0)
-            strcpy(prefix, "orcish ");
+            prefix, "orcish ";
         else if(absorb_bonus == 2)
-            strcpy(prefix, "dwarven ");
+            prefix, "dwarven ";
 
         symbol = ']'; setColor(100, 100, 100);
         absorb_bonus += 2; //absorb 2-4 
@@ -444,12 +503,12 @@ void Item::createArmour(int level, int secondary_type)
     }
     else
     {
-        strcpy(name, "plate mail");
+        name = "plate mail";
 
         if(absorb_bonus == 0)
-            strcpy(prefix, "rusty ");
+            prefix =  "rusty ";
         else if(absorb_bonus == 2)
-            strcpy(prefix, "full ");
+            prefix, "full ";
 
         symbol = ']';
         setColor(200, 200, 200);
@@ -459,7 +518,7 @@ void Item::createArmour(int level, int secondary_type)
 
     if (getInt(100, 0) >= 98 && absorb_bonus > 2)
     {
-        strcpy(postfix, " of Defence");
+        postfix = " of Defence";
         setColor(255, 255, 255);
         absorb_bonus += 1;
     }
@@ -468,7 +527,7 @@ void Item::createArmour(int level, int secondary_type)
 
 }
 
-/////////////////////////////////
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::setColor(int c1, int c2, int c3)
 {
@@ -477,50 +536,77 @@ void Item::setColor(int c1, int c2, int c3)
     color3 = c3;
 }
 
-char *Item::GetName()
+// --------------------------------------------------------------------------------------------------------------------------------
+
+std::string Item::BaseName()
 {
+    return name;
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+std::string Item::getPostfix()
+{
+    return postfix;
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+std::string Item::getPrefix()
+{
+    return prefix;
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+std::string Item::GetName()
+{
+    char tempName[64];
+
     if (identified)
     {
         switch (type)
         {
-        case armour:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix); break;
+        case armour:
+            sprintf(tempName, "%s%s [Def:%d]%s", prefix.c_str(), name.c_str(), absorb_bonus, postfix.c_str()); break;
 
-        case weapon:            sprintf(id_name, "+%d %s%s [+%d]%s", skill_bonus, prefix, name, h2hNumDice, postfix);
-                                // sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, h2hNumDice, h2hSidesDice, postfix);
+        case weapon:
+            sprintf(tempName, "+%d %s%s [Att:%d]%s", skill_bonus, prefix.c_str(), name.c_str(), h2hNumDice, postfix.c_str());
             break;
 
-        case projectile:        if (itemNumber[1] > 1)    
-                                    sprintf(id_name, "%d +%d %s%s%s%s", itemNumber[1], skill_bonus, prefix, name, itemNumber[1] > 1 ? "s" : nothing, postfix);
-                                else                
-                                     sprintf(id_name, "+%d %s%s%s", skill_bonus, prefix, name, postfix); break;
+        case projectile:
+            if (itemNumber[1] > 1)
+                sprintf(tempName, "%d +%d %s%s%s%s", itemNumber[1], skill_bonus, prefix.c_str(), name.c_str(), itemNumber[1] > 1 ? "s" : "", postfix.c_str());
+            else
+                sprintf(tempName, "+%d %s%s%s", skill_bonus, prefix.c_str(), name.c_str(), postfix.c_str()); break;
 
-        case projectileWeapon:     sprintf(id_name, "+%d %s%s [+%d]%s", skill_bonus, prefix, name, thrNumDice/*, thrSidesDice*/, postfix);    break;
-                                // sprintf(id_name, "+%d %s%s (%dd%d)%s", skill_bonus, prefix, name, thrNumDice, thrSidesDice, postfix);    break;
+        case projectileWeapon:
+            sprintf(tempName, "+%d %s%s [+%d]%s", skill_bonus, prefix.c_str(), name.c_str(), thrNumDice/*, thrSidesDice*/, postfix.c_str());    break;
 
-        case shield:            sprintf(id_name, "%s%s[%d]%s", prefix, name, absorb_bonus, postfix);    break;
+        case shield:
+            sprintf(tempName, "%s%s [Blk:%d]%s", prefix.c_str(), name.c_str(), absorb_bonus, postfix.c_str());    break;
 
-        default:                sprintf(id_name, "%s", name); break;
+        default:
+            sprintf(tempName, "%s", name.c_str()); break;
         }
     }
     else
     {
-        if (strlen(postfix) > 0)
+        if (postfix.length() > 0)
         {
-            sprintf(id_name, "glowing %s%s", name, itemNumber[1] > 1 ? "s" : nothing);
+            sprintf(tempName, "glowing %s%s", name.c_str(), itemNumber[1] > 1 ? "s" : "");
         }
         else
-            sprintf(id_name, "unidentified %s%s", name, itemNumber[1] > 1 ? "s" : nothing);
+            sprintf(tempName, "unidentified %s%s", name.c_str(), itemNumber[1] > 1 ? "s" : "");
     }
 
     if (equipped)
-        strcat(id_name, " (equipped)");
-    //sprintf(id_name,"%s (equipped)",id_name);
+        strcat(tempName, " (equipped)");
 
-
-    return id_name;
-
+    return std::string(tempName);
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::SetDice_h2h(int nDice, int sides)
 {
@@ -528,12 +614,16 @@ void Item::SetDice_h2h(int nDice, int sides)
     h2hNumDice = nDice;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 void Item::SetDice_thr(int nDice, int sides)
 {
     thrSidesDice = sides;
     thrNumDice = nDice;
 
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int Item::GetAttack_h2h()
 {
@@ -545,16 +635,22 @@ int Item::GetAttack_h2h()
     return getInt(h2hNumDice + 1, 1) + skill_bonus;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int Item::getAverage_h2h()
 {
     return  h2hNumDice + skill_bonus; //((float)h2hSidesDice * (float)h2hNumDice) / 2.0f + (float)skill_bonus;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int Item::getAverage_thr()
 {
     return  thrNumDice + skill_bonus;
     //return  ((float)thrSidesDice * (float)thrNumDice) / 2.0f + (float)skill_bonus;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int Item::GetAttack_thr()
 {
@@ -564,8 +660,9 @@ int Item::GetAttack_thr()
 
     return attack + skill_bonus;*/
     return getInt(thrNumDice + 1, 1) + skill_bonus;
-
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::AddBrand(bool special)
 {
@@ -583,11 +680,11 @@ void Item::AddBrand(bool special)
         int poison = getInt(4, 1);
         SetBrand(bPoison, poison);
         if (poison == 3)
-            strcpy(postfix, " of the Snake");
+            postfix = (" of the Snake");
         else if (poison == 2)
-            strcpy(postfix, " of Venom");
+            postfix = (" of Venom");
         else if (poison == 1)
-            strcpy(postfix, " of Weak Posion");
+            postfix = (" of Weak Posion");
         
         setColor(0, 255, 0);
     }
@@ -597,11 +694,11 @@ void Item::AddBrand(bool special)
         int fire = getInt(4, 1);
         SetBrand(bFire, fire);
         if (fire == 3)
-            strcpy(postfix, " of the Sun");
+            postfix = (" of the Sun");
         else if (fire == 2)
-            strcpy(postfix, " of Flame");
+            postfix = (" of Flame");
         else if (fire == 1)
-            strcpy(postfix, " of Candle Light");
+            postfix = (" of Candle Light");
         setColor(128, 0, 0);
 
     }
@@ -610,11 +707,11 @@ void Item::AddBrand(bool special)
         int cold = getInt(4, 1);
         SetBrand(bFrost, cold);
         if (cold == 3)
-            strcpy(postfix, " of the Ice Crystal");
+            postfix = (" of the Ice Crystal");
         else if (cold == 2)
-            strcpy(postfix, " of Frost");
+            postfix = (" of Frost");
         else if (cold == 1)
-            strcpy(postfix, " of Chills");
+            postfix = (" of Chills");
         setColor(0, 0, 128);
     }
     else if (brandType < 99)
@@ -622,11 +719,11 @@ void Item::AddBrand(bool special)
         int lightning = getInt(4, 1);
         SetBrand(bLightning, lightning);
         if (lightning == 3)
-            strcpy(postfix, " of the Thunder God");
+            postfix = (" of the Thunder God");
         else if (lightning == 2)
-            strcpy(postfix, " of Lightning");
+            postfix = (" of Lightning");
         else if (lightning == 1)
-            strcpy(postfix, " of Static");
+            postfix = ( " of Static");
         setColor(128, 128, 0);
     }
     else if (brandType < 101)
@@ -634,18 +731,20 @@ void Item::AddBrand(bool special)
         int acid = getInt(4, 1);
         SetBrand(bAcid, acid);
         if (acid == 3)
-            strcpy(postfix, " of Zayt al-Zaj"); //acid
+            postfix = (" of Zayt al-Zaj"); //acid
         else if (acid == 2)
-            strcpy(postfix, " of Corrosion");    //corrosion
+            postfix = (" of Corrosion");    //corrosion
         else if (acid == 1)
-            strcpy(postfix, " of Weak Acid"); //oil of vitriol or  Zayt al-Zaj
+            postfix = (" of Weak Acid"); //oil of vitriol or  Zayt al-Zaj
         setColor(128, 0, 128);
     }
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 void Item::AddResistance(bool special)
 {
-    if (strlen(postfix) > 0)
+    if (postfix.length() > 0)
         return;
 
     int brandType = getInt(103, 0);
@@ -663,11 +762,11 @@ void Item::AddResistance(bool special)
         int poison = 3;//getInt(4,1);
         SetResistance(bFire, poison);
         if (poison == 3)
-            strcpy(postfix, " of Strong Poison Resistance");
+            postfix = (" of Strong Poison Resistance");
         else if (poison == 2)
-            strcpy(postfix, " of Medium Poison Resistance");
+            postfix = (" of Medium Poison Resistance");
         else if (poison == 1)
-            strcpy(postfix, " of Weak Poison Resistance");
+            postfix = (" of Weak Poison Resistance");
         setColor(0, 255, 0);
     }
 
@@ -676,11 +775,11 @@ void Item::AddResistance(bool special)
         int fire = 3;//getInt(4,1);
         SetResistance(bFire, fire);
         if (fire == 3)
-            strcpy(postfix, " of Fire Resistance");
+            postfix = (" of Fire Resistance");
         else if (fire == 2)
-            strcpy(postfix, " of Flame Retardant");
+            postfix = (" of Flame Retardant");
         else if (fire == 1)
-            strcpy(postfix, " of the Anti-Candle");
+            postfix = (" of the Anti-Candle");
         setColor(128, 0, 0);
 
     }
@@ -689,11 +788,11 @@ void Item::AddResistance(bool special)
         int cold = 3;//getInt(4,1);
         SetResistance(bFrost, cold);
         if (cold == 3)
-            strcpy(postfix, " of Ice Shield");
+            postfix = (" of Ice Shield");
         else if (cold == 2)
-            strcpy(postfix, " of Frostproof");
+            postfix = (" of Frostproof");
         else if (cold == 1)
-            strcpy(postfix, " of Frost Resistance");
+            postfix = (" of Frost Resistance");
 
         setColor(0, 0, 128);
     }
@@ -702,11 +801,11 @@ void Item::AddResistance(bool special)
         int lightning = getInt(4, 1);
         SetResistance(bLightning, lightning);
         if (lightning == 3)
-            strcpy(postfix, " of Lightning Resistance");
+            postfix = (" of Lightning Resistance");
         else if (lightning == 2)
-            strcpy(postfix, " of Sparks Resistance");
+            postfix = (" of Sparks Resistance");
         else if (lightning == 1)
-            strcpy(postfix, " of Grounding");
+            postfix = (" of Grounding");
 
         setColor(128, 128, 0);
     }
@@ -715,15 +814,17 @@ void Item::AddResistance(bool special)
         int acid = getInt(4, 1);
         SetResistance(bAcid, acid);
         if (acid == 3)
-            strcat(postfix, " of Acid Resistance"); //acid
+            postfix = (" of Acid Resistance"); //acid
         else if (acid == 2)
-            strcat(postfix, " of Corrosion Resistance");    //corrosion
+            postfix = (" of Corrosion Resistance");    //corrosion
         else if (acid == 1)
-            strcat(postfix, " of Low Acid Resistance"); //oil of vitriol or  Zayt al-Zaj
+            postfix = (" of Low Acid Resistance"); //oil of vitriol or  Zayt al-Zaj
 
         setColor(128, 0, 128);
     }
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item& Item::wearable(bool rWearable)
 {
@@ -732,15 +833,21 @@ Item& Item::wearable(bool rWearable)
     return *this;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 bool Item::wearable()
 {
     return mWearable;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 bool Item::stackable()
 {
     return mStackable;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item& Item::stackable(bool rStackable)
 {
@@ -748,3 +855,5 @@ Item& Item::stackable(bool rStackable)
 
     return *this;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------

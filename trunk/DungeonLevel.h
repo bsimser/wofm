@@ -16,7 +16,7 @@
 #include "Item.h"
 #include "LOS/LineOfSight.h"
 
-#include "coord.h"
+#include "Coord.h"
 
 enum eLevelType
 {
@@ -50,10 +50,24 @@ enum ePath
     blocked
 };
 
+struct Symbol
+{
+    Symbol(char symbol, unsigned char c1, unsigned char c2, unsigned char c3):
+        mSymbol(symbol), mColour1(c1), mColour2(c2), mColour3(c3)
+    {}
+    char mSymbol;
+    unsigned char mColour1;
+    unsigned char mColour2;
+    unsigned char mColour3;
+};
+
 class cell
 {
 public:
-    cell() :extra(0), show_target(0), show_path(none){};
+    cell() :
+        extra(0), show_target(0), show_path(none), monster(NULL), item(NULL), mSymbol(NULL)
+    {};
+
     ~cell(){};
     Terrain terrain;
 
@@ -74,12 +88,20 @@ public:
     bool monsterExists()    { return (monster == NULL ? false : true); };
     bool itemExists()       { return (item == NULL ? false : true); };
 
+    void setSymbol(Symbol & symbol)     
+    {
+        mSymbol = &symbol; 
+    };
+    void clearSymbol()                  { mSymbol = 0; };
+    Symbol * getSymbol()                { return mSymbol; };
+
 private:
     Monster *   monster;
     Item *      item;
+    Symbol *    mSymbol;
 };
 
-typedef std::vector<coord> COORDLIST1;
+typedef std::vector<Coord> COORDLIST1;
 
 class DungeonLevel : public LineOfSight
 {
@@ -99,14 +121,14 @@ public:
     cell map[DUNGEON_SIZE_W][DUNGEON_SIZE_H];
 
     int MakeLevelMap();
-    coord * getStartPos();
-    coord * GetEndPosition();
-    coord * NewBridgePosition();
-    coord * NewItemPosition(bool space = false);
+    Coord * getStartPos();
+    Coord * GetEndPosition();
+    Coord * NewBridgePosition();
+    Coord * NewItemPosition(bool space = false);
     int     getAdjacentFreeSpaces(int x, int y);
-    coord * NewSpecialItemPosition();
-    coord * FreeTerrainPosition(eTerrainType type);
-    coord * FreeTerrainPosition(const std::string & name);
+    Coord * NewSpecialItemPosition();
+    Coord * FreeTerrainPosition(eTerrainType type);
+    Coord * FreeTerrainPosition(const std::string & name);
 
     bool IsCellTransparent(int x, int y);
     bool HighLightPath(int x, int y, int w, int h);
@@ -114,7 +136,7 @@ public:
 
     COORDLIST show_path;
     int _type;
-    coord tempPos;
+    Coord tempPos;
     int initialised;
 
     enum EMapLight

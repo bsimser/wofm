@@ -11,11 +11,9 @@
 
 using namespace Random;
 
-
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-
 
 int DungeonManager::Initialise()
 {
@@ -51,7 +49,8 @@ int DungeonManager::BuildCompleteDungeon(int max_num_levels)
 
     CreateLockedDungeon();
 
-    try{
+    try
+    {
         CreateSpecialDungeon();
         AddKeysToDungeon();
     }
@@ -85,11 +84,11 @@ int DungeonManager::DeleteDungeon(int dlevel)
 }
 
 
-coord * DungeonManager::NewMonsterPosition(int lev)
+Coord * DungeonManager::NewMonsterPosition(int lev)
 {
     try
     {
-        coord *newPos = level[lev].FreeTerrainPosition(dfloor);
+        Coord *newPos = level[lev].FreeTerrainPosition(dfloor);
         if (newPos)
             return newPos;
         throw std::exception("Failed to find free floor position for monster");
@@ -102,7 +101,7 @@ coord * DungeonManager::NewMonsterPosition(int lev)
     }
 }
 
-coord * DungeonManager::NewBridgePosition(int lev)
+Coord * DungeonManager::NewBridgePosition(int lev)
 {
     try
     {
@@ -116,37 +115,36 @@ coord * DungeonManager::NewBridgePosition(int lev)
     }
 }
 
-
 int DungeonManager::AddItems(int lev)
 {
     int nItems = getInt(4 + lev, 2 + lev);
 
     for (int i = 0; i < nItems; i++)
     {
-        coord* pos = level[lev].NewItemPosition();
-        //level[lev].map[pos->x][pos->y].getItem() = WorldBuilder::itemManager.CreateRandomItem(lev);
+        Coord* pos = level[lev].NewItemPosition();
+        //level[lev].map[pos->x][pos->y].getItem() = World.getItemManager().CreateRandomItem(lev);
         int item_test = getInt(10, 0);
         if (item_test == 0)
         {
-            coord* pos = level[lev].NewItemPosition(true);
-            level[lev].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(lev, lockedChest));
+            Coord* pos = level[lev].NewItemPosition(true);
+            level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev, lockedChest));
         }
         else if (getInt(10, 0) < 2)
         {
-            coord* pos = level[lev].NewItemPosition(true);
-            level[lev].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(lev, openChest));
+            Coord* pos = level[lev].NewItemPosition(true);
+            level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev, openChest));
         }
         else
         {
-            coord* pos = level[lev].NewItemPosition();
-            level[lev].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(lev, corpse));
+            Coord* pos = level[lev].NewItemPosition();
+            level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev, corpse));
         }
     }
 
     /*	if(lev==1)
         {
-        coord* pos = level[lev].NewItemPosition();
-        level[lev].map[pos->x][pos->y].item = WorldBuilder::itemManager.CreateItem(lockedChest,lev);
+        Coord* pos = level[lev].NewItemPosition();
+        level[lev].map[pos->x][pos->y].item = World.getItemManager().CreateItem(lockedChest,lev);
         }*/
 
     return 1;
@@ -162,23 +160,22 @@ int DungeonManager::PopulateDungeon(int lev)
 
     if (lev == 0) //first level add player
     {
-        coord *start = level[lev].getStartPos(); //get starting point (up stairs)
-        monsterData* player = WorldBuilder::monsterManager.CreateMonster(mPlayer, sub_type, 0, start->x, start->y);
+        Coord *start = level[lev].getStartPos(); //get starting point (up stairs)
+        monsterData* player = World.getMonsterManager().CreateMonster(mPlayer, sub_type, 0, start->x, start->y);
 
         if (fopen("Zagor", "r"))
         {
-            WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
-            WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
-            WorldBuilder::spellManager.AddMonsterSpell(player, spRepelMissiles);
-            WorldBuilder::spellManager.AddMonsterSpell(player, spSlowEnemies);
-            WorldBuilder::spellManager.AddMonsterSpell(player, spTeleport);
-            WorldBuilder::spellManager.AddMonsterSpell(player, spTeleport);
+            World.getSpellManager().AddMonsterSpell(player, spFlyingWeapon);
+            World.getSpellManager().AddMonsterSpell(player, spFlyingWeapon);
+            World.getSpellManager().AddMonsterSpell(player, spRepelMissiles);
+            World.getSpellManager().AddMonsterSpell(player, spSlowEnemies);
+            World.getSpellManager().AddMonsterSpell(player, spTeleport);
+            World.getSpellManager().AddMonsterSpell(player, spTeleport);
         }
         else
-            WorldBuilder::spellManager.AddMonsterSpell(player, spFlyingWeapon);
+            World.getSpellManager().AddMonsterSpell(player, spFlyingWeapon);
         
-        //WorldBuilder::spellManager.AddMonsterSpell(player, spDragonFire);
-
+        //World.getSpellManager().AddMonsterSpell(player, spDragonFire);
     }
 
     //add monsters
@@ -192,41 +189,41 @@ int DungeonManager::PopulateDungeon(int lev)
         {
             int type = mUndead;//Random::getInt(1,1);
 
-            coord *pos = NewMonsterPosition(lev); //??
-            monsterData *mob = WorldBuilder::monsterManager.CreateMonster(type, Random::getInt(4, 0), lev, pos->x, pos->y);
+            Coord *pos = NewMonsterPosition(lev); //??
+            monsterData *mob = World.getMonsterManager().CreateMonster(type, Random::getInt(4, 0), lev, pos->x, pos->y);
 
             	std::string name = mob->Name();
             //	if(name.find("Ghoul") !=-1 )
             //		mob->monster.SetBrand(bFire,3);
         }
 
-        coord *pos = NewMonsterPosition(lev); //??
-        WorldBuilder::monsterManager.CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
+        Coord *pos = NewMonsterPosition(lev); //??
+        World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
     }
 
     else if (lev == 0) //start level
     {
-        coord *pos = NewBridgePosition(lev); //??
+        Coord *pos = NewBridgePosition(lev); //??
         if (!pos)
             pos = NewMonsterPosition(lev);
 
-        monsterData *gog = WorldBuilder::monsterManager.CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
+        monsterData *gog = World.getMonsterManager().CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
 
         pos = NewBridgePosition(lev); //??
         if (!pos)
             pos = NewMonsterPosition(lev);
         
-        gog = WorldBuilder::monsterManager.CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
+        gog = World.getMonsterManager().CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
 
         //pos = level[lev].FreeTerrainPosition(openStairs); //??
         pos = level[lev].GetEndPosition();
 
-        WorldBuilder::monsterManager.CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
+        World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
     }
 
     else if (lev == 20) //encounter level
     {
-        int player_level = WorldBuilder::restLevel.GetOldLevel();
+        int player_level = World.getRestLevel().GetOldLevel();
 
         int max_monsters = Random::getInt(3 + player_level, 1);
 
@@ -234,8 +231,8 @@ int DungeonManager::PopulateDungeon(int lev)
         {
             int type = mOrc;//Random::getInt(1,1);
 
-            coord *pos = NewMonsterPosition(lev); //??
-            WorldBuilder::monsterManager.CreateMonster(type, sub_type, lev, pos->x, pos->y);
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(type, sub_type, lev, pos->x, pos->y);
         }
     }
     else	//standard orc level
@@ -246,8 +243,8 @@ int DungeonManager::PopulateDungeon(int lev)
         {
             int type = mOrc;//Random::getInt(1,1);
 
-            coord *pos = NewMonsterPosition(lev); //??
-            WorldBuilder::monsterManager.CreateMonster(type, sub_type, lev, pos->x, pos->y);
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(type, sub_type, lev, pos->x, pos->y);
 
         }
         // create digger
@@ -257,32 +254,55 @@ int DungeonManager::PopulateDungeon(int lev)
             count++;
             if (count < 3)
             {
-                coord *pos = NewMonsterPosition(lev);
-                WorldBuilder::monsterManager.CreateMonster(mDigger, sub_type, lev, pos->x, pos->y);
+                Coord *pos = NewMonsterPosition(lev);
+                World.getMonsterManager().CreateMonster(mDigger, sub_type, lev, pos->x, pos->y);
+            }
+        }
+        // crocodiles!!
+        if (lev > 1)
+        {
+            int maxNumber = lev/2; 
+
+            maxNumber = Random::getInt(maxNumber, 0);
+            if (maxNumber >= 5) 
+                maxNumber = 4;
+            for (int x = 0; x < maxNumber; x++)
+            {
+                Coord *pos = level[lev].FreeTerrainPosition(deepWater);
+                if (pos)
+                {
+                    World.getMonsterManager().CreateMonster(mCrocodile, 0, lev, pos->x, pos->y);
+                }
             }
         }
 
-        coord *pos = NewMonsterPosition(lev); //??
+        // create level guardian
+        Coord *pos = NewMonsterPosition(lev); //??
         if (lev != 9)
-            monsterData * special = WorldBuilder::monsterManager.CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
-
+            monsterData * special = World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
     }
     if (lev == 4) //river level
     {
-        coord *pos = NewBridgePosition(lev); //??
+        Coord *pos = NewBridgePosition(lev); //??
         if (pos == NULL)
             throw std::exception("no bridge master, Game halted");
-        WorldBuilder::monsterManager.CreateMonster(mBridgeMaster, sub_type, lev, pos->x, pos->y);
+        World.getMonsterManager().CreateMonster(mBridgeMaster, sub_type, lev, pos->x, pos->y);
+
+        pos = level[lev].FreeTerrainPosition(deepWater);
+        if (pos)
+        {
+            World.getMonsterManager().CreateMonster(mCrocodile, 0, lev, pos->x, pos->y);
+        }
     }
 
     if (lev == 9) //end level
     {
-        coord *pos = NewMonsterPosition(lev); //??
-        monsterData* wiz = WorldBuilder::monsterManager.CreateMonster(mWizard, sub_type, lev, pos->x, pos->y);
-        WorldBuilder::spellManager.AddMonsterSpell(wiz, spRepelMissiles);
-        WorldBuilder::spellManager.AddMonsterSpell(wiz, spTeleport);
-        WorldBuilder::spellManager.AddMonsterSpell(wiz, spFlyingWeapon);
-        WorldBuilder::spellManager.AddMonsterSpell(wiz, spSlowEnemies);
+        Coord *pos = NewMonsterPosition(lev); //??
+        monsterData* wiz = World.getMonsterManager().CreateMonster(mWizard, sub_type, lev, pos->x, pos->y);
+        World.getSpellManager().AddMonsterSpell(wiz, spRepelMissiles);
+        World.getSpellManager().AddMonsterSpell(wiz, spTeleport);
+        World.getSpellManager().AddMonsterSpell(wiz, spFlyingWeapon);
+        World.getSpellManager().AddMonsterSpell(wiz, spSlowEnemies);
 
         wiz->is_magic = 1;
     }
@@ -296,8 +316,8 @@ int DungeonManager::PopulateDungeon(int lev)
 
     if (lev == 0)
     {
-        //	coord* pos = level[lev].NewItemPosition();
-        //level[lev].map[3][3].AssignItem( WorldBuilder::itemManager.CreateItem(lev,lockedChest));
+        //	Coord* pos = level[lev].NewItemPosition();
+        //level[lev].map[3][3].AssignItem( World.getItemManager().CreateItem(lev,lockedChest));
 
     }
 
@@ -319,11 +339,12 @@ void DungeonManager::CreateSpecialDungeon()
             int test = 0;
             if (i == 0)
             {
-                CreateDungeon(i + 10, slBarracks);
+                // no special dungeon on level 0
+                /*CreateDungeon(i + 10, slBarracks);
                 PopulateSpecialDungeon(i + 10, slRandom);
 
                 // make entrance
-                coord * pos = level[i].FreeTerrainPosition("dungeon floor");
+                Coord * pos = level[i].FreeTerrainPosition("dungeon floor");
                 if (!pos)
                 {
                     pos->x = 5;
@@ -332,76 +353,58 @@ void DungeonManager::CreateSpecialDungeon()
                 level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
 
                 pos = level[i + 10].NewSpecialItemPosition();
-                level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                // pos = level[i + 10].NewSpecialItemPosition(); //??
-                WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);*/
             }
             else if (i == 1 || i == 2 || i == 3)
             {
-                if (getInt(1, 1) == 1 && i == 1) //%30
+                if (/*getInt(1, 1) == 1 &&*/ i == 1) // %100
                 {
                     CreateDungeon(i + 10, slBarracks);
                     PopulateSpecialDungeon(i + 10, slBarracks);
-                    coord *pos = NewMonsterPosition(i);
+                    Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
-                    special_type1++;
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    //pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
-
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
-                else if (i == 2 && special_type1 == 0)
+                else if (i == 2 && special_type1 == 0 && Random::getInt(2,0)) // 50%
                 {
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
-                    coord *pos = NewMonsterPosition(i);
+                    Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
                     special_type1++;
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
-                else if (i == 2 && special_type1 == 1 && getInt(4, 1) == 2) //%30
+                else if (i == 3 && special_type1 == 0) // 50 %
                 {
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
-                    coord *pos = NewMonsterPosition(i);
+                    Coord *pos = NewMonsterPosition(i); //create entry on normal dungeon
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
                     special_type1++;
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
-
-                    pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
-                }
-                else if (i == 3 && special_type1 == 1)
-                {
-                    CreateDungeon(i + 10, i + 10);
-                    PopulateSpecialDungeon(i + 10, slRandom);
-                    coord *pos = NewMonsterPosition(i); //create entry on normal dungeon
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
-                    special_type1++;
-
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     //pos = level[i+10].NewSpecialItemPosition(); // put guard of chest
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
-
             }
             else if (i == 4) // boat house - skeletons
             {
-                coord *pos;
-                CreateDungeon(i + 10, i + 10);
+                Coord *pos;
+                CreateDungeon(i + 10, slBoatHouse);
                 PopulateSpecialDungeon(i + 10, slBoatHouse);
 
                 do
@@ -410,15 +413,15 @@ void DungeonManager::CreateSpecialDungeon()
                     test++;
                     if (test > 10000)
                         break;
-                } while (strcmp(level[i].map[pos->x][pos->y].terrain.name, "sand"));
+                } while (std::string(level[i].map[pos->x][pos->y].terrain.name) != "sand");
 
                 level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
 
                 pos = level[i + 10].NewSpecialItemPosition();
-                level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                 //pos = level[i + 10].NewSpecialItemPosition(); //??
-                WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
             }
             else if (i == 5 || i == 6)
             {
@@ -427,29 +430,29 @@ void DungeonManager::CreateSpecialDungeon()
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     //choose one entrances
-                    coord *pos = NewMonsterPosition(i);
+                    Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
                     special_type2++;
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
                 else if (i == 6 && special_type2 == 0)
                 {
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     //choose one entrances
-                    coord *pos = NewMonsterPosition(i + 10);
+                    Coord *pos = NewMonsterPosition(i + 10);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
             else if (i == 7 || i == 8)
@@ -459,29 +462,29 @@ void DungeonManager::CreateSpecialDungeon()
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     //choose special undead level
-                    coord *pos = NewMonsterPosition(i);
+                    Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
                     special_type3++;
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
                 else if (i == 8 && special_type3 == 0)
                 {
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     //choose one entrances
-                    coord *pos = NewMonsterPosition(i);
+                    Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
 
                     pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     pos = level[i + 10].NewSpecialItemPosition(); //??
-                    WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                    World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
             else if (i == 9)
@@ -490,16 +493,16 @@ void DungeonManager::CreateSpecialDungeon()
                 //	PopulateSpecialDungeon(i+10,slRandom);
 
                 //create treasure level
-                coord *pos = NewMonsterPosition(i);
+                Coord *pos = NewMonsterPosition(i);
                 level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
 
                 pos = level[i + 10].NewSpecialItemPosition();
-                level[i + 10].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(i + 10, lockedChest));
+                level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                 pos = level[i + 10].NewSpecialItemPosition(); //??
-                monsterData *dragon = WorldBuilder::monsterManager.CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                monsterData *dragon = World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
 
-                WorldBuilder::spellManager.AddMonsterSpell(dragon, spDragonFire);
+                World.getSpellManager().AddMonsterSpell(dragon, spDragonFire);
 
                 dragon->is_magic = 1;
             }
@@ -524,7 +527,7 @@ void DungeonManager::CreateLockedDungeon()
     for (int i = 0; i < 10; i++)
     {
         //get gate position
-        coord *pos = level[i].GetEndPosition();
+        Coord *pos = level[i].GetEndPosition();
 
         if (pos == NULL)
         {
@@ -593,8 +596,8 @@ void DungeonManager::PopulateSpecialDungeon(int lev, int type)
         {
             int type = mOrc;//Random::getInt(1,1);
 
-            coord *pos = NewMonsterPosition(lev); //??
-            WorldBuilder::monsterManager.CreateMonster(type, Random::getInt(4, 0), lev, pos->x, pos->y);
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(type, Random::getInt(4, 0), lev, pos->x, pos->y);
         }
     }
 
@@ -606,8 +609,8 @@ void DungeonManager::PopulateSpecialDungeon(int lev, int type)
         {
             int type = mUndead;//Random::getInt(1,1);
 
-            coord *pos = NewMonsterPosition(lev); //??
-            WorldBuilder::monsterManager.CreateMonster(type, skeleton, lev, pos->x, pos->y);
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(type, skeleton, lev, pos->x, pos->y);
         }
     }
      
@@ -617,18 +620,29 @@ void DungeonManager::PopulateSpecialDungeon(int lev, int type)
 
         for (int i = 0; i < max_monsters; i++)
         {
-            coord *pos = NewMonsterPosition(lev); //??
-            WorldBuilder::monsterManager.CreateMonster(mRandom, sub_type, lev, pos->x, pos->y);
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(mRandom, sub_type, lev, pos->x, pos->y);
         }
 
-        //	coord *pos = NewMonsterPosition(lev); //??
-        //	WorldBuilder::monsterManager.CreateMonster(mSpecial,sub_type,lev,pos->x,pos->y); 
+        //	Coord *pos = NewMonsterPosition(lev); //??
+        //	World.getMonsterManager().CreateMonster(mSpecial,sub_type,lev,pos->x,pos->y); 
+    }
+
+    int maxCrocs = Random::getInt(5, 0);
+    for (int x = 0; x < maxCrocs; x++)
+    {
+        Coord *pos = level[lev].FreeTerrainPosition(deepWater);
+
+        if (pos)
+        {
+            World.getMonsterManager().CreateMonster(mCrocodile, 0, lev, pos->x, pos->y);
+        }
     }
 
     /*	if(lev==0)
         {
-        coord* pos = level[lev].NewItemPosition();
-        level[lev].map[3][3].item = WorldBuilder::itemManager.CreateItem(lev,lockedChest);
+        Coord* pos = level[lev].NewItemPosition();
+        level[lev].map[3][3].item = World.getItemManager().CreateItem(lev,lockedChest);
         }*/
 }
 
@@ -646,20 +660,20 @@ int DungeonManager::AddKeysToDungeon()
         }
         try
         {
-            coord* pos = level[rand_level].NewItemPosition(true); // put keys in rooms
+            Coord* pos = level[rand_level].NewItemPosition(true); // put keys in rooms
             if (pos == NULL)
                 throw std::exception("Could not create keys");
 
             ITEMLIST::iterator it;
             int duplicated = 0;
 
-            for (it = WorldBuilder::itemManager.all_items.begin(); it != WorldBuilder::itemManager.all_items.end(); it++)
+            for (it = World.getItemManager().all_items.begin(); it != World.getItemManager().all_items.end(); it++)
             {
                 if (it->type == key)
                 {
                     int x = it->itemNumber[0];
-                    int y = WorldBuilder::itemManager.KeySpecial[ind - 10];
-                    if (it->itemNumber[0] == WorldBuilder::itemManager.KeySpecial[ind - 10])
+                    int y = World.getItemManager().KeySpecial[ind - 10];
+                    if (it->itemNumber[0] == World.getItemManager().KeySpecial[ind - 10])
                     {
                         duplicated = 1;
                         break;
@@ -668,7 +682,7 @@ int DungeonManager::AddKeysToDungeon()
             }
 
             if (!duplicated)
-                level[rand_level].map[pos->x][pos->y].AssignItem(WorldBuilder::itemManager.CreateItem(ind, key));
+                level[rand_level].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(ind, key));
         }
         catch (const std::exception)
         {
@@ -682,6 +696,6 @@ int DungeonManager::AddKeysToDungeon()
 
 DungeonLevel* DungeonManager::CurrentLevel()
 {
-    return &level[WorldBuilder::GetCurrentLevel()];
+    return &level[World.GetCurrentLevel()];
 }
 

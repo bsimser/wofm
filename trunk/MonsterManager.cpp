@@ -47,6 +47,7 @@ monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     case mGuards:{	SpecialGuardians guard; guard.Create(minor_type, level); new_monster.monster = guard; }break;
     case mUndead:{	UndeadMonster undead; undead.Create(minor_type, level); new_monster.monster = undead; }break;
     case mOrc:		new_monster.monster.Create(mOrc, level, 0); break;
+    case mCrocodile:    new_monster.monster.Create(mCrocodile, level, 0); break;
     case mSpecial:  new_monster.monster.Create(mSpecial, level); break;
     case mWizard:	new_monster.monster.Create(mSpecial, level); break;
     case mPlayer:	new_monster.monster.Create(mPlayer, level); break;
@@ -123,8 +124,8 @@ int MonsterManager::DestroyMonster(int ref)
     {
         if (it->ref == ref)
         {
-            coord * pos = it->getPosition();
-            WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
+            Coord * pos = it->getPosition();
+            World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
             monster_list.erase(it);
             return 1;
         }
@@ -138,8 +139,8 @@ int MonsterManager::DestroyMonster(MONSTERLIST::iterator it)
 {
 
     //remove from map;
-    coord * pos = it->getPosition();
-    WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
+    Coord * pos = it->getPosition();
+    World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
 
     monster_list.erase(it); //remove from list
 
@@ -156,7 +157,7 @@ monsterData * /*MONSTERLIST::iterator */MonsterManager::Player()
 
 int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* actionManager)
 {
-    dungeonLevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     //check status
 
@@ -168,38 +169,38 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
         {
             if (r_it->isPlayer())
             {
-                WorldBuilder::textManager.newLine("You die. ");
-                WorldBuilder::deathMessage.ShowDeath(0);
+                World.getTextManager().newLine("You die. ");
+                World.getDeathMessage().ShowDeath(0);
                 Sleep(1000);
-                WorldBuilder::SetState(sDeath);
+                World.SetState(sDeath);
                 return 0;
             }
-            //	WorldBuilder::textManager.newLine("You die. Your spirit floats to another soul.");
+            //	World.getTextManager().newLine("You die. Your spirit floats to another soul.");
             else if (r_it->isSeen())
             {
-                WorldBuilder::textManager.newLine("The %s dies. ", r_it->monster.name.c_str());
+                World.getTextManager().newLine("The %s dies. ", r_it->monster.name.c_str());
             }
 
             if (r_it->Name() == "minotaur")
             {
-                WorldBuilder::textManager.newLine("You see more clearly. ");
+                World.getTextManager().newLine("You see more clearly. ");
                 dungeonLevel->setMapLight(DungeonLevel::eNormal);
             }
 
-            WorldBuilder::monsterManager.monsterItems.DropRandomItems(&(*r_it));
+            World.getMonsterManager().monsterItems.DropRandomItems(&(*r_it));
             r_it->SetState(dead);
             r_it->monster.dead();
             if (r_it->monster.GetType() == mWizard)
             {
-                WorldBuilder::deathMessage.done.zagor = 1;
-                WorldBuilder::textManager.newLine("'And the mad wizard falls...hahaha'. ");
+                World.getDeathMessage().done.zagor = 1;
+                World.getTextManager().newLine("'And the mad wizard falls...hahaha'. ");
             }
 
             //DestroyMonster(r_it->ref);
 
             //remove from map;
-            coord * pos = r_it->getPosition();
-            WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
+            Coord * pos = r_it->getPosition();
+            World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
 
             r_it = monster_list.erase(r_it); //remove from list
 
@@ -217,7 +218,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
 
         if (it->isPlayer()) //no AI for player
         {
-            coord * pos = it->getPosition();
+            Coord * pos = it->getPosition();
             dungeonLevel->map[pos->x][pos->y].AssignMonster(&it->monster);
             //static int gogo =0; //effect tests
             //if(gogo==0)
@@ -236,7 +237,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
         }
         else
         {
-            if (it->level == WorldBuilder::GetCurrentLevel()) //don't process AI for monsters on other levels
+            if (it->level == World.GetCurrentLevel()) //don't process AI for monsters on other levels
             {
                 if (it->Name() == "troll")
                 {
@@ -246,7 +247,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
                         {
                             it->monster.stamina++;
                             if (it->isSeen() == 1)
-                                WorldBuilder::textManager.newLine("The troll regenerates! ");
+                                World.getTextManager().newLine("The troll regenerates! ");
                         }
                     }
                 }
@@ -254,7 +255,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
 
                 ai.ProcessIntelligence(&(*it));
 
-                coord * pos = it->getPosition();
+                Coord * pos = it->getPosition();
                 dungeonLevel->map[pos->x][pos->y].AssignMonster(&it->monster);
 
                 it->last_stamina = it->monster.stamina;
@@ -262,12 +263,12 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
         }
     }
 
-    if (WorldBuilder::monsterManager.monster_list.size() == 1 && WorldBuilder::monsterManager.monsterItems.GetEquipment(WorldBuilder::monsterManager.Player(), gold) != NULL)
+    if (World.getMonsterManager().monster_list.size() == 1 && World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), gold) != NULL)
     {
-        WorldBuilder::deathMessage.SetDeathMessage(" killed all that moved and acquired the treasure. WOW!");
-        WorldBuilder::deathMessage.ShowDeath(1);
+        World.getDeathMessage().SetDeathMessage(" killed all that moved and acquired the treasure. WOW!");
+        World.getDeathMessage().ShowDeath(1);
         Sleep(1000);
-        WorldBuilder::SetState(sDeath);
+        World.SetState(sDeath);
     }
 
     return 1;
@@ -284,7 +285,6 @@ monsterData * MonsterManager::FindMonsterData(Monster * monster)
         if (monster == &it->monster)
             return &(*it);
     }
-
 
     return NULL;
 }
@@ -356,7 +356,7 @@ void MonsterManager::PrintMonsters()
 
     MONSTERLIST::iterator it;
 
-    for (it = WorldBuilder::monsterManager.monster_list.begin(); it != WorldBuilder::monsterManager.monster_list.end(); it++)
+    for (it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
     {
         ofile << it->monster.name << " " << it->level << " " << it->monster.skill << " " << it->monster.stamina << " X:" << it->pos.x << " Y:" << it->pos.y;
         ofile << std::endl;

@@ -14,15 +14,13 @@
 class SpecialLevelGenerator : public DungeonGenerator  
 {
 public:
-	SpecialLevelGenerator();
-	virtual ~SpecialLevelGenerator();
-
 	int Create( int _type);
 
 	int CreateMap();
 
 	int makeBarracksDungeon();
 	int makeSpecialItemSpot();
+    int makeCrypt();
 };
 
 #endif // !defined(AFX_SPECIALLEVELGENERATOR_H__50E5F382_0B44_41F6_8C67_1A1A2BAA53F0__INCLUDED_)

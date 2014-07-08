@@ -37,7 +37,7 @@ int ProjectileItem::createProjectile(int level, int secondary_type)
     switch (secondary_type)
     {
     case arrow: symbol = '\\';
-        strcpy(name, "arrow");
+        name =( "arrow");
         weight = 1;
         setColor(128, 64, 0);
         //SetDice_thr(1, 6);
@@ -45,7 +45,7 @@ int ProjectileItem::createProjectile(int level, int secondary_type)
         break;
 
     case bolt: symbol = '\\';
-        strcpy(name, "bolt");
+        name = ("bolt");
         weight = 2;
         setColor(100, 100, 100);
         //SetDice_thr(1, 6);
@@ -74,30 +74,30 @@ int ProjectileItem::createProjectileWeapon(int level, int secondary_type)
     switch (secondary_type)
     {
     case bow: 	symbol = '{';
-        strcpy(name, "short bow");
+        name = ("short bow");
         identified = 0;
         weight = 100;
-        setColor(128, 64, 0);
-        SetDice_thr(5, 6);
+        setColor(200, 100, 0);
+        SetDice_thr(4, 6);
         itemNumber[0] = bowArrow;
         break;
 
     case longbow: 	symbol = '{';
-        strcpy(name, "long bow");
+        name = ("long bow");
         identified = 0;
         weight = 100;
-        setColor(148, 64, 0);
+        setColor(128, 64, 0);
         itemNumber[0] = bowArrow;
-        SetDice_thr(6, 8);
+        SetDice_thr(5, 8);
         break;
 
-    case crossbow: 	symbol = '{';
-        strcpy(name, "crossbow");
+    case crossbow: 	symbol = '}';
+        name = ("crossbow");
         identified = 0;
         weight = 100;
         setColor(100, 100, 100);
         itemNumber[0] = crossbowBolts;
-        SetDice_thr(8, 5);
+        SetDice_thr(6, 5);
         break;
     }
 
@@ -111,36 +111,3 @@ int ProjectileItem::createProjectileWeapon(int level, int secondary_type)
     return 0;
 }
 
-char *ProjectileItem::GetName()
-{
-  /*  if (identified)
-    {
-        int bonus = 0;
-        switch (type)
-        {
-        case projectile: 	bonus = skill_bonus;
-            //sprintf(id_name, "%d $%d %s (%dd%d)", itemNumber[1], bonus, name, thrNumDice, thrSidesDice);
-            sprintf(id_name, "%d $%d %s", itemNumber[1], bonus, name);
-            break;
-        case projectileWeapon:
-            bonus = skill_bonus;
-            sprintf(id_name, " $%d %s (%dd%d)", bonus, name, thrNumDice, thrSidesDice);
-            break;
-
-        default: bonus = 0; sprintf(id_name, "%s", name); break;
-        }
-    }
-    else
-    {
-        sprintf(id_name, "unidentified %s", name);
-    }
-
-    if (equipped)
-        strcat(id_name, " (equipped)");
-    //sprintf(id_name,"%s (equipped)",id_name);
-
-
-    return id_name;*/
-    return id_name;
-
-}

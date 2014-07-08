@@ -65,9 +65,9 @@ int MonsterItems::EquipMonster(monsterData *monster, int level)
     if (name.find("Servant") != -1) //servants do not use armour and have maces or swords
     {
         if (Random::getInt(2, 0) == 0)
-            item = WorldBuilder::itemManager.CreateItem(level, weapon, sword);
+            item = World.getItemManager().CreateItem(level, weapon, sword);
         else
-            item = WorldBuilder::itemManager.CreateItem(level, weapon, mace);
+            item = World.getItemManager().CreateItem(level, weapon, mace);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
     }
@@ -85,68 +85,68 @@ int MonsterItems::EquipMonster(monsterData *monster, int level)
         case 2: p = arrow; pw = longbow; monster->monster.name = "orc archer"; break;
         }
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, projectile, p));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, projectile, p));
         monster->inventory.back().itemNumber[1] = getInt(20, 10);
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, projectileWeapon, pw));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, projectileWeapon, pw));
         monster->inventory.back().equipped = 1;
 
         if (Random::getInt(2, 0) == 0)
-            item = WorldBuilder::itemManager.CreateItem(level, weapon, sword);
+            item = World.getItemManager().CreateItem(level, weapon, sword);
         else
-            item = WorldBuilder::itemManager.CreateItem(level, weapon, mace);
+            item = World.getItemManager().CreateItem(level, weapon, mace);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, armour, leather));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour, leather));
         monster->inventory.back().equipped = 1;
     }
     else if (name.find("warrior") != -1 || name.find("sentry") != -1)
     {
-        item = WorldBuilder::itemManager.CreateItem(level, weapon);
+        item = World.getItemManager().CreateItem(level, weapon);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, armour));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour));
         monster->inventory.back().equipped = 1;
 
         if (Random::getInt(3, 0) == 0)//add shield
         {
-            monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, shield, 0));
+            monster->inventory.push_back(*World.getItemManager().CreateItem(level, shield, 0));
             monster->inventory.back().equipped = 1;
         }
 
     }
     else if (name.find("butcher") != -1)
     {
-        item = WorldBuilder::itemManager.CreateItem(level, weapon, cleaver);
+        item = World.getItemManager().CreateItem(level, weapon, cleaver);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, armour, bloodyapron));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour, bloodyapron));
         monster->inventory.back().equipped = 1;
 
     }
 
     else if (name.find("Zagor") != -1)
     {
-        item = WorldBuilder::itemManager.CreateItem(level, weapon, staff);
+        item = World.getItemManager().CreateItem(level, weapon, staff);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, armour, blackcloak));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour, blackcloak));
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, cards, 0));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, cards, 0));
     }
     else //create random weapon and armour
     {
-        item = WorldBuilder::itemManager.CreateItem(level, weapon, sword);
+        item = World.getItemManager().CreateItem(level, weapon, sword);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
 
-        monster->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, armour));
+        monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour));
         monster->inventory.back().equipped = 1;
     }
     return 1;
@@ -159,26 +159,26 @@ int MonsterItems::EquipPlayer(monsterData *player)
     player->inventory.clear();
 
     //weapon
-    Item * item = WorldBuilder::itemManager.CreateItem(level, weapon);
+    Item * item = World.getItemManager().CreateItem(level, weapon);
     item->identified = 1;
     player->inventory.push_back(*item);
     player->inventory.back().equipped = 1;
 
     //armour
-    item = WorldBuilder::itemManager.CreateItem(level, armour);
+    item = World.getItemManager().CreateItem(level, armour);
     item->identified = 1;
     player->inventory.push_back(*item);
     player->inventory.back().equipped = 1;
 
-    //player->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level,cards,0)); //give magic to player
+    //player->inventory.push_back(*World.getItemManager().CreateItem(level,cards,0)); //give magic to player
 
     //shield
-    //player->inventory.push_back(*WorldBuilder::itemManager.CreateItem(level,shield,0));
+    //player->inventory.push_back(*World.getItemManager().CreateItem(level,shield,0));
     //player->inventory.back().equipped=1;
 
     //for(int i=0;i<20;i++)
     {
-        //	item = WorldBuilder::itemManager.CreateItem(i,key);
+        //	item = World.getItemManager().CreateItem(i,key);
         //	player->inventory.push_back(*item);
     }
 
@@ -195,13 +195,13 @@ int MonsterItems::EquipPlayer(monsterData *player)
     }
 
     //projectile weapons
-    item = WorldBuilder::itemManager.CreateItem(level, projectileWeapon, pw);
+    item = World.getItemManager().CreateItem(level, projectileWeapon, pw);
     item->identified = 1;
     player->inventory.push_back(*item);
     player->inventory.back().equipped = 1;
 
     //projectiles
-    item = WorldBuilder::itemManager.CreateItem(level, projectile, p);
+    item = World.getItemManager().CreateItem(level, projectile, p);
     item->identified = 1;
     item->itemNumber[1] = getInt(12, 6);
     player->inventory.push_back(*item);
@@ -299,9 +299,9 @@ int MonsterItems::DropItem(monsterData *monster, int item, bool erace_from_inv)
     ITEMLIST::iterator it;
     ITEMLIST::iterator it_all;
 
-    ITEMLIST *all = &WorldBuilder::itemManager.all_items;
+    ITEMLIST *all = &World.getItemManager().all_items;
 
-    coord *pos = &monster->pos;
+    Coord *pos = &monster->pos;
 
     int i = 0;
 
@@ -344,41 +344,41 @@ int MonsterItems::DropItem(monsterData *monster, int item, bool erace_from_inv)
 int MonsterItems::PickupItem(monsterData *monster)
 {
 
-    if (!WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].getItem()) //check if item exists
+    if (!World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].getItem()) //check if item exists
         return 0;
 
 
     if (monster->inventory.size() > 25)
     {
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You have no room in you pack. ");
+            World.getTextManager().newLine("You have no room in you pack. ");
         return 0;
     }
 
 
     if (monster->isPlayer()) //id item for player
     {
-        Item * item_to_copy = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].getItem();
+        Item * item_to_copy = World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].getItem();
         if (item_to_copy->type == lockedChest || item_to_copy->type == openChest)
         {
-            WorldBuilder::textManager.newLine("You cannot lift it. ");
+            World.getTextManager().newLine("You cannot lift it. ");
             return 0;
         }
         item_to_copy->identified = 1;
     }
     //get copy of item
 
-    Item item(*WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].getItem());
+    Item item(*World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].getItem());
 
 
 
     //delete reference from map but item is still in all items list
-    WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveItemRef();
+    World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveItemRef();
  
     if (monster->isPlayer())
-        WorldBuilder::textManager.newLine("You pick up the %s%s", item.GetName(), item.itemNumber[1] > 1 ? ". " : ". ");
+        World.getTextManager().newLine("You pick up the %s%s", item.GetName().c_str(), item.itemNumber[1] > 1 ? ". " : ". ");
     else
-        WorldBuilder::textManager.newLine("The %s picks up the %s%s", monster->monster.name.c_str(), item.name, item.itemNumber[1] > 1 ? "s. " : ". ");
+        World.getTextManager().newLine("The %s picks up the %s%s", monster->monster.name.c_str(), item.BaseName().c_str(), item.itemNumber[1] > 1 ? "s. " : ". ");
 
     //give item to monster
 
@@ -391,7 +391,7 @@ int MonsterItems::PickupItem(monsterData *monster)
         {
             //check if same type, secondary ype and skill bonus
             if (item.type == it->type && item.secondaryType == it->secondaryType && item.skill_bonus == it->skill_bonus &&
-                !strcmp(item.prefix, it->prefix) && !strcmp(item.postfix, it->postfix))
+                item.getPrefix() == it->getPrefix() && item.getPostfix() == it->getPostfix())
             {
                 it->itemNumber[1] += item.itemNumber[1];
                 stacked = true;
@@ -426,12 +426,12 @@ int MonsterItems::DropRandomItems(monsterData *monster)
     {
         if (it->type == key)
         {
-            WorldBuilder::monsterManager.monsterItems.DropItem(monster, i, false);
+            World.getMonsterManager().monsterItems.DropItem(monster, i, false);
             it = monster->inventory.erase(it);
         }
         else if (it->type == cards)
         {
-            WorldBuilder::monsterManager.monsterItems.DropItem(monster, i, false);
+            World.getMonsterManager().monsterItems.DropItem(monster, i, false);
             it = monster->inventory.erase(it);
         }
         else
@@ -441,7 +441,7 @@ int MonsterItems::DropRandomItems(monsterData *monster)
         }
         /*else if(rit->type == gold)
         {
-        WorldBuilder::monsterManager.monsterItems.DropItem(monster,i);
+        World.getMonsterManager().monsterItems.DropItem(monster,i);
         }*/
     }
 
@@ -450,7 +450,7 @@ int MonsterItems::DropRandomItems(monsterData *monster)
     if (rand_drop == monster->inventory.size()) //no drop (0=0)
         return 0;
 
-    WorldBuilder::monsterManager.monsterItems.DropItem(monster, rand_drop);
+    World.getMonsterManager().monsterItems.DropItem(monster, rand_drop);
 
     if (monster->inventory.size() > 0) //more items to drop
         DropRandomItems(monster);
@@ -462,16 +462,16 @@ int MonsterItems::DropRandomItems(monsterData *monster)
 ///////////private///////////////////
 int MonsterItems::DropStackableItem(monsterData *monster, Item *item, int x, int y)
 {
-    Item* floor_item = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].getItem();
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != dfloor
-        &&WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != bridge)
+    Item* floor_item = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].getItem();
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type != dfloor
+        &&World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type != bridge)
     {
         return 0;
     }
 
     else if (floor_item == NULL) //no item
     {
-        WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].AssignItem(item);
+        World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].AssignItem(item);
         return 1;
     }
     else //item - check if same
@@ -487,7 +487,7 @@ int MonsterItems::DropStackableItem(monsterData *monster, Item *item, int x, int
 
 int MonsterItems::DropItem(monsterData *monster, Item *item, int x, int y)
 {
-    if (std::string("a fountain") == WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name)
+    if (std::string("a fountain") == World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.name)
         int test = 0;
 
     if (x <= 0 || y <= 0 || x >= (DUNGEON_SIZE_W - 1) || y >= (DUNGEON_SIZE_W - 1))
@@ -498,18 +498,18 @@ int MonsterItems::DropItem(monsterData *monster, Item *item, int x, int y)
         return DropStackableItem(monster, item, x, y);
     }
     // dont drop if there is an item there or the ground is not floor or bridge
-    else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x ][y].getItem() ||
-             (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != dfloor &&
-              WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type != bridge))
+    else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x ][y].getItem() ||
+             (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type != dfloor &&
+              World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type != bridge))
     {
         return 0;
     }
-    else if (std::string("a fountain") == WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name)
+    else if (std::string("a fountain") == World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.name)
         return 0;
-    else if (std::string("a teleport") == WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.name)
+    else if (std::string("a teleport") == World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.name)
         return 0;
     else
-        WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].AssignItem(item);
+        World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].AssignItem(item);
     return 1;
 }
 
@@ -564,7 +564,7 @@ int MonsterItems::AttemptDropItem(monsterData *monster, Item *item, int x, int y
         else
         {
             if (monster->isPlayer())
-                WorldBuilder::textManager.newLine("No room. ");
+                World.getTextManager().newLine("No room. ");
             //	throw std::exception("No room to drop any more items");
             return 0; //failure - dungeon is full
         }

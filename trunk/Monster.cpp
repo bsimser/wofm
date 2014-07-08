@@ -87,6 +87,7 @@ int Monster::Create(int _type, int level, int level_variation)
     case mSpecial:      return createSpecial(level);    break;
     case mDigger:       return createDigger();          break;
     case mBridgeMaster: return createBridgeMaster();    break;
+    case mCrocodile:     createCrocodile();    break;
 
     default: throw std::exception("Invalid monster type passed into monster creator"); break;
     }
@@ -96,7 +97,7 @@ int Monster::Create(int _type, int level, int level_variation)
 
 int Monster::dead()
 {
-    symbol = '%%';
+    symbol = 'c';
     return 1;
 }
 
@@ -271,7 +272,6 @@ int Monster::createSpecial(int level)
 
 int Monster::createWerewolf()
 {
-
     symbol = 'W';
     name = ("Werewolf");
     setDescription("A large scruffy lythro...err,  lithra, no um, lycanothdo... werewolf. ");
@@ -284,6 +284,18 @@ int Monster::createWerewolf()
     return 1;
 }
 
+void Monster::createCrocodile()
+{
+    symbol = 'C';
+    name = ("crocodile");
+
+    setDescription("A large predatory reptile with long jaws, sharp claws and a hungry smile. ");
+
+    setColor(0, 128, 64);
+
+    stamina = 10;
+    skill = 8 + getInt(3, 0);
+}
 
 int Monster::createDigger()
 {

@@ -12,12 +12,14 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-
 int StandardMonsterActions::ThrowTarget(monsterData* attacker, int targetX, int targetY, eAction action)
 {
     int ret;
     COORDLIST::iterator it;
-    DungeonLevel* level = WorldBuilder::dungeonManager.CurrentLevel();
+    DungeonLevel* level = World.getDungeonManager().CurrentLevel();
+
+    int finalX = targetX;
+    int finalY = targetY;
 
     level->HighLightPath(attacker->pos.x, attacker->pos.y, targetX, targetY);
 
@@ -25,36 +27,55 @@ int StandardMonsterActions::ThrowTarget(monsterData* attacker, int targetX, int 
     {
         if (!level->IsCellTransparent(it->x, it->y) || level->map[it->x][it->y].monsterExists())
         {
-            int ret = attacker->NextAction(WorldBuilder::actionManager.UpdateAction(&attacker->action, action, it->x, it->y));
-            WorldBuilder::dungeonManager.CurrentLevel()->ClearPath();
-            return ret;
+            finalX = it->x;
+            finalY = it->y;
+            break;
         }
     }
 
     //path clear - attack target
-    ret = attacker->NextAction(WorldBuilder::actionManager.UpdateAction(&attacker->action, action, targetX, targetY));
+    ret = attacker->NextAction(World.getActionManager().UpdateAction(&attacker->action, action, finalX, finalY));
 
-    WorldBuilder::dungeonManager.CurrentLevel()->ClearPath();
-
+    World.getDungeonManager().CurrentLevel()->ClearPath();
     return ret;
+}
+
+void StandardMonsterActions::ShowTrajectory(int level, int sourceX, int sourceY, int targetX, int targetY, char symbol, int c1, int c2, int c3)
+{
+    Symbol vSymbol(symbol, c1, c2, c3);
+
+    // get and copy path
+    DungeonLevel & dungeonLevel = World.getDungeonManager().level[level];
+    dungeonLevel.HighLightPath(sourceX, sourceY, targetX, targetY);
+    COORDLIST path = dungeonLevel.show_path;
+    World.getDungeonManager().CurrentLevel()->ClearPath();
+
+    COORDLIST::iterator it;
+    for (it = path.begin(); it != path.end(); it++) 
+    {
+         dungeonLevel.map[it->x][it->y].setSymbol(vSymbol);
+        World.Render();
+        Sleep(10);
+        dungeonLevel.map[it->x][it->y].clearSymbol();
+    }
 }
 
 int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
 {
-    Item* projectilePile = WorldBuilder::monsterManager.monsterItems.GetEquipment(attacker, projectile);
-    Item* projectileLauncher = WorldBuilder::monsterManager.monsterItems.GetEquipment(attacker, projectileWeapon);
+    Item* projectilePile = World.getMonsterManager().monsterItems.GetEquipment(attacker, projectile);
+    Item* projectileLauncher = World.getMonsterManager().monsterItems.GetEquipment(attacker, projectileWeapon);
 
     if (attacker->pos.x == x && attacker->pos.y == y)
     {
         if (attacker->isPlayer())
-            WorldBuilder::textManager.newLine("Can not shoot yourself on purpose. ");
+            World.getTextManager().newLine("Can not shoot yourself on purpose. ");
         return 0;
     }
 
     if (!projectilePile) //no projectiles
     {
         if (attacker->isPlayer())
-            WorldBuilder::textManager.newLine("You have no projectiles equipped. ");
+            World.getTextManager().newLine("You have no projectiles equipped. ");
         attacker->is_archer = 0;
         return 0;
     }
@@ -63,7 +84,7 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
         if (projectilePile->itemNumber[0] != 0)
         {
             if (attacker->isPlayer())
-                WorldBuilder::textManager.newLine("You do not have the correct weapon equipped. ");
+                World.getTextManager().newLine("You do not have the correct weapon equipped. ");
             return 0;
         }
     }
@@ -72,7 +93,7 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
         if (projectilePile->itemNumber[0] != projectileLauncher->itemNumber[0])  //wrong projectiles
         {
             //if(attacker->isPlayer())
-            WorldBuilder::textManager.newLine("You do not have the correct weapon equipped. ");
+            World.getTextManager().newLine("You do not have the correct weapon equipped. ");
             return 0;
         }
     }
@@ -96,30 +117,35 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
             }
         }
     }
+
+    // show trajectory
+    Symbol symbol('*', 255, 0, 0);
+    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, x, y, actualProjectile->symbol, actualProjectile->color1, actualProjectile->color2, actualProjectile->color2);
+
     actualProjectile->equipped = 0;
 
-    Monster *d = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = WorldBuilder::monsterManager.FindMonsterData(d);
+    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
+    monsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
-    std::string throw_name = actualProjectile->name;
+    std::string throw_name = actualProjectile->BaseName();
 
     if (defender == NULL || d == NULL) //no target but terrain
     {
-        if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type == deepWater ||
-            WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type == shallowWater)
-            WorldBuilder::textManager.newLine("Splash! "); //missile are lost
+        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == deepWater ||
+            World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == shallowWater)
+            World.getTextManager().newLine("Splash! "); //missile are lost
         else
         {
-            WorldBuilder::textManager.newLine("Thud! ");
+            World.getTextManager().newLine("Thud! ");
             if (Random::getInt(10, 0) < 5) //50% breakage
-                WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
+                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
         }
         return 1;
     }
 
     //add to ground
     if (Random::getInt(10, 0) < 7) //20% breakage
-        WorldBuilder::monsterManager.monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
+        World.getMonsterManager().monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
 
     //calculate attack
     int dist = (int)sqrt((float)(attacker->pos.x - x)*(attacker->pos.x - x) + (attacker->pos.y - y) *(attacker->pos.y - y));
@@ -140,11 +166,11 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
         attackStrength = attackStrength / 2;
 
     //if(slots.weapon != NULL)
-    Item* a = WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, armour);
+    Item* a = World.getMonsterManager().monsterItems.GetEquipment(defender, armour);
     if (a)
         defenceStrength += a->absorb_bonus;
 
-    //WorldBuilder::textManager.newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
+    //World.getTextManager().newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
 
     if (attackStrength > defenceStrength) //attacker hits defender
     {
@@ -152,7 +178,7 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
         {
             if (defender->AbsorbTest())
             {
-                WorldBuilder::textManager.newLine("The %s's armour deflected the %s. ", defender->monster.name.c_str(), throw_name.c_str());
+                World.getTextManager().newLine("The %s's armour deflected the %s. ", defender->monster.name.c_str(), throw_name.c_str());
             }
             else
             {
@@ -160,11 +186,11 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
                 {
                     if (Random::getInt(4, 0) <= effect)
                     {
-                        WorldBuilder::textManager.newLine("The %s is repelled. ", throw_name.c_str(), defender->monster.name.c_str());
+                        World.getTextManager().newLine("The %s is repelled. ", throw_name.c_str(), defender->monster.name.c_str());
                         return 1;
                     }
                 }
-                WorldBuilder::textManager.newLine("The %s hits the %s. ", throw_name.c_str(), defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s hits the %s. ", throw_name.c_str(), defender->monster.name.c_str());
                 defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
                 defender->monster.stamina -= AddBrandDamage(attacker, defender, actualProjectile);
 
@@ -178,21 +204,21 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
         else if (defender->isPlayer())
         {
             if (defender->AbsorbTest())
-                WorldBuilder::textManager.newLine("The %s's %s clipped your armour. ", attacker->monster.name.c_str(), throw_name.c_str());
+                World.getTextManager().newLine("The %s's %s clipped your armour. ", attacker->monster.name.c_str(), throw_name.c_str());
             else
             {
                 if (int effect = defender->monster.GetEffect(repelMissiles) > 0) //always repel missiles?
                 {
-                    WorldBuilder::textManager.newLine("You repel the %s. ", throw_name.c_str());
+                    World.getTextManager().newLine("You repel the %s. ", throw_name.c_str());
                     return 1;
                 }
-                WorldBuilder::textManager.newLine("The %s's %s hits you. ", attacker->monster.name.c_str(), throw_name.c_str());
+                World.getTextManager().newLine("The %s's %s hits you. ", attacker->monster.name.c_str(), throw_name.c_str());
                 defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
                 defender->monster.stamina -= AddBrandDamage(attacker, defender, actualProjectile);
 
                 if (defender->monster.stamina < 1) //dead
                 {
-                    WorldBuilder::deathMessage.SetDeathMessage("was killed by a %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
+                    World.getDeathMessage().SetDeathMessage("was killed by a %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
                 }
             }
         }
@@ -200,32 +226,32 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
     else if (attackStrength < defenceStrength) //defender blocks attacker
     {
         if (attacker->isPlayer()) //player is attacker
-            WorldBuilder::textManager.newLine("You miss the %s. ", defender->monster.name.c_str());
+            World.getTextManager().newLine("You miss the %s. ", defender->monster.name.c_str());
 
 
         else if (defender->isPlayer()) //player is defender
-            WorldBuilder::textManager.newLine("The %s's %s misses you. ", attacker->monster.name.c_str(), throw_name.c_str());
+            World.getTextManager().newLine("The %s's %s misses you. ", attacker->monster.name.c_str(), throw_name.c_str());
 
     }
     else //no damage done
     {
         if (attacker->isPlayer())
         {
-            if (WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, weapon) && defender->isHumanoid())
-                WorldBuilder::textManager.newLine("The %s deflects your attack. ", defender->monster.name.c_str());
+            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon) && defender->isHumanoid())
+                World.getTextManager().newLine("The %s deflects your attack. ", defender->monster.name.c_str());
             else
-                WorldBuilder::textManager.newLine("The %s dodges your attack. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s dodges your attack. ", defender->monster.name.c_str());
         }
         if (defender->isPlayer())
         {
-            if (WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, weapon))
-                WorldBuilder::textManager.newLine("You deflect the %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
+            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon))
+                World.getTextManager().newLine("You deflect the %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
             else
-                WorldBuilder::textManager.newLine("You dodge the %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
+                World.getTextManager().newLine("You dodge the %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
         }
     }
 
-    //WorldBuilder::textManager.newLine(text_output);
+    //World.getTextManager().newLine(text_output);
     return 1;
 }
 
@@ -234,16 +260,16 @@ int	StandardMonsterActions::MoveMonster(monsterData* monster, int new_x, int new
     if (monster->monster.GetEffect(paralysis))
         return 0;
 
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].terrain.type == stone)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type == stone)
         return 0;
 
-    if (WorldBuilder::GetCurrentLevel() == 0 && (new_y == 0 || new_x == 0 || new_x == DUNGEON_SIZE_W - 1 || new_y == DUNGEON_SIZE_H - 1)
+    if (World.GetCurrentLevel() == 0 && (new_y == 0 || new_x == 0 || new_x == DUNGEON_SIZE_W - 1 || new_y == DUNGEON_SIZE_H - 1)
         && monster->isPlayer()) //exit world
     {
-        if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].terrain.type != deepWater)
+        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type != deepWater)
         {
-            WorldBuilder::textManager.newLine("Do you want to leave? (y)");
-            WorldBuilder::SetState(sLeave);
+            World.getTextManager().newLine("Do you want to leave? (y)");
+            World.SetState(sLeave);
             return 0;
         }
     }
@@ -252,81 +278,85 @@ int	StandardMonsterActions::MoveMonster(monsterData* monster, int new_x, int new
         return 0;
 
     //check if a monster is in new spot(attack or stop)
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].GetMonster() != NULL)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].GetMonster() != NULL)
     {
         if (monster->fleeing)
         {
-            WorldBuilder::textManager.newLine("You cannot attack while fleeing. ");
+            World.getTextManager().newLine("You cannot attack while fleeing. ");
             return 0;
         }
-        Action* new_action = WorldBuilder::actionManager.UpdateAction(&monster->action, aAttack, new_x, new_y);
+        Action* new_action = World.getActionManager().UpdateAction(&monster->action, aAttack, new_x, new_y);
         monster->NextAction(new_action);
         return 2;
     }
 
     //open door
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].terrain.type == closedDoor)   //open door
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type == closedDoor)   //open door
     {
-        WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
+        World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You open the door. ");
+            World.getTextManager().newLine("You open the door. ");
         else if (monster->isSeen() == 1)
         {
-            WorldBuilder::textManager.newLine("The %s opens the door. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s opens the door. ", monster->monster.name.c_str());
         }
         else if (monster->isSeen() == 2)
-            WorldBuilder::textManager.newLine("A door squeaks. ");
+            World.getTextManager().newLine("A door squeaks. ");
         return 3;
     }
 
-    if (strcmp(WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].terrain.name, "a teleport") == 0)
+    if (strcmp(World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.name, "a teleport") == 0)
     {
-        coord * ner_coord = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].FreeTerrainPosition(dfloor);
-        if (ner_coord)
+        Coord * ner_Coord = World.getDungeonManager().level[World.GetCurrentLevel()].FreeTerrainPosition(dfloor);
+        if (ner_Coord)
         {
-            new_x = ner_coord->x;
-            new_y = ner_coord->y;
+            new_x = ner_Coord->x;
+            new_y = ner_Coord->y;
+
+            StandardMonsterActions::ShowTrajectory(monster->level, monster->pos.x, monster->pos.y, new_x, new_y, '#', Random::getInt(2, 0) ? 255 : 128, 0, 255);
+
+
             if (monster->isPlayer())
-                WorldBuilder::textManager.newLine("You are surrounded by colourful swirls of magic. ");
+                World.getTextManager().newLine("You are surrounded by colourful swirls of magic. ");
             else if (monster->isSeen() == 1)
             {
-                WorldBuilder::textManager.newLine("The %s is engulfed by colourful swirls of magic.", monster->monster.name.c_str());
+                World.getTextManager().newLine("The %s is engulfed by colourful swirls of magic.", monster->monster.name.c_str());
             }
             else if (monster->isSeen() == 2)
-                WorldBuilder::textManager.newLine("You hear a distant whumph! ");
+                World.getTextManager().newLine("You hear a distant whumph! ");
 
             monster->monster.AddEffect(confused, 1);
         }
     }
 
     //remove old ref on successful move
-    WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveMonsterRef();
+    World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveMonsterRef();
 
     //update monster position
     monster->pos.x = new_x;
     monster->pos.y = new_y;
 
-    WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveMonsterRef();
+    World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveMonsterRef();
 
-    WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_x][new_y].AssignMonster(&monster->monster);
+    World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].AssignMonster(&monster->monster);
 
     return 1;
 }
 
 int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
 {
-    Monster *d = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = WorldBuilder::monsterManager.FindMonsterData(d);
+    monsterData* defender = World.getMonsterManager().FindMonsterData(World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster());
 
-    if (defender == NULL || d == NULL) return 0;
+    if (defender == NULL) 
+        return 0;
 
-    int attackStrength = attacker->AttackStrength();
+    int attackStrength  = attacker->AttackStrength();
     int defenceStrength = defender->DefendStrength();
 
     attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
-    //WorldBuilder::textManager.newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
+    //World.getTextManager().newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
 
     // attack hits
     if (attackStrength > defenceStrength) //attacker hits defender
@@ -335,13 +365,13 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
         {
             if (defender->AbsorbTest())
             {
-                WorldBuilder::textManager.newLine("The %s's armour deflected the blow. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s's armour deflected the blow. ", defender->monster.name.c_str());
             }
             else
             {
-                WorldBuilder::textManager.newLine("You hit the %s. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("You hit the %s. ", defender->monster.name.c_str());
                 defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
-                defender->monster.stamina -= AddBrandDamage(attacker, defender, WorldBuilder::monsterManager.monsterItems.GetEquipment(attacker, weapon));
+                defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().monsterItems.GetEquipment(attacker, weapon));
 
                 if (defender->monster.stamina <= 0)
                 {
@@ -353,12 +383,12 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
                     if (defender->Name() == "Ferryman" && Random::getInt(5, 1) == 3)
                     {
                         defender->monster.createBridgeMaster(true);
-                        WorldBuilder::textManager.newLine("The Ferryman transforms! ");
+                        World.getTextManager().newLine("The Ferryman transforms! ");
                     }
                     if (defender->Name() == "Boathouse Keeper" && Random::getInt(5, 1) == 3)
                     {
                         defender->monster.createWerewolf();
-                        WorldBuilder::textManager.newLine("The Boathouse Keeper transforms! ");
+                        World.getTextManager().newLine("The Boathouse Keeper transforms! ");
                     }
                 }
             }
@@ -367,14 +397,14 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
         {
             if (defender->AbsorbTest())
             {
-                WorldBuilder::textManager.newLine("The %s's attack was deflected by your armour. ", attacker->monster.name.c_str());
+                World.getTextManager().newLine("The %s's attack was deflected by your armour. ", attacker->monster.name.c_str());
             }
             else
             {
-                WorldBuilder::textManager.newLine("The %s hits you. ", attacker->monster.name.c_str());
+                World.getTextManager().newLine("The %s hits you. ", attacker->monster.name.c_str());
                 defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
-                defender->monster.stamina -= AddBrandDamage(attacker, defender, WorldBuilder::monsterManager.monsterItems.GetEquipment(attacker, weapon));
-                WorldBuilder::deathMessage.SetDeathMessage("was killed by a %s ", attacker->monster.name.c_str());
+                defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().monsterItems.GetEquipment(attacker, weapon));
+                World.getDeathMessage().SetDeathMessage("was killed by a %s ", attacker->monster.name.c_str());
             }
         }
     }
@@ -383,36 +413,36 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
     {
         if (attacker->isPlayer()) //player is attacker
         {
-            WorldBuilder::textManager.newLine("You miss the %s. ", defender->monster.name.c_str());
+            World.getTextManager().newLine("You miss the %s. ", defender->monster.name.c_str());
         }
 
         else if (defender->isPlayer()) //player is defender
         {
-            WorldBuilder::textManager.newLine("You block the %s's attack. ", attacker->monster.name.c_str());
+            World.getTextManager().newLine("You block the %s's attack. ", attacker->monster.name.c_str());
         }
     }
     else //no damage done
     {
         if (attacker->isPlayer())
         {
-            if (WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, weapon) && defender->isHumanoid())
+            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon) && defender->isHumanoid())
             {
-                WorldBuilder::textManager.newLine("The %s parries your attack. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s parries your attack. ", defender->monster.name.c_str());
             }
             else
             {
-                WorldBuilder::textManager.newLine("The %s dodges your attack. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s dodges your attack. ", defender->monster.name.c_str());
             }
         }
         if (defender->isPlayer())
         {
-            if (WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, weapon))
+            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon))
             {
-                WorldBuilder::textManager.newLine("You parry the %s's attack. ", attacker->monster.name.c_str());
+                World.getTextManager().newLine("You parry the %s's attack. ", attacker->monster.name.c_str());
             }
             else
             {
-                WorldBuilder::textManager.newLine("You dodge the %s's attack. ", attacker->monster.name.c_str());
+                World.getTextManager().newLine("You dodge the %s's attack. ", attacker->monster.name.c_str());
             }
         }
     }
@@ -430,16 +460,16 @@ int	StandardMonsterActions::CalculateDamage(monsterData* defender, int attackStr
     if (diff <= 0)
         return 0;
 
-    Item* has_shield = WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, shield);
+    Item* has_shield = World.getMonsterManager().monsterItems.GetEquipment(defender, shield);
 
     if (has_shield)
     {
         if (Random::getInt(6, 0) < has_shield->absorb_bonus) //block some damage
         {
             if (defender->isPlayer())
-                WorldBuilder::textManager.newLine("Your shield partially blocks the attack. ");
+                World.getTextManager().newLine("Your shield partially blocks the attack. ");
             else
-                WorldBuilder::textManager.newLine("The %s's shield partially blocks your attack. ", defender->Name().c_str());
+                World.getTextManager().newLine("The %s's shield partially blocks your attack. ", defender->Name().c_str());
 
             return 1;
         }
@@ -448,7 +478,7 @@ int	StandardMonsterActions::CalculateDamage(monsterData* defender, int attackStr
         {
             if (defender->isPlayer() && defender->Stamina() < 4 && (Random::getInt(7, 1) + Random::getInt(7, 1)) < defender->Luck())
             {
-                WorldBuilder::textManager.newLine("Your shield *luckily* partially blocks the attack. ");
+                World.getTextManager().newLine("Your shield *luckily* partially blocks the attack. ");
                 return 1;
             }
         }
@@ -470,8 +500,8 @@ int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* d
 
             for (it = attack_weapon->brandMap.begin(); it != attack_weapon->brandMap.end(); it++)
             {
-                int damage = WorldBuilder::itemManager.CalculateBrandDamage(attack_weapon, it->first, it->second);
-                extra_damage += WorldBuilder::monsterManager.CalculateBrandDamageOnMonster(defender, it->first, damage);
+                int damage = World.getItemManager().CalculateBrandDamage(attack_weapon, it->first, it->second);
+                extra_damage += World.getMonsterManager().CalculateBrandDamageOnMonster(defender, it->first, damage);
                 extra_damage = int(extra_damage / 4 + .5f);
 
                 EffectManager effectManager; //add effect
@@ -483,9 +513,9 @@ int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* d
                 if (extra_damage || taken_effect)
                 {
                     if (defender->isPlayer())
-                        WorldBuilder::textManager.newLine("You get %s. ", attack_weapon->GetBrandName(it->first));
+                        World.getTextManager().newLine("You get %s. ", attack_weapon->GetBrandName(it->first));
                     else
-                        WorldBuilder::textManager.newLine("The %s gets %s. ", defender->monster.name.c_str(), attack_weapon->GetBrandName(it->first));
+                        World.getTextManager().newLine("The %s gets %s. ", defender->monster.name.c_str(), attack_weapon->GetBrandName(it->first));
                 }
             }
         }
@@ -499,8 +529,8 @@ int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* d
 
         for (it = attacker->monster.brandMap.begin(); it != attacker->monster.brandMap.end(); it++)
         {
-            int damage = WorldBuilder::itemManager.CalculateBrandDamage(NULL, it->first, it->second);
-            extra_damage += WorldBuilder::monsterManager.CalculateBrandDamageOnMonster(defender, it->first, damage);
+            int damage = World.getItemManager().CalculateBrandDamage(NULL, it->first, it->second);
+            extra_damage += World.getMonsterManager().CalculateBrandDamageOnMonster(defender, it->first, damage);
             extra_damage = int(extra_damage / 4 + .5f);
 
             EffectManager effectManager; //add effect
@@ -513,14 +543,14 @@ int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* d
             if (extra_damage || taken_effect)
             {
                 if (defender->isPlayer())
-                    WorldBuilder::textManager.newLine("You get %s. ", attacker->monster.GetBrandName(it->first));
+                    World.getTextManager().newLine("You get %s. ", attacker->monster.GetBrandName(it->first));
                 else
-                    WorldBuilder::textManager.newLine("The %s gets %s. ", defender->monster.name.c_str(), attacker->monster.GetBrandName(it->first));
+                    World.getTextManager().newLine("The %s gets %s. ", defender->monster.name.c_str(), attacker->monster.GetBrandName(it->first));
             }
         }
     }
 
-    //WorldBuilder::textManager.newLine("Ext:%d ",extra_damage);
+    //World.getTextManager().newLine("Ext:%d ",extra_damage);
     if (extra_damage > 0)
         return 1;
     else return 0;
@@ -529,11 +559,11 @@ int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* d
 
 int	StandardMonsterActions::CastSpell(monsterData*caster, int spellID)
 {
-    return WorldBuilder::spellManager.CallSpellRoutine(caster, spellID);
+    return World.getSpellManager().CallSpellRoutine(caster, spellID);
 }
 
 int	StandardMonsterActions::CastTargetSpell(monsterData* caster, eSpellList spell, int TargetX, int TargetY)
 {
-    return WorldBuilder::spellManager.CastCurrentSpell(caster, TargetX, TargetY);
-    //return caster->NextAction(WorldBuilder::actionManager.UpdateAction(&caster->action,aCastSpell,TargetX,TargetY));
+    return World.getSpellManager().CastCurrentSpell(caster, TargetX, TargetY);
+    //return caster->NextAction(World.getActionManager().UpdateAction(&caster->action,aCastSpell,TargetX,TargetY));
 }

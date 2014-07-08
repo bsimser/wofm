@@ -76,6 +76,7 @@ int DungeonLevel::Initialise(int level_type)
             case 'r':map[w][h].terrain.Create(ruins); break;
             case 'f':map[w][h].terrain.Create(fountain); break;
             case 'v':map[w][h].terrain.Create(teleport); break;
+            case 'S':map[w][h].terrain.Create(fountain); break;
 
             default:map[w][h].terrain.Create(stone); break;
             }
@@ -125,7 +126,7 @@ int DungeonLevel::Delete()
 }
 
 //This lights the dungeon around the player within a sight range
-//This keeps a list of the coords that are lit only changes these and any others within the players radius.
+//This keeps a list of the Coords that are lit only changes these and any others within the players radius.
 //This is much faster that testing the entire dungeon
 
 
@@ -141,7 +142,7 @@ int DungeonLevel::Delete()
     {
     map[w][h].terrain.found = 1;
     map[w][h].terrain.light = 1;
-    coord *pos = new coord;
+    Coord *pos = new Coord;
     pos->x=w;
     pos->y=h;
     lit_cells.push_back(*pos);
@@ -159,7 +160,7 @@ int DungeonLevel::Delete()
 void DungeonLevel::LightDungeon(int x, int y, int range) //los??
 {
 
-    if (WorldBuilder::GetCurrentLevel() == 0) //outside
+    if (World.GetCurrentLevel() == 0) //outside
         range = 20;
 
     /*//if(lit_cells.size()==0) //initial test, do this once - test entire dungeon
@@ -172,7 +173,7 @@ void DungeonLevel::LightDungeon(int x, int y, int range) //los??
     {
     map[w][h].terrain.found = 1;
     map[w][h].terrain.light = 1;
-    //coord *pos = new coord;
+    //Coord *pos = new Coord;
     //	pos->x=w;
     //pos->y=h;
     //lit_cells.push_back(*pos);
@@ -230,10 +231,10 @@ void DungeonLevel::LightDungeon(int x, int y, int range) //los??
                 {
                     map[w][h].terrain.found = 1;
                     map[w][h].terrain.light = 1;
-                    coord new_coord;
-                    new_coord.x = w;
-                    new_coord.y = h;
-                    lit_cells.push_back(new_coord);
+                    Coord new_Coord;
+                    new_Coord.x = w;
+                    new_Coord.y = h;
+                    lit_cells.push_back(new_Coord);
                 }
             }
         }
@@ -253,7 +254,7 @@ int DungeonLevel::ClearPath()
     return 0;
 }
 
-bool isAdjacent(const coord & c1, const coord & c2)
+bool isAdjacent(const Coord & c1, const Coord & c2)
 {
     if (abs(c1.x - c2.x) <= 1 && abs(c1.y - c2.y) <= 1)
         return true;
@@ -286,7 +287,7 @@ bool DungeonLevel::HighLightPath(int x, int y, int w, int h)
     if (mod)
         h++;
 
-    coord pos;
+    Coord pos;
     pos.x = w;
     pos.y = h;
     show_path.push_back(pos);
@@ -399,7 +400,7 @@ int DungeonLevel::ClearMonsters()
 }
 
 
-coord * DungeonLevel::getStartPos()
+Coord * DungeonLevel::getStartPos()
 {
 
     if (_type == lOutside)
@@ -422,7 +423,7 @@ coord * DungeonLevel::getStartPos()
     }
     return NULL;
 }
-coord * DungeonLevel::GetEndPosition()
+Coord * DungeonLevel::GetEndPosition()
 {
     for (int y = 0; y < DUNGEON_SIZE_H; y++)
     {
@@ -439,7 +440,7 @@ coord * DungeonLevel::GetEndPosition()
     return NULL;
 }
 
-coord * DungeonLevel::FreeTerrainPosition(const std::string & name)
+Coord * DungeonLevel::FreeTerrainPosition(const std::string & name)
 {
     COORDLIST posList;
     COORDLIST::iterator it;
@@ -449,7 +450,7 @@ coord * DungeonLevel::FreeTerrainPosition(const std::string & name)
         {
             if (name == map[w][h].terrain.name)
             {
-                coord pos;
+                Coord pos;
                 pos.x = w;
                 pos.y = h;
                 posList.push_back(pos);
@@ -472,7 +473,7 @@ coord * DungeonLevel::FreeTerrainPosition(const std::string & name)
     return NULL;
 }
 
-coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
+Coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
 {
     COORDLIST posList;
     COORDLIST::iterator it;
@@ -482,7 +483,7 @@ coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
         {
             if (map[w][h].terrain.type == type)
             {
-                coord pos;
+                Coord pos;
                 pos.x = w;
                 pos.y = h;
                 posList.push_back(pos);
@@ -505,7 +506,7 @@ coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
     return NULL;
 }
 
-/*coord * DungeonLevel::NewBridgePosition()
+/*Coord * DungeonLevel::NewBridgePosition()
 {
 COORDLIST posList;
 COORDLIST::iterator it;
@@ -515,7 +516,7 @@ for(int w=1;w<DUNGEON_SIZE_W-1;w++)
 {
 if(map[w][h].item == NULL && map[w][h].GetMonster() == NULL && map[w][h].terrain.type == bridge )
 {
-coord pos;pos.x = w; pos.y=h;
+Coord pos;pos.x = w; pos.y=h;
 posList.push_back(pos);
 }
 }
@@ -565,7 +566,7 @@ int DungeonLevel::getAdjacentFreeSpaces(int x, int y)
     return spaces;
 }
 
-coord * DungeonLevel::NewItemPosition(bool space)
+Coord * DungeonLevel::NewItemPosition(bool space)
 {
     //
     COORDLIST posList;
@@ -584,7 +585,7 @@ coord * DungeonLevel::NewItemPosition(bool space)
                         continue;
                     }
                 }
-                coord pos; pos.x = w; pos.y = h;
+                Coord pos; pos.x = w; pos.y = h;
                 posList.push_back(pos);
             }
         }
@@ -607,7 +608,7 @@ coord * DungeonLevel::NewItemPosition(bool space)
     return &tempPos;
 }
 
-coord * DungeonLevel::NewSpecialItemPosition()
+Coord * DungeonLevel::NewSpecialItemPosition()
 {
     for (int h = 1; h < DUNGEON_SIZE_H - 1; h++)
     {
@@ -644,7 +645,7 @@ bool DungeonLevel::IsCellTransparent(int x, int y)
     {
         //	if(is)
         {
-            coord pos;
+            Coord pos;
             pos.x = x;
             pos.y = y;
             show_path.push_back(pos);

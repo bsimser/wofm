@@ -25,9 +25,6 @@ public:
 	virtual ~ProjectileItem(void);
 	int CreateItem(eItemType type,int level,int secondary_type);
 
-
 	int createProjectile(int level,int secondary_type);
 	int createProjectileWeapon(int level,int secondary_type);
-
-	char *GetName();
 };

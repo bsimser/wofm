@@ -33,6 +33,7 @@ public:
     virtual int createBridgeMaster(bool wereRat = false);
     virtual int createWerewolf();
     virtual int createDigger();
+    virtual void createCrocodile();
 
 	int dead();
 	int MaxStamina()    {return max_stamina; };
@@ -43,15 +44,15 @@ public:
     void setDescription(const std::string & about);
     const std::string getDescription() const;
 
-	int symbol;
-	int color1,color2,color3;
+	char symbol;
+    unsigned char color1, color2, color3;
 
-	int stamina;
-	int skill;
-	int luck;
+	signed char stamina;
+	unsigned char skill;
+    char luck;
 
-	int sight_range;
-	int asleep_sight_Range;
+    unsigned char sight_range;
+    unsigned char asleep_sight_Range;
 
     std::string name;
 	//char name[64];
@@ -61,15 +62,15 @@ public:
     bool undead;
 
 	int experience;
-	int max_stamina;
+    unsigned char max_stamina;
 
-	int speed;
+    signed char speed;
 private:
 
-	int mLevelVariation;
-	int mLevel;
-	int type;
-    int description;
+    unsigned char mLevelVariation;
+    unsigned char mLevel;
+    unsigned char type;
+    unsigned char description;
     static std::vector<std::string> descriptions;
 };
 

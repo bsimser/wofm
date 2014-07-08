@@ -108,16 +108,18 @@ int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
 
     case paralysis: move_done = 2;
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You cannot move. "); break;
+            World.getTextManager().newLine("You cannot move. "); break;
 
     case confused: if (Random::getInt(10, 0) > 3 - strength)
     {
         RandomMove(monster);
         move_done = 1;
-        if (!monster->isPlayer() && monster->isSeen() == 1)
-            WorldBuilder::textManager.newLine("%s is confused. ", monster->monster.name.c_str());
-        else
-            WorldBuilder::textManager.newLine("You are confused. ");
+        if (monster->isPlayer())
+        {
+            World.getTextManager().newLine("You are confused. ");
+        }
+        if (monster->isSeen() == 1)
+            World.getTextManager().newLine("%s is confused. ", monster->monster.name.c_str());
 
     } break; //70%+10% for strength random move;
 
@@ -210,16 +212,16 @@ eMonsterState MonsterAI::UpdateMonsterState(monsterData* monster)
         if (detect || monster->wasHit())
         {
             
-            int luck = WorldBuilder::monsterManager.Player()->Luck();
+            int luck = World.getMonsterManager().Player()->Luck();
 
             if (monster->wasHit() == false && Random::getInt(1, 8) + Random::getInt(1, 8) <= luck)
             {
-                WorldBuilder::textManager.newLine("The %s snores loudly. ", monster->monster.name.c_str());
+                World.getTextManager().newLine("The %s snores loudly. ", monster->monster.name.c_str());
             }
             else
             {
                 state = waking;
-                WorldBuilder::textManager.newLine("The %s wakes up. ", monster->monster.name.c_str());
+                World.getTextManager().newLine("The %s wakes up. ", monster->monster.name.c_str());
             }
         }
     }
@@ -241,7 +243,7 @@ void MonsterAI::DoNothing(monsterData* monster)
 {
     if (monster->GetState() != dead)
     {
-        monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aWait));
+        monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aWait));
     }
 }
 
@@ -254,8 +256,8 @@ int MonsterAI::RandomMove(monsterData* monster)
 
     int dir = Random::getInt(9, 1);
 
-    coord * pos = monster->getPosition();
-    coord new_pos;
+    Coord * pos = monster->getPosition();
+    Coord new_pos;
     new_pos.x = pos->x;
     new_pos.y = pos->y;
 
@@ -272,33 +274,34 @@ int MonsterAI::RandomMove(monsterData* monster)
     case dNorthWest: new_pos.x--; new_pos.y--; break;
     }
 
-    DungeonLevel* dungeonLevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     //cant move into stone, dont attack friendly monster, dont willingly go into water.
 
-    if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != stone
-        && dungeonLevel->map[new_pos.x][new_pos.y].GetMonster() == NULL
-        && dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != deepWater)
+    if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != stone &&
+         dungeonLevel->map[new_pos.x][new_pos.y].GetMonster() == NULL &&
+        (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != deepWater || monster->Name() == "crocodile"))
     {
         //	if(monster->state != dead && dungeonLevel->map[pos->x][pos->y].terrain.type != deepWater) 
         {
             dungeonLevel->map[pos->x][pos->y].RemoveMonsterRef();
-            monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
+            monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
         }
         //else get out of water
     }
     else if (dungeonLevel->map[pos->x][pos->y].terrain.type == deepWater && dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != stone)
     {	//find a way out of deep water
         dungeonLevel->map[pos->x][pos->y].RemoveMonsterRef();
-        monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
+        monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
     }
+    // dig your way out
     else if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type == stone &&
              monster->monster.GetType() == mDigger)
     {
         if (Random::getInt(3,0) == 1 && new_pos.x < DUNGEON_SIZE_W - 1 && new_pos.y < DUNGEON_SIZE_H - 1 && new_pos.x > 0 && new_pos.y > 0)
         {
             dungeonLevel->map[new_pos.x][new_pos.y].terrain.Create(dfloor);
-            monster->NextAction(WorldBuilder::actionManager.UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
+            monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
         }
     }
     return 1;
@@ -331,25 +334,25 @@ int MonsterAI::MagicAttackPlayer(monsterData* monster)
 
         int random_spell = Random::getInt(monster->spellList.size(), 0);
 
-        SpellBase *spell = WorldBuilder::spellManager.GetMonsterSpell(monster, random_spell);
+        SpellBase *spell = World.getSpellManager().GetMonsterSpell(monster, random_spell);
         if (!spell)
             ChasePlayer(monster);
         else if (spell->GetTarget() == spTarget) //target spell
         {
-            WorldBuilder::actionManager.monsterAction.CastSpell(monster, random_spell);//prepare spell
+            World.getActionManager().monsterAction.CastSpell(monster, random_spell);//prepare spell
 
             if (spell->GetType() == spAttack) //player target
-                WorldBuilder::actionManager.monsterAction.CastTargetSpell(monster, spell->GetSpell(), p_x, p_y);
+                World.getActionManager().monsterAction.CastTargetSpell(monster, spell->GetSpell(), p_x, p_y);
             else if (spell->GetType() == spDefence || spell->GetType() == spEnhance || spell->GetType() == spPanic) //target self
-                WorldBuilder::actionManager.monsterAction.CastTargetSpell(monster, spell->GetSpell(), m_x, m_y);
+                World.getActionManager().monsterAction.CastTargetSpell(monster, spell->GetSpell(), m_x, m_y);
         }
         else if (spell->GetTarget() == spAreaEffect) //area spell
-            WorldBuilder::actionManager.monsterAction.CastSpell(monster, random_spell);
+            World.getActionManager().monsterAction.CastSpell(monster, random_spell);
 
         if (m_x != monster->pos.x || m_y != monster->pos.y) //caster has moved
             DetectPlayer(monster->pos.x, monster->pos.y, &p_x, &p_y);
 
-        //set last known player coord
+        //set last known player Coord
         monster->go_to.x = p_x;
         monster->go_to.y = p_y;
     }
@@ -375,10 +378,10 @@ int MonsterAI::DistanceAttackPlayer(monsterData* monster)
         {
             return ChasePlayer(monster);
         }
-        if (!WorldBuilder::actionManager.monsterAction.ThrowTarget(monster, p_x, p_y, aFire)) //change to nextAction command
+        if (!World.getActionManager().monsterAction.ThrowTarget(monster, p_x, p_y, aFire)) //change to nextAction command
             ChasePlayer(monster);
 
-        //p_x,p_y; set last know player coord to these
+        //p_x,p_y; set last know player Coord to these
         monster->go_to.x = p_x;
         monster->go_to.y = p_y;
     }
@@ -392,8 +395,8 @@ int MonsterAI::DistanceAttackPlayer(monsterData* monster)
 int MonsterAI::ChasePlayer(monsterData* monster)
 {
     int sight_range = 10;
-    int m_x, m_y; //monster coord
-    int p_x, p_y; //player coord 
+    int m_x, m_y; //monster Coord
+    int p_x, p_y; //player Coord 
 
     m_x = monster->pos.x;
     m_y = monster->pos.y;
@@ -404,18 +407,18 @@ int MonsterAI::ChasePlayer(monsterData* monster)
     {
         MoveCloserToPlayer(m_x, m_y, p_x, p_y);	//move toward player
 
-        //p_x,p_y; set last know player coord to these
+        //p_x,p_y; set last know player Coord to these
         monster->go_to.x = p_x;
         monster->go_to.y = p_y;
     }
     else
     {
-        if (monster->go_to.x != -1 || monster->go_to.y != -1) //last know coords are set
+        if (monster->go_to.x != -1 || monster->go_to.y != -1) //last know Coords are set
             MoveCloserToPlayer(m_x, m_y, monster->go_to.x, monster->go_to.y);
-        //move toward last know coord 
-        //or give monster global coords with a time out if it does not see the player in X number of turns (ESP smart)
-        //look if mob can see player and if so update go coords
-        if (DetectPlayer(monster->pos.x, monster->pos.y, &p_x, &p_y)) //use updated pos coords
+        //move toward last know Coord 
+        //or give monster global Coords with a time out if it does not see the player in X number of turns (ESP smart)
+        //look if mob can see player and if so update go Coords
+        if (DetectPlayer(monster->pos.x, monster->pos.y, &p_x, &p_y)) //use updated pos Coords
         {
             monster->go_to.x = p_x;
             monster->go_to.y = p_y;
@@ -427,7 +430,7 @@ int MonsterAI::ChasePlayer(monsterData* monster)
 
 int MonsterAI::CheckValidMove(int x, int y, int dir)
 {
-    coord new_pos;
+    Coord new_pos;
 
     switch (dir)
     {
@@ -440,7 +443,7 @@ int MonsterAI::CheckValidMove(int x, int y, int dir)
     case dNorthWest:	new_pos.x = x - 1;	new_pos.y = y - 1;	break;
     case dSouthWest:	new_pos.x = x - 1;	new_pos.y = y + 1; break;
     }
-    DungeonLevel* dungeonLevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type == stone)
         return 0;
@@ -449,7 +452,7 @@ int MonsterAI::CheckValidMove(int x, int y, int dir)
     Monster * mob = dungeonLevel->map[new_pos.x][new_pos.y].GetMonster();
     if (mob)
     {
-        if (WorldBuilder::monsterManager.FindMonsterData(mob)->isPlayer())
+        if (World.getMonsterManager().FindMonsterData(mob)->isPlayer())
         {
             return 1;
         }
@@ -460,13 +463,13 @@ int MonsterAI::CheckValidMove(int x, int y, int dir)
     return 1;
 }
 
-// determines new coords to closer postion to player
+// determines new Coords to closer postion to player
 // move diagonal until mob is equal x or y then move closer
 // This emulates mirror movement and eliminates escape potential
 // I.e Move in x or y first allows player to out manoeurve AI
 int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
 {
-    DungeonLevel* dungeonLevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     int dir = dWait;
 
@@ -606,7 +609,7 @@ int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
         }
     }
 
-    coord new_pos;
+    Coord new_pos;
 
     new_pos.x = m_x;
     new_pos.y = m_y;
@@ -626,7 +629,7 @@ int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
     }
 
     //monsters hate water
-    /*	if(WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type == deepWater
+    /*	if(World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type == deepWater
             && Random::getInt(10,0)) //random chance the mob chases in the water
             {
             if(sqrt( (m_x-p_x)*(m_x-p_x) +   (m_y - p_y)*(m_y - p_y))>1) //attack if close
@@ -637,15 +640,15 @@ int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
             }*/
 
     //dont attack friend
-    if ((WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster()))
-    if (!WorldBuilder::monsterManager.FindMonsterData(WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster())->isPlayer())
+    if ((World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster()))
+    if (!World.getMonsterManager().FindMonsterData(World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster())->isPlayer())
     {
         RandomMove(current_monster); //find better route to player (random for now)
         return 1;
     }
 
     dungeonLevel->map[m_x][m_y].RemoveMonsterRef();
-    current_monster->NextAction(WorldBuilder::actionManager.UpdateAction(&current_monster->action, aMove, new_pos.x, new_pos.y));
+    current_monster->NextAction(World.getActionManager().UpdateAction(&current_monster->action, aMove, new_pos.x, new_pos.y));
 
     return 1;
 }
@@ -663,7 +666,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
     else
         sight = current_monster->monster.sight_range;
 
-    DungeonLevel* dungeonLevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     /*	//check radius for enemies
         int min_h_range = m_y-sight;
@@ -685,7 +688,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
 
     //check for enemy - at this stage it just checks player
     //cheat code - passes players position into LOS code and tests if it can be detectec
-    monsterData* player = &(*WorldBuilder::monsterManager.Player());
+    monsterData* player = &(*World.getMonsterManager().Player());
 
     if (sqrt((float)(m_x - player->pos.x)*(m_x - player->pos.x) + (player->pos.y - m_y)*(player->pos.y - m_y)) <= sight)
     {
@@ -710,7 +713,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
         {
         if(dungeonLevel->map[w][h].GetMonster())
         {
-        if(WorldBuilder::monsterManager.FindMonsterData(dungeonLevel->map[w][h].GetMonster())->isPlayer())
+        if(World.getMonsterManager().FindMonsterData(dungeonLevel->map[w][h].GetMonster())->isPlayer())
         {
         *p_x = w;
         *p_y = h;
@@ -732,7 +735,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
         {
         if(dungeonLevel->map[w][h].GetMonster())
         {
-        if(WorldBuilder::monsterManager.FindMonsterData(dungeonLevel->map[w][h].GetMonster())->isPlayer())
+        if(World.getMonsterManager().FindMonsterData(dungeonLevel->map[w][h].GetMonster())->isPlayer())
         {
         *p_x = w;
         *p_y = h;
@@ -749,7 +752,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
 
 int MonsterAI::LOS(int m_x, int m_y, int p_x, int p_y, int range)
 {
-    DungeonLevel* dungeonLevel = &WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     int r = (int)sqrt((float)(m_x - p_x)*(m_x - p_x) + (p_y - m_y)*(p_y - m_y));
 

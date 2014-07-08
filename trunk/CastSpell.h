@@ -3,9 +3,6 @@
 class CastMagic
 {
 public:
-	CastMagic(void);
-	~CastMagic(void);
-
 	int SlowEnemies(monsterData* caster);
 	int RepelMissiles(monsterData* caster);
 	int Teleport(monsterData* caster);
