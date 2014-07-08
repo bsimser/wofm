@@ -15,7 +15,6 @@ class InventoryManager
 {
 public:
 	InventoryManager();
-	virtual ~InventoryManager();
 
 	int ShowInventory(int type);
 	int EquipMessage();
@@ -26,21 +25,21 @@ public:
 	int Drop(bool *keys);
 	int DropItem(int item);
 	int Unequip(int item);
+    void setState(int state);	
+    
+    enum EInvState
+    {
+        eDisplay,
+        eEquip,
+        eDrop,
+        eShowEquipment
+    };
 
 private:
-
-	enum invState{
-		display,
-		equip,
-		drop,
-		equipment
-	};
-	invState state;
-
-
-	bool showEquip;
-	bool showInv;
-	bool showAll;
+    EInvState mState;
+	bool mShowEquip;
+	bool mShowInv;
+	bool mShowAll;
 };
 
 #endif // !defined(AFX_INVENTORYMANAGER_H__65C8D882_9323_46EC_8A13_BCC5962EC377__INCLUDED_)

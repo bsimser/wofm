@@ -27,6 +27,8 @@ public:
 	int		CastTargetSpell(monsterData* caster, eSpellList spell, int TargetX, int TargetY);
 	int		AddBrandDamage(monsterData* attacker,monsterData* defender, Item* attack_weapon);
 
+    static void ShowTrajectory(int level, int sourceX, int sourceY, int targetX, int targetY, char symbol, int c1, int c2, int c3);
+
 };
 
 #endif // !defined(AFX_STANDARDMONSTERACTIONS_H__0827BB51_C8A4_43C0_81BA_74884B9970EF__INCLUDED_)

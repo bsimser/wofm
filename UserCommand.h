@@ -39,9 +39,9 @@ public:
 	void FleeCommand();
 
 private:
-    coord autoTarget();
+    Coord autoTarget();
 
-    static coord look_pos;
+    static Coord look_pos;
 	static int run_dir;
     static monsterData * lastTarget;
 };

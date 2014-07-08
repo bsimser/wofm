@@ -4,7 +4,6 @@
 #include <map>
 #include "SpellBase.h"
 
-
 class monsterData;
 
 typedef std::list <SpellBase> SPELLLIST;
@@ -15,9 +14,6 @@ typedef std::list <SpellBase*> MONSTERSPELLLIST;
 class SpellManager
 {
 public:
-    SpellManager(void);
-    ~SpellManager(void);
-
     int Initialise(void);
 
     void CreateSpell(eSpellList type);

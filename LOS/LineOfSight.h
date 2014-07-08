@@ -21,7 +21,7 @@
 #define LINEOFSIGHT_H
 
 #include <math.h>
-#include "..\coord.h"
+#include "..\Coord.h"
 class Fraction;
 
 class LineOfSight

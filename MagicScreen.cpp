@@ -31,9 +31,9 @@ int MagicScreen::CastSpell(bool *keys)
     {
         if (keys[i] == true)
         {
-            monsterData* player = WorldBuilder::monsterManager.Player();
-            //ret = WorldBuilder::spellManager.CallSpellRoutine(WorldBuilder::monsterManager.Player(),i-65);
-            ret = player->NextAction(WorldBuilder::actionManager.UpdateAction(&player->action, aCastSpell, i - 65));
+            monsterData* player = World.getMonsterManager().Player();
+            //ret = World.getSpellManager().CallSpellRoutine(World.getMonsterManager().Player(),i-65);
+            ret = player->NextAction(World.getActionManager().UpdateAction(&player->action, aCastSpell, i - 65));
 
             keys[i] = false;
             break;
@@ -46,23 +46,21 @@ int MagicScreen::CastSpell(bool *keys)
 void MagicScreen::Display()
 {
 
-    WorldBuilder::textManager.ClearDisplayLines();
+    World.getTextManager().ClearDisplayLines();
 
-    monsterData* player = WorldBuilder::monsterManager.Player();
+    monsterData* player = World.getMonsterManager().Player();
 
-    WorldBuilder::textManager.SetDisplayLine(0, "Spell List");
-    WorldBuilder::textManager.SetDisplayLine(1, "==========");
-
-
+    World.getTextManager().SetDisplayLine(0, "Spell List");
+    World.getTextManager().SetDisplayLine(1, "==========");
 
     if (player->spellList.size() == 0)
     {
-        WorldBuilder::textManager.SetDisplayLine(3, "You know no spells. ");
+        World.getTextManager().SetDisplayLine(3, "You know no spells. ");
     }
     else
     {
-        WorldBuilder::textManager.SetDisplayLine(3, "You shuffle your deck, you now have the power of Zagor at your command. ");
-        WorldBuilder::textManager.SetDisplayLine(5, "    Spell                Description");
+        World.getTextManager().SetDisplayLine(3, "You shuffle your deck, you now have the power of Zagor at your command. ");
+        World.getTextManager().SetDisplayLine(5, "    Spell                Description");
     }
 
     MONSTERSPELLLIST::iterator sp;
@@ -72,11 +70,9 @@ void MagicScreen::Display()
 
     for (sp = player->spellList.begin(); sp != player->spellList.end(); sp++, i++)
     {
-        WorldBuilder::textManager.SetDisplayLine(i, "(%c) %s       %s  ", i + 97 - start, (*sp)->Name(), (*sp)->Desription().c_str());
+        World.getTextManager().SetDisplayLine(i, "(%c) %s       %s  ", i + 97 - start, (*sp)->Name(), (*sp)->Desription().c_str());
 
     }
-
-
-    WorldBuilder::textManager.SetDisplayLine(39, "[a-d] to select spell, [x] to cancel");
-
-}
+    
+    World.getTextManager().SetDisplayLine(39, "[a-d] to select spell, [x] to cancel");
+    }

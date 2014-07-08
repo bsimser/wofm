@@ -2,14 +2,13 @@
 #include <windows.h>        // Header File For Windows
 #include "WorldBuilder.h"
 #include "OpenGLSceneGen.h"
+#include <sstream>
 
 //general
 bool    keys[256];            // Array Used For The Keyboard Routine
 bool    active = true;        // Window Active Flag Set To true By Default
 
 bool    keypress;
-
-WorldBuilder world; //the one and only world
 
 LRESULT CALLBACK WndProc(HWND    hWnd,            // Handle For This Window
 						 UINT    uMsg,            // Message For This Window
@@ -82,7 +81,7 @@ LRESULT CALLBACK WndProc(HWND    hWnd,            // Handle For This Window
 
     case WM_SIZE:                                // Resize The OpenGL Window
     {
-        world.Resize(lParam, wParam);
+        World.Resize(lParam, wParam);
 
         return 0;                                // Jump Back
     }
@@ -102,9 +101,16 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
 
     keypress = false;
 
+    std::stringstream str;
+    str << lpCmdLine;
+    int temp;
+    str >> temp ;
+    
+    Random::reseed(temp);
+
     try
     {
-        if (!world.Initialise("The Warlock of Firetop Mountain: Roguelike (c) 2014 Corremn"))
+        if (!World.Initialise("The Warlock of Firetop Mountain: Roguelike (c) 2014 Corremn"))
             return 0;
     }
     catch (std::exception & ex)
@@ -117,7 +123,7 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
         ::MessageBox(NULL, "Unknown Error", "Initialisation", MB_ICONERROR);
     }
 
-	world.Run(); //display world
+    World.Run(); //display world
 
     while (!done)                                    // Loop That Runs While done=false
     {
@@ -144,14 +150,14 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
             {
                 if (keypress)
                 {
-                    world.ProcessCommand(keys);
-					world.Run();
+                    World.ProcessCommand(keys);
+                    World.Run();
 					keypress = false;
 				}
                 else                                // Not Time To Quit, Update Screen
                 {
-					if (world.State() == sRunning || world.State() == sResting) //update while player is running or resting(HACK)
-						world.Run();
+                    if (World.State() == sRunning || World.State() == sResting) //update while player is running or resting(HACK)
+                        World.Run();
                 }
 				Sleep(10);
             }
@@ -159,13 +165,13 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
             if (keys[VK_F1])                // Is F1 Being Pressed?
             {
                 keys[VK_F1] = false;            // If So Make Key false
-                world.ToggleFullScreen(800, 600);
+                World.ToggleFullScreen(800, 600);
             }
             if (keys[VK_F2])                // Is F2 Being Pressed?
             {
                 keys[VK_F2] = false;            // If So Make Key false
 
-                world.ToggleFullScreen(1024, 768);
+                World.ToggleFullScreen(1024, 768);
 
             }/*
             if (keys[VK_F3])                // Is F3 Being Pressed?
@@ -187,7 +193,7 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
     }
 
     // Shutdown
-    world.Stop();
+    World.Stop();
 
     try{
         return 0;                            // Exit The Program

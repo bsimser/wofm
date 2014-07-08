@@ -35,6 +35,7 @@ enum eMonsterMajorType
 	mBridgeMaster,
 	mGuards,
     mRandom,
+    mCrocodile,
     mDigger,
 };
 

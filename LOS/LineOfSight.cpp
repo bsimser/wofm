@@ -20,7 +20,7 @@
 
 #include "Fraction.h"
 #include "LineOfSight.h"
-#include "..\coord.h"
+#include "..\Coord.h"
 
 ////////////////////////////////////////////////////////////////////////
 // Destructor.
@@ -31,7 +31,7 @@ LineOfSight::
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Determine if the map cell at given coordinates is visible,
+// Determine if the map cell at given Coordinates is visible,
 // by tracing a line of sight from the source to the destination
 // cell.
 ////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ IsCellVisible(int srcX, int srcY, int destX, int destY)
     // then the cell is visible.
 
     // Note that since the algorithm used by TracePath() translates
-    // coordinates to the (+x,+y) quadrant when performing slope
+    // Coordinates to the (+x,+y) quadrant when performing slope
     // calculations, we take the absolute value of the x and y
     // differences when calculating the slopes.
 

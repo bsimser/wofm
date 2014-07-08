@@ -5,6 +5,7 @@
 #include "NumberGenerator.h"
 
 #include <stdlib.h>
+#include <fstream>
 #include <time.h>	//seed generation
 #include <assert.h>
 
@@ -38,8 +39,16 @@ namespace Random
         return random_integer;
     }
 
-    void reseed()
+    void reseed(int seed)
     {
-        srand((unsigned)time(NULL));
+        if (seed == -1)
+            seed = (int)time(NULL);
+
+        srand(seed);
+
+        std::ofstream myfile;
+        myfile.open("seed.txt");
+        myfile << seed;
+        myfile.close();
     }
 }

@@ -10,7 +10,7 @@
 #endif // _MSC_VER > 1000
 
 #include ".\resistancebrands.h"
-
+#include <string>
 
 enum eItemType
 {
@@ -25,7 +25,11 @@ enum eItemType
 	openChest,
     cards,
     gold,
-	key,
+    key,
+    ration,
+    gem,
+    stake,
+    cheese,
 };
 
 enum eWeaponType
@@ -65,10 +69,18 @@ public:
 	void createOpenChest(int level);
 	void createGold(int level);
 	void createShield(int level);
-	void createCards(int level);
+    void createCards(int level);
+    void createRation();
+    void createGem();
+    void createStake();
+    void createCheese();
 
 	void setColor(int c1, int c2, int c3);
-	virtual char * GetName();
+    std::string GetName();
+    std::string BaseName();
+
+    std::string getPostfix();
+    std::string getPrefix();
 
 	void SetDice_h2h(int nDice, int sides);
 	void SetDice_thr(int nDice, int sides);
@@ -86,34 +98,31 @@ public:
     bool stackable();
     Item& stackable(bool);
 
-	char name[64];
-	char id_name[64];
-	char prefix[32];
-	char postfix[32];
-
-	char nothing[1];
-
 	eItemType type;
 	int secondaryType;
 
-	int symbol;
+	char symbol;
 
-	int weight;
+	unsigned int weight;
 
 	unsigned char color1;
     unsigned char color2;
     unsigned char color3;
 
-	int skill_bonus;
-	int defence_bonus;
-	int absorb_bonus;
+	signed char skill_bonus;
+    signed char defence_bonus;
+    signed char absorb_bonus;
 
-	int identified;
-	int equipped;
-	int ref;
-	int itemNumber[3];
+	bool identified;
+    bool equipped;
+    unsigned char ref;
+    unsigned char itemNumber[3];
 
-private:
+protected:
+    std::string name;
+    std::string prefix;
+    std::string postfix;
+
 	int h2hSidesDice;		//I.e 6 = 6 sided dice
 	int h2hNumDice;			//I.e 2 = 2 dice i.e Attack = (h2hNumDice)d(h2hSidesDice) +skill_bonus;
 

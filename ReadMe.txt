@@ -41,13 +41,13 @@ Luck can effect the quality of items found in chests too.
 Combat
 ------
 When attacking your skill and weapon effect your chances of a successful hit as well as the skill and weapon values of your enemy. 
-Both the weapons base attack value (shown in the [x]) and and the bonus skill value (shown as +x) will be used for determining attacks.
+Both the weapons base attack value (shown as [Att:x]) and and the bonus skill value (shown as +x) will be used for determining attacks.
 The higher values the better.
 
 Defence
 -------
 If you are wearing armour there is a chance that the attack will be deflected or blocked by your armour and no damage will be taken. 
-The armours defence value is shown in the [x] and the higher the better.
+The armours defence value is shown in the [Def:x] and the higher the better.
 
 
 Hints on how to play
@@ -75,6 +75,7 @@ Use in game help '?': key bindings
     message history    - [ctrl-p]
     view inventory     - [i]
     view quipment      - [e]
+    quit               - [Q]
     toggle Full Screen - [F1]
 
 

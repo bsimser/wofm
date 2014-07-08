@@ -20,7 +20,7 @@ namespace Random
 
 	int getInt(int max, int min);
 
-	void reseed();
+	void reseed(int seed = -1);
 
 	static int primeNumbers[20] = {2,3,5,7,9,11,13,17,19,23,27,29,31,37,41,47,53,59,61,67};
 

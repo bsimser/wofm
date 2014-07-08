@@ -22,8 +22,8 @@ public:
 
 	virtual int PopulateDungeon(int level);
 
-	coord * NewMonsterPosition(int lev);
-	coord * NewBridgePosition(int lev);
+	Coord * NewMonsterPosition(int lev);
+	Coord * NewBridgePosition(int lev);
 
 	virtual int AddItems(int lev);
 

@@ -189,7 +189,7 @@ namespace freetype {
 
     /// A fairly straight forward function that pushes
     /// a projection matrix that will make object world 
-    /// coordinates identical to window coordinates.
+    /// Coordinates identical to window Coordinates.
     inline void pushScreenCoordinateMatrix() {
         glPushAttrib(GL_TRANSFORM_BIT);
         GLint	viewport[4];
@@ -214,7 +214,7 @@ namespace freetype {
     ///with freetype fonts.
     void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  
     {
-        // We want a coordinate system where things corresponding to window pixels.
+        // We want a Coordinate system where things corresponding to window pixels.
         pushScreenCoordinateMatrix();
 
         GLuint font = ft_font.list_base;
@@ -302,7 +302,7 @@ namespace freetype {
     //void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  {
     void qprint(const font_data &ft_font, int x, int y, const char c)
     {
-        // We want a coordinate system where things corresponding to window pixels.
+        // We want a Coordinate system where things corresponding to window pixels.
         pushScreenCoordinateMatrix();
 
         GLuint font = ft_font.list_base;

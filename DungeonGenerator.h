@@ -12,9 +12,6 @@
 #include <iostream>
 #include <fstream>
 
-//#include "DungeonLevel.h"
-
-
 typedef enum eDir
 {
 	dNone = -2,
@@ -27,7 +24,6 @@ typedef enum eDir
 	dWest	   = 6,
 	dNorthWest = 7,
 	dSouthWest = 8,
-
 	dUp,
 	dDown
 }direction;
@@ -57,31 +53,23 @@ class DungeonGenerator
 {
 public:
 	DungeonGenerator();
-	virtual ~DungeonGenerator();
 
 	int CreateMap();
 	virtual int Create(int type);
-
 	char dmap[DUNGEON_SIZE_W ][DUNGEON_SIZE_H];
 	char flood_test[DUNGEON_SIZE_W ][DUNGEON_SIZE_H];
-
-//	DungeonLevel level;
 	int ConvertMapToDungeon();
-	
 	bool FloodTest();
 
-//	coord * DungeonGenerator::getStartPos();
-
 protected:
-
 	int DumpDungeon();
-
 	virtual	int makeNormalDungeon();
 	virtual	int makeRiverDungeon();
 	virtual	int makeMazeDungeon();
 	virtual	int makeOutSideDungeon();
-	virtual int makeUndeadDungeon();
+    virtual int makeUndeadDungeon();
 	virtual	int makeSpecialDungeon();
+    virtual void makeBoatHouse();
 	virtual int makeEncounterDungeon();
 	int makeCavernDungeon();
 
@@ -101,17 +89,19 @@ protected:
 	int last_room_x;
 	int last_room_y;
 
-	std::ofstream ofile;
-
-	void OpenTrace(bool open);
+    void OpenTrace(bool open);
 
 	void buildRoom(int x,int y,int w_size,int h_size,int type);
 
 	void TraceMsg(char * msg);
 
     int isNearWall(int x, int y);
+    
+    /* 
+     * Remove doors that dont make sense
+     */
     int fixDoors();
-
+    bool addSpecialRoom();
 	int validRoomPos(int x,int y,int w_size,int h_size);
 
 	void makeRiver(int top,int size =0);
@@ -127,16 +117,16 @@ protected:
     int AddFountain();
     int AddTeleport();
 
-	int type;
-
     void SafetyReset();
 
     int Safety(char*message,int test=5000);
-    int safety;
 
     bool findTerrainType(int &x, int &y, const char terrain);
 
-
+protected:
+    std::ofstream ofile;
+    int type;
+    int safety;
 };
 
 #endif // !defined(AFX_DUNGEONGENERATOR_H__D49B02F6_8AA1_4C67_8264_6171D1953767__INCLUDED_)

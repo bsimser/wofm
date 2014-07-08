@@ -2,16 +2,6 @@
 #include "WorldBuilder.h"
 #include "CastSpell.h"
 
-SpellManager WorldBuilder::spellManager;
-
-SpellManager::SpellManager(void)
-{
-}
-
-SpellManager::~SpellManager(void)
-{
-}
-
 int SpellManager::Initialise(void)
 {
     CreateSpell(spFlyingWeapon);
@@ -28,8 +18,8 @@ void SpellManager::CreateSpell(eSpellList type)
     SpellBase s;// = new SpellBase;
     if (s.CreateSpell(type))
         all_spells.push_back(s);
-
 }
+
 int SpellManager::CallSpellRoutine(monsterData* caster, int spell) //call spell from list;
 {
     //GetSpell from caster spell list
@@ -74,6 +64,7 @@ int SpellManager::AddMonsterSpell(monsterData* caster, eSpellList spell)
     }
     return 1;
 }
+
 SpellBase* SpellManager::GetMonsterSpell(monsterData*caster, int random_spell)
 {
     MONSTERSPELLLIST::iterator sp;
@@ -121,7 +112,7 @@ int SpellManager::CastSpell(monsterData* caster, int spell)
         if (!caster->isPlayer())
             SpellText(caster, "blinks");
         else
-            WorldBuilder::textManager.newLine("You blink. ");
+            World.getTextManager().newLine("You blink. ");
         s.Teleport(caster); currentSpell = spTeleport;
         return NORMAL;
 
@@ -129,7 +120,7 @@ int SpellManager::CastSpell(monsterData* caster, int spell)
         if (!caster->isPlayer())
             SpellText(caster, "breaths fire at you");
         else
-            WorldBuilder::textManager.newLine("You breath fire. ");
+            World.getTextManager().newLine("You breath fire. ");
 
         currentSpell = spDragonFire;
         return SELECT_TARGET;
@@ -142,9 +133,9 @@ int SpellManager::CastSpell(monsterData* caster, int spell)
 void SpellManager::SpellText(monsterData* caster, const char * spell_name)
 {
     if (caster->isPlayer())
-        WorldBuilder::textManager.newLine("You cast %s. ", spell_name);
+        World.getTextManager().newLine("You cast %s. ", spell_name);
     else
-        WorldBuilder::textManager.newLine("The %s %s. ", caster->Name().c_str(), spell_name);
+        World.getTextManager().newLine("The %s %s. ", caster->Name().c_str(), spell_name);
 }
 
 int SpellManager::CastCurrentSpell(monsterData* caster, int targetX, int targetY) //target select spells
@@ -153,7 +144,7 @@ int SpellManager::CastCurrentSpell(monsterData* caster, int targetX, int targetY
 
     CastMagic s;
 
-    DungeonLevel* level = WorldBuilder::dungeonManager.CurrentLevel();
+    DungeonLevel* level = World.getDungeonManager().CurrentLevel();
     level->HighLightPath(caster->pos.x, caster->pos.y, targetX, targetY);
     COORDLIST::iterator it;
 
@@ -173,11 +164,11 @@ int SpellManager::CastCurrentSpell(monsterData* caster, int targetX, int targetY
             case spDragonFire:		ret = s.DragonBreath(caster, it->x, it->y); break;
             }
 
-            WorldBuilder::dungeonManager.CurrentLevel()->ClearPath(); //uncomment to remove path from monsters
+            World.getDungeonManager().CurrentLevel()->ClearPath(); //uncomment to remove path from monsters
             return ret;
         }
     }
-    WorldBuilder::dungeonManager.CurrentLevel()->ClearPath();
+    World.getDungeonManager().CurrentLevel()->ClearPath();
     return 0;
 }
 

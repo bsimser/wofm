@@ -12,15 +12,6 @@ using namespace Random;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-SpecialLevelGenerator::SpecialLevelGenerator()
-{
-}
-
-SpecialLevelGenerator::~SpecialLevelGenerator()
-{
-
-}
-
 int SpecialLevelGenerator::Create(int _type)
 {
     int w, h;
@@ -37,9 +28,9 @@ int SpecialLevelGenerator::Create(int _type)
     {
     case	slTrollCave: makeSpecialDungeon(); break;
     case	slPrison:	 makeSpecialDungeon(); break;
-    case	slBoatHouse: makeSpecialDungeon(); break;
+    case	slBoatHouse: makeBoatHouse(); break;
     case	slShop:		 makeSpecialDungeon(); break;
-    case	slVampire:   makeSpecialDungeon(); break;
+    case	slVampire:   makeCrypt(); break;
     case	slTresure:   makeSpecialDungeon(); break;
     case	slEncounter: makeEncounterDungeon(); break;
     case	slBarracks:  makeBarracksDungeon(); break;
@@ -63,6 +54,28 @@ int SpecialLevelGenerator::Create(int _type)
 
 int SpecialLevelGenerator::CreateMap()
 {
+    return 1;
+}
+
+int SpecialLevelGenerator::makeCrypt()
+{
+    makeUndeadDungeon();
+
+    // remove '>' and '<'
+
+    for (int h = 0; h < DUNGEON_SIZE_H; h++)
+    {
+        for (int w = 0; w < DUNGEON_SIZE_W; w++)
+        {
+            if (dmap[w][h] == '<')
+                dmap[w][h] = '(';
+            else if (dmap[w][h] == '>')
+                dmap[w][h] = '.';
+        }
+    }
+
+    makeSpecialItemSpot();
+
     return 1;
 }
 
@@ -112,7 +125,7 @@ int SpecialLevelGenerator::makeBarracksDungeon()
         }
         else if (x > randCorridoor_W)
         {
-            for (int w = x; w>randCorridoor_W; w--)
+            for (int w = x; w > randCorridoor_W; w--)
             {
                 dmap[w][y] = '.';
             }
@@ -135,6 +148,7 @@ int SpecialLevelGenerator::makeBarracksDungeon()
 
 int SpecialLevelGenerator::makeSpecialItemSpot()
 {
+    // put in room (or open space)
     COORDLIST specialSpotCoords;
     for (int h = 0; h < DUNGEON_SIZE_H; h++)
     {
@@ -143,8 +157,8 @@ int SpecialLevelGenerator::makeSpecialItemSpot()
             if (dmap[w][h] == '.' && dmap[w + 1][h] == '.' && dmap[w - 1][h] == '.' && dmap[w][h + 1] == '.' && dmap[w][h - 1] == '.'
                 && dmap[w + 1][h + 1] == '.' && dmap[w - 1][h + 1] == '.' && dmap[w - 1][h - 1] == '.' && dmap[w + 1][h - 1] == '.')
             {
-                coord new_coord; new_coord.x = w; new_coord.y = h;
-                specialSpotCoords.push_back(new_coord);
+                Coord new_Coord; new_Coord.x = w; new_Coord.y = h;
+                specialSpotCoords.push_back(new_Coord);
             }
         }
     }

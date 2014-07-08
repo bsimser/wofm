@@ -25,24 +25,24 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
         if (monster->isPlayer())
         {
             if (ret == REDUCED)
-                WorldBuilder::textManager.newLine("Your glow fades slightly. ");
+                World.getTextManager().newLine("Your glow fades slightly. ");
             else if (ret == REMOVED)
-                WorldBuilder::textManager.newLine("You stop glowing. ");
+                World.getTextManager().newLine("You stop glowing. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s stops glowing. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s stops glowing. ", monster->monster.name.c_str());
         break;
     case diseased:
         ret = TestEffect(monster, effect, strength);
         if (monster->isPlayer())
         {
             if (ret == REDUCED)
-                WorldBuilder::textManager.newLine("You feel healthier. ");
+                World.getTextManager().newLine("You feel healthier. ");
             else if (ret == REMOVED)
-                WorldBuilder::textManager.newLine("You feel better. ");
+                World.getTextManager().newLine("You feel better. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s looks better. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s looks better. ", monster->monster.name.c_str());
         break;
 
     case slowed:
@@ -50,12 +50,12 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
         if (monster->isPlayer())
         {
             if (ret == REDUCED)
-                WorldBuilder::textManager.newLine("You speed up slightly. ");
+                World.getTextManager().newLine("You speed up slightly. ");
             else if (ret == REMOVED)
-                WorldBuilder::textManager.newLine("You speed up. ");
+                World.getTextManager().newLine("You speed up. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s speeds up. ", monster->monster.name.c_str());
 
         break;
 
@@ -64,12 +64,12 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
         if (monster->isPlayer())
         {
             if (ret == REDUCED)
-                WorldBuilder::textManager.newLine("You feel movement. ");
+                World.getTextManager().newLine("You feel movement. ");
             else if (ret == REMOVED)
-                WorldBuilder::textManager.newLine("You can move again. ");
+                World.getTextManager().newLine("You can move again. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s can move again. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s can move again. ", monster->monster.name.c_str());
         break;
 
     case teleportitus: ret = TestEffect(monster, effect, strength);
@@ -78,12 +78,12 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
         if (monster->isPlayer())
         {
             //if(ret == REDUCED)
-            //	WorldBuilder::textManager.newLine("You feel more stable. ");
+            //	World.getTextManager().newLine("You feel more stable. ");
             if (ret == REMOVED)
-                WorldBuilder::textManager.newLine("Your feel stable. ");
+                World.getTextManager().newLine("Your feel stable. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s looks stable. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s looks stable. ", monster->monster.name.c_str());
         break;
 
 
@@ -92,12 +92,12 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
         if (monster->isPlayer())
         {
             if (ret == REDUCED)
-                WorldBuilder::textManager.newLine("You feel less confused. ");
+                World.getTextManager().newLine("You feel less confused. ");
             else if (ret == REMOVED)
-                WorldBuilder::textManager.newLine("Your head clears. ");
+                World.getTextManager().newLine("Your head clears. ");
         }
         else  if (monster->isSeen() && ret == REMOVED)
-            WorldBuilder::textManager.newLine("The %s looks normal. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s looks normal. ", monster->monster.name.c_str());
         break;
     }
 
@@ -150,9 +150,9 @@ void EffectManager::AddBrandEffect(monsterData *monster, eBrandType brand, int s
     case bPoison: monster->monster.AddEffect(poisoned, strength); break;
     case bParalysis: monster->monster.AddEffect(paralysis, strength);     break;     	
         if(monster->isPlayer())
-           WorldBuilder::textManager.newLine("You are paralysed. ");
+           World.getTextManager().newLine("You are paralysed. ");
         else if(monster->isSeen())
-           WorldBuilder::textManager.newLine("The %s is paralysed. ",monster->monster.name.c_str());;
+           World.getTextManager().newLine("The %s is paralysed. ",monster->monster.name.c_str());;
 
         break;
     }
@@ -203,7 +203,7 @@ int EffectManager::RunSlowed(monsterData *monster, int strength)
     if (chance < resistance + 1)//10% chance reduction + 10% for each resistance point - 0= 10%
     {
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You speed up slightly. ");
+            World.getTextManager().newLine("You speed up slightly. ");
         monster->monster.ReduceEffect(slowed, 1);
     }
 
@@ -216,9 +216,9 @@ int EffectManager::RunSlowed(monsterData *monster, int strength)
     else
     {
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You speed up. ");
+            World.getTextManager().newLine("You speed up. ");
         else if (monster->isSeen())
-            WorldBuilder::textManager.newLine("The %s speeds up. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s speeds up. ", monster->monster.name.c_str());
         return 0;
     }
 
@@ -234,7 +234,7 @@ int EffectManager::RunPoison(monsterData *monster, int strength)
     {
         monster->monster.ReduceEffect(poisoned, 1);
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You feel less poisoned. ");
+            World.getTextManager().newLine("You feel less poisoned. ");
         return REDUCED;
     }
 
@@ -248,19 +248,19 @@ int EffectManager::RunPoison(monsterData *monster, int strength)
 
             if (monster->isPlayer())
             {
-                WorldBuilder::textManager.newLine("You are poisoned. ");
-                WorldBuilder::deathMessage.SetDeathMessage("became immune to poison the moment he died of it. ");
+                World.getTextManager().newLine("You are poisoned. ");
+                World.getDeathMessage().SetDeathMessage("became immune to poison the moment he died of it. ");
             }
             else if (monster->isSeen())
-                WorldBuilder::textManager.newLine("The %s is poisoned. ", monster->monster.name.c_str());
+                World.getTextManager().newLine("The %s is poisoned. ", monster->monster.name.c_str());
         }
     }
     else
     {
         if (monster->isPlayer())
-            WorldBuilder::textManager.newLine("You are no longer poisoned. ");
+            World.getTextManager().newLine("You are no longer poisoned. ");
         else if (monster->isSeen())
-            WorldBuilder::textManager.newLine("The %s recovers. ", monster->monster.name.c_str());
+            World.getTextManager().newLine("The %s recovers. ", monster->monster.name.c_str());
         return REMOVED;
     }
     return NO_CHANGE;

@@ -43,12 +43,12 @@ int monsterData::NextAction(Action *action)
     switch (action->Type())
     {
     case aWait:  break;
-    case aMove:  success = WorldBuilder::actionManager.monsterAction.MoveMonster(this, action->param1, action->param2); break;
-    case aAttack: success = WorldBuilder::actionManager.monsterAction.AttackMonster(this, action->param1, action->param2); break;
-    case aPickup: success = WorldBuilder::monsterManager.monsterItems.PickupItem(this); break;
-    case aDrop:  success = WorldBuilder::monsterManager.monsterItems.DropItem(this, action->param1); break;
-    case aFire:  success = WorldBuilder::actionManager.monsterAction.FireItem(this, action->param1, action->param2); break;
-    case aCastSpell:  success = WorldBuilder::actionManager.monsterAction.CastSpell(this, action->param1); break;
+    case aMove:  success = World.getActionManager().monsterAction.MoveMonster(this, action->param1, action->param2); break;
+    case aAttack: success = World.getActionManager().monsterAction.AttackMonster(this, action->param1, action->param2); break;
+    case aPickup: success = World.getMonsterManager().monsterItems.PickupItem(this); break;
+    case aDrop:  success = World.getMonsterManager().monsterItems.DropItem(this, action->param1); break;
+    case aFire:  success = World.getActionManager().monsterAction.FireItem(this, action->param1, action->param2); break;
+    case aCastSpell:  success = World.getActionManager().monsterAction.CastSpell(this, action->param1); break;
 
     }
 
@@ -63,7 +63,7 @@ int monsterData::NextAction(Action *action)
             if (flee_count == 0)
             {
                 fleeing = false;
-                WorldBuilder::textManager.newLine("You are no longer fleeing. ");
+                World.getTextManager().newLine("You are no longer fleeing. ");
                 monster.color1 = 200;
                 monster.color2 = 200;
                 monster.color3 = 40;
@@ -75,9 +75,7 @@ int monsterData::NextAction(Action *action)
             if (luck_counter % 1000 == 0)
                 luck_penalty++;
         }
-
     }
-
 
     return success;
 }
@@ -87,46 +85,55 @@ int monsterData::TerrainAttack(int x, int y)
 
     terrain_attack = 0;
 
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].terrain.type == deepWater)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == deepWater && Name() != "crocodile")
     {
         //	if(pack weight > 100) //drown
         //	{
         //		if(stamina == 1)
-        //			WorldBuilder::textManager.newLine("Glug Glug!. ");
+        //			World.getTextManager().newLine("Glug Glug!. ");
         //		else
         ///		{
-        //			WorldBuilder::textManager.newLine("You are drowning. ");
+        //			World.getTextManager().newLine("You are drowning. ");
         //		}
         //		stamina--;
         //	}
 
         //Piranhas 
-        int piranhas_attack = getInt(20, 0);//+WorldBuilder::GetCurrentLevel()/2;
+        int piranhas_attack = getInt(20, 0);//+World.GetCurrentLevel()/2;
         if (piranhas_attack > 18)
         {
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You are being eaten by paranhas!!. ");
+                World.getTextManager().newLine("You are being eaten by paranhas!!. ");
             else if (isSeen())
             {
-                WorldBuilder::textManager.newLine("The %s is attacked by something. ", monster.name.c_str());
+                World.getTextManager().newLine("The %s is attacked by something. ", monster.name.c_str());
             }
 
             monster.stamina--;
             if (monster.stamina <= 0)
-                WorldBuilder::deathMessage.SetDeathMessage("was eaten alive by piranhas. ");
+                World.getDeathMessage().SetDeathMessage("was eaten alive by piranhas. ");
         }
         else if (piranhas_attack > 5)
         {
             if (isPlayer())
-                WorldBuilder::textManager.newLine("There's something in the water!! ");//("Something nibbles at you armour. ");
+                World.getTextManager().newLine("There's something in the water!! ");//("Something nibbles at you armour. ");
             else if (isSeen() == 1 && state != asleep)
-                WorldBuilder::textManager.newLine("The %s curses at the water. ", monster.name.c_str());
+            {
+                if (isHumanoid())
+                    World.getTextManager().newLine("The %s curses at the water. ", monster.name.c_str());
+                else
+                    World.getTextManager().newLine("The %s splashes around frantically. ", monster.name.c_str());
+            }
             else if (isSeen() == 2 && state != asleep)
-                WorldBuilder::textManager.newLine("You hear cursing. ", monster.name.c_str());
+            {
+                if (isHumanoid())
+                    World.getTextManager().newLine("You hear cursing. ", monster.name.c_str());
+                else
+                    World.getTextManager().newLine("You hear splashing. ", monster.name.c_str());
+            }
         }
-
-        int slow_swept = WorldBuilder::GetCurrentLevel() / 2;
-        if (WorldBuilder::GetCurrentLevel() == 0)
+        int slow_swept = World.GetCurrentLevel() / 2;
+        if (World.GetCurrentLevel() == 0)
             slow_swept = 3;
 
         do //swept
@@ -137,62 +144,62 @@ int monsterData::TerrainAttack(int x, int y)
             {
                 int swept_away = 1;
 
-                if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y - 1].terrain.type == deepWater)
+                if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 1].terrain.type == deepWater)
                 {
-                    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y - 1].GetMonster() == NULL)
-                        swept_away = NextAction(WorldBuilder::actionManager.UpdateAction(&action, aMove, pos.x, pos.y - 1));
+                    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 1].GetMonster() == NULL)
+                        swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x, pos.y - 1));
 
                     else swept_away = 2;
                 }
 
-                else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x + 1][y - 1].terrain.type == deepWater)
+                else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x + 1][y - 1].terrain.type == deepWater)
                 {
-                    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x + 1][y - 1].GetMonster() == NULL)
-                        swept_away = NextAction(WorldBuilder::actionManager.UpdateAction(&action, aMove, pos.x + 1, pos.y - 1));
+                    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x + 1][y - 1].GetMonster() == NULL)
+                        swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x + 1, pos.y - 1));
                     else swept_away = 2;
                 }
 
-                else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x - 1][y - 1].terrain.type == deepWater)
+                else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x - 1][y - 1].terrain.type == deepWater)
                 {
-                    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x - 1][y - 1].GetMonster() == NULL)
-                        swept_away = NextAction(WorldBuilder::actionManager.UpdateAction(&action, aMove, pos.x - 1, pos.y - 1));
+                    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x - 1][y - 1].GetMonster() == NULL)
+                        swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x - 1, pos.y - 1));
                     else swept_away = 2;
                 }
-                else if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y - 1].terrain.type == bridge
-                    &&WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y - 2].terrain.type == deepWater)
-                    swept_away = NextAction(WorldBuilder::actionManager.UpdateAction(&action, aMove, pos.x, pos.y - 2));
+                else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 1].terrain.type == bridge
+                    &&World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 2].terrain.type == deepWater)
+                    swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x, pos.y - 2));
 
                 if (swept_away == 0)
                 {
                     monster.stamina = 0;
                     if (isPlayer())
                     {
-                        WorldBuilder::textManager.newLine("You are swept away never to be seen again. ");//("Something nibbles at you armour. ");
-                        WorldBuilder::deathMessage.SetDeathMessage("was swept away never to be seen again. ");
+                        World.getTextManager().newLine("You are swept away never to be seen again. ");//("Something nibbles at you armour. ");
+                        World.getDeathMessage().SetDeathMessage("was swept away never to be seen again. ");
                     }
 
                     else if (isSeen() == 1)
                     {
-                        WorldBuilder::textManager.newLine("The %s screams as it swept away. ", monster.name.c_str());
+                        World.getTextManager().newLine("The %s screams as it swept away. ", monster.name.c_str());
                     }
                     else if (isSeen() == 2)
-                        WorldBuilder::textManager.newLine("You hear a gurgled scream. ");
+                        World.getTextManager().newLine("You hear a gurgled scream. ");
                     break;
                 }
                 if (swept_away == 2)
                 {
                     if (isPlayer() || isSeen() == 1)
-                        WorldBuilder::textManager.newLine("Bump!");
+                        World.getTextManager().newLine("Bump!");
                 }
                 else
                 {
                     if (isPlayer())
-                        WorldBuilder::textManager.newLine("You are swept away!! ");
+                        World.getTextManager().newLine("You are swept away!! ");
                     else if (isSeen() == 1)
                     {
                         //char buf[64];
                         //sprintf(buf,"The %s is swept away. ",monster.name.c_str());
-                        //WorldBuilder::textManager.newLine(buf);
+                        //World.getTextManager().newLine(buf);
                     }
                 }
 
@@ -208,17 +215,17 @@ int monsterData::TerrainAttack(int x, int y)
 
 int monsterData::isPlayer()
 {
-    if (this == &(*WorldBuilder::monsterManager.Player()))
+    if (this == &(*World.getMonsterManager().Player()))
         return 1;
     else return 0;
 }
 
 int monsterData::isSeen()
 {
-    monsterData *player = WorldBuilder::monsterManager.Player();
+    monsterData *player = World.getMonsterManager().Player();
     int hear_range = 20;
 
-    if (level != WorldBuilder::GetCurrentLevel())
+    if (level != World.GetCurrentLevel())
         return 0;
 
     int r = (int)sqrt((float)(pos.x - player->pos.x)*(pos.x - player->pos.x) + (player->pos.y - pos.y)*(player->pos.y - pos.y));/// +getInt(3, 0);
@@ -228,9 +235,9 @@ int monsterData::isSeen()
         sightRange = 19;
     if (r <= sightRange)
     {
-        //if(WorldBuilder::dungeonManager.CurrentLevel()->IsCellVisible(pos.x,pos.y,player->pos.x,player->pos.y))
+        //if(World.getDungeonManager().CurrentLevel()->IsCellVisible(pos.x,pos.y,player->pos.x,player->pos.y))
         //use point from player
-        if (WorldBuilder::dungeonManager.CurrentLevel()->IsCellVisible(player->pos.x, player->pos.y, pos.x, pos.y))
+        if (World.getDungeonManager().CurrentLevel()->IsCellVisible(player->pos.x, player->pos.y, pos.x, pos.y))
             return 1;
         else return 2;
     }
@@ -242,8 +249,8 @@ int monsterData::isSeen()
 }
 void monsterData::UpdateSightRange()
 {
-    if (WorldBuilder::GetCurrentLevel() >= 0)
-        WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].LightDungeon(pos.x, pos.y, monster.sight_range);
+    if (World.GetCurrentLevel() >= 0)
+        World.getDungeonManager().level[World.GetCurrentLevel()].LightDungeon(pos.x, pos.y, monster.sight_range);
     else
     {
         int x = 0;
@@ -262,10 +269,10 @@ void monsterData::XP()
         {
             experience_level = 1;
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You gain a level. ");
+                World.getTextManager().newLine("You gain a level. ");
             monster.stamina++;
             monster.max_stamina++;
-            WorldBuilder::spellManager.AddMonsterSpell(this, spRepelMissiles);
+            World.getSpellManager().AddMonsterSpell(this, spRepelMissiles);
 
 
         }
@@ -277,10 +284,10 @@ void monsterData::XP()
         {
             experience_level = 2;
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You gain a level. ");
+                World.getTextManager().newLine("You gain a level. ");
             monster.stamina++;
             monster.max_stamina++;
-            WorldBuilder::spellManager.AddMonsterSpell(this, spSlowEnemies);
+            World.getSpellManager().AddMonsterSpell(this, spSlowEnemies);
 
         }
     }
@@ -292,11 +299,11 @@ void monsterData::XP()
         {
             experience_level = 3;
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You gain a level. You feel more skillful. ");
+                World.getTextManager().newLine("You gain a level. You feel more skillful. ");
             monster.skill++;
             monster.stamina++;
             monster.max_stamina++;
-            WorldBuilder::spellManager.AddMonsterSpell(this, spTeleport);
+            World.getSpellManager().AddMonsterSpell(this, spTeleport);
 
         }
     }
@@ -307,7 +314,7 @@ void monsterData::XP()
         {
             experience_level = 4;
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You gain a level. ");
+                World.getTextManager().newLine("You gain a level. ");
             monster.stamina++;
             monster.max_stamina++;
         }
@@ -319,7 +326,7 @@ void monsterData::XP()
         {
             experience_level = 5;
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You gain a level. ");
+                World.getTextManager().newLine("You gain a level. ");
 
             monster.stamina++;
             monster.max_stamina++;
@@ -332,7 +339,7 @@ void monsterData::XP()
         {
             experience_level = 6;
             if (isPlayer())
-                WorldBuilder::textManager.newLine("You gain a level. Wow you're buff!! ");
+                World.getTextManager().newLine("You gain a level. Wow you're buff!! ");
         }
     }
     kills++;
@@ -369,7 +376,7 @@ int monsterData::AdjustedSkill()
 
     //	if(slots.weapon != NULL)
 
-    Item* w = WorldBuilder::monsterManager.monsterItems.GetEquipment(this, weapon);
+    Item* w = World.getMonsterManager().monsterItems.GetEquipment(this, weapon);
     if (w)
         skill += w->skill_bonus;
 
@@ -386,7 +393,7 @@ int monsterData::AttackStrength()
     int attack = monster.skill;
 
     //if(slots.weapon != NULL)
-    Item* w = WorldBuilder::monsterManager.monsterItems.GetEquipment(this, weapon);
+    Item* w = World.getMonsterManager().monsterItems.GetEquipment(this, weapon);
     if (w)
         attack += w->GetAttack_h2h(); //get weapon damage
 
@@ -396,8 +403,11 @@ int monsterData::AttackStrength()
     else attack += Random::getInt(6 + (level > 9) ? level / 2 : level, 1 + level / 3); //animal
 
     //attack is reduced in deep water
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater &&
+        Name() != "crocodile")
+    {
         attack -= 5;
+    }
 
     return attack;
 }
@@ -411,7 +421,7 @@ int monsterData::DefendStrength()
     int defend = monster.skill;
 
     //if(slots.weapon != NULL)
-    Item* w = WorldBuilder::monsterManager.monsterItems.GetEquipment(this, weapon);
+    Item* w = World.getMonsterManager().monsterItems.GetEquipment(this, weapon);
     if (w)
         defend += w->GetAttack_h2h();
 
@@ -420,7 +430,7 @@ int monsterData::DefendStrength()
     else if (isHumanoid()) //no weapon
         defend = (int)(defend + .5) / 2;
 
-    if (WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater)
+    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater)
         defend -= 4;
 
     return defend;
@@ -431,11 +441,11 @@ bool monsterData::AbsorbTest()
     bool absorb = false;
 
     //if(slots.armour == NULL)
-    if (!WorldBuilder::monsterManager.monsterItems.GetEquipment(this, armour))
+    if (!World.getMonsterManager().monsterItems.GetEquipment(this, armour))
         absorb = false;
     else
     {
-        Item * a = WorldBuilder::monsterManager.monsterItems.GetEquipment(this, armour);
+        Item * a = World.getMonsterManager().monsterItems.GetEquipment(this, armour);
         int test = getInt(10, 0); //1-9
         if (a->absorb_bonus > test)
         {
@@ -448,7 +458,7 @@ bool monsterData::AbsorbTest()
             {
                 if (Stamina() < 4 && (Random::getInt(7, 1) + Random::getInt(7, 1)) < Luck())
                 {
-                    WorldBuilder::textManager.newLine("You feel lucky! ");
+                    World.getTextManager().newLine("You feel lucky! ");
                     absorb = true;
                 }
             }
@@ -459,14 +469,14 @@ bool monsterData::AbsorbTest()
 
 int monsterData::EquipKey(int level)
 {
-    //Item *item = 	WorldBuilder::itemManager.CreateItem(level,key);
+    //Item *item = 	World.getItemManager().CreateItem(level,key);
     //	inventory.push_back(*item);
 
     if (level == 0 || level == 3 || level == 6 || level == 8)
-        inventory.push_back(*WorldBuilder::itemManager.CreateItem(level, key));  //normal keys
+        inventory.push_back(*World.getItemManager().CreateItem(level, key));  //normal keys
 
     if (level == 4 || level == 9)
-        inventory.push_back(*WorldBuilder::itemManager.CreateItem(level + 10, key)); //special keys
+        inventory.push_back(*World.getItemManager().CreateItem(level + 10, key)); //special keys
 
     return 1;
 }
@@ -500,8 +510,8 @@ void monsterData::Heal()
 
 int monsterData::TestArcher()
 {
-    Item* p = WorldBuilder::monsterManager.monsterItems.GetEquipment(this, projectile);
-    Item* pw = WorldBuilder::monsterManager.monsterItems.GetEquipment(this, projectileWeapon);
+    Item* p = World.getMonsterManager().monsterItems.GetEquipment(this, projectile);
+    Item* pw = World.getMonsterManager().monsterItems.GetEquipment(this, projectileWeapon);
 
     if (!p) //no projectiles
     {

@@ -1,14 +1,7 @@
 #include "WorldBuilder.h"
 #include ".\CastSpell.h"
 
-CastMagic::CastMagic(void)
-{
-}
-
-CastMagic::~CastMagic(void)
-{
-}
-
+// -------------------------------------------------------------------------------------------------------------------------------
 
 int	CastMagic::SlowEnemies(monsterData* caster)
 {
@@ -16,7 +9,7 @@ int	CastMagic::SlowEnemies(monsterData* caster)
     {
         MONSTERLIST::iterator it;
         //get list of enemies on LOS.
-        for (it = WorldBuilder::monsterManager.monster_list.begin(); it != WorldBuilder::monsterManager.monster_list.end(); it++)
+        for (it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
         {
             if (it->isSeen() == 1 && !it->isPlayer())
             {
@@ -24,55 +17,62 @@ int	CastMagic::SlowEnemies(monsterData* caster)
                 if (Random::getInt(10, 0) + resistance < 5)
                 {
                     it->monster.AddEffect(slowed, 3);
-                    WorldBuilder::textManager.newLine("The %s is slowed. ", it->monster.name.c_str());
+                    World.getTextManager().newLine("The %s is slowed. ", it->monster.name.c_str());
                 }
                 else
-                    WorldBuilder::textManager.newLine("The %s resists. ", it->monster.name.c_str());
-
+                    World.getTextManager().newLine("The %s resists. ", it->monster.name.c_str());
             }
         }
     }
     else //cast on player
     {
-        monsterData* player = WorldBuilder::monsterManager.Player();
+        monsterData* player = World.getMonsterManager().Player();
         int resistance = player->monster.GetResistance(bSlow);
         if (Random::getInt(10, 0) + resistance < 5)
         {
             player->monster.AddEffect(slowed, 3);
-            WorldBuilder::textManager.newLine("You are slowed. ");
+            World.getTextManager().newLine("You are slowed. ");
         }
         else
-            WorldBuilder::textManager.newLine("You resist. ");
+            World.getTextManager().newLine("You resist. ");
     }
     return 0;
 }
+
+// -------------------------------------------------------------------------------------------------------------------------------
+
 int	CastMagic::RepelMissiles(monsterData* caster) //glow blue?
 {
-
     if (caster->isPlayer())
     {
         if (caster->monster.GetEffect(repelMissiles)) //already done
-            WorldBuilder::textManager.newLine("Your glow increases. ");
+            World.getTextManager().newLine("Your glow increases. ");
         else
-            WorldBuilder::textManager.newLine("You start glowing. ");
+            World.getTextManager().newLine("You start glowing. ");
     }
     else
     {
         if (caster->monster.GetEffect(repelMissiles)) //already done
-            WorldBuilder::textManager.newLine("The %s glows brighter. ", caster->monster.name.c_str());
+            World.getTextManager().newLine("The %s glows brighter. ", caster->monster.name.c_str());
         else
-            WorldBuilder::textManager.newLine("The %s starts glowing. ", caster->monster.name.c_str());
+            World.getTextManager().newLine("The %s starts glowing. ", caster->monster.name.c_str());
     }
 
     caster->monster.AddEffect(repelMissiles, 3);
 
+    // hack to show traj on map
+    WorldBuilder & world = World;
+    world.getScene().DisplayMap(true);
+    StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, caster->pos.x, caster->pos.y, '#', Random::getInt(2, 0) ? 255 : 128, 0, 255);
+
     return 0;
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------
 
 int	CastMagic::Teleport(monsterData* caster)
 {
-    DungeonLevel* level = WorldBuilder::dungeonManager.CurrentLevel();
+    DungeonLevel* level = World.getDungeonManager().CurrentLevel();
 
     int new_x;
     int new_y;
@@ -94,18 +94,31 @@ int	CastMagic::Teleport(monsterData* caster)
 
     } while (failed || level->map[new_x][new_y].terrain.type == stone || level->map[new_x][new_y].monsterExists());
 
-    caster->NextAction(WorldBuilder::actionManager.UpdateAction(&caster->action, aMove, new_x, new_y));
+    // hack to show traj on map
+    WorldBuilder & world = World;
+    world.getScene().DisplayMap(true);
+    StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, new_x, new_y, '@', Random::getInt(2, 0) ? 255 : 128, 0, 255);
 
-    WorldBuilder::monsterManager.Player()->UpdateSightRange();
+    level->map[caster->pos.x][caster->pos.y].RemoveMonsterRef();
+
+    caster->NextAction(World.getActionManager().UpdateAction(&caster->action, aMove, new_x, new_y));
+
+    World.getMonsterManager().Player()->UpdateSightRange();
     return 0;
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------
+
 int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
 {
-    Monster *d = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = WorldBuilder::monsterManager.FindMonsterData(d);
+    Monster * d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
+    monsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
-    if (defender == NULL || d == NULL) return 0;
+    WorldBuilder & world = World;
+    StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, x, y, '*', Random::getInt(2,0) ? 255:128, 0, 255);
+
+    if (defender == NULL || d == NULL) 
+        return 0;
 
     int attackStrength  = caster->AttackStrength();
     int defenceStrength = defender->DefendStrength();
@@ -119,7 +132,7 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
         {
             if (defender->AbsorbTest())
             {
-                WorldBuilder::textManager.newLine("The %s's armour deflected the magic missile. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s's armour deflected the magic missile. ", defender->monster.name.c_str());
             }
             else
             {
@@ -127,12 +140,12 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
                 {
                     if (Random::getInt(5, 0) <= effect)
                     {
-                        WorldBuilder::textManager.newLine("The %s repels your magic missile. ", defender->monster.name.c_str());
+                        World.getTextManager().newLine("The %s repels your magic missile. ", defender->monster.name.c_str());
                         return 1;
                     }
                 }
 
-                WorldBuilder::textManager.newLine("Your magic missile hits the %s. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("Your magic missile hits the %s. ", defender->monster.name.c_str());
                 defender->monster.stamina -= CalculateDamage(attackStrength, defenceStrength);
                 if (defender->monster.stamina <= 0)
                 {
@@ -145,7 +158,7 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
         {
             if (defender->AbsorbTest())
             {
-                WorldBuilder::textManager.newLine("The %s's magic missile was deflected by your armour. ", caster->monster.name.c_str());
+                World.getTextManager().newLine("The %s's magic missile was deflected by your armour. ", caster->monster.name.c_str());
             }
             else
             {
@@ -153,13 +166,13 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
                 {
                     if (Random::getInt(5, 0) <= effect)
                     {
-                        WorldBuilder::textManager.newLine("The repel the %s's magic missile. ", caster->monster.name.c_str());
+                        World.getTextManager().newLine("The repel the %s's magic missile. ", caster->monster.name.c_str());
                         return 1;
                     }
                 }
-                WorldBuilder::textManager.newLine("The %s's magic missile hits you. ", caster->monster.name.c_str());
+                World.getTextManager().newLine("The %s's magic missile hits you. ", caster->monster.name.c_str());
                 defender->monster.stamina -= CalculateDamage(attackStrength, defenceStrength);
-                WorldBuilder::deathMessage.SetDeathMessage("was killed by a %s's magic missile. ", caster->monster.name.c_str());
+                World.getDeathMessage().SetDeathMessage("was killed by a %s's magic missile. ", caster->monster.name.c_str());
 
             }
         }
@@ -169,30 +182,30 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
     {
         if (caster->isPlayer()) //player is caster
         {
-            WorldBuilder::textManager.newLine("Your magic missile misses the %s. ", defender->monster.name.c_str());
+            World.getTextManager().newLine("Your magic missile misses the %s. ", defender->monster.name.c_str());
         }
 
         else if (defender->isPlayer()) //player is defender
         {
-            WorldBuilder::textManager.newLine("You dodge the %s's magic missile. ", caster->monster.name.c_str());
+            World.getTextManager().newLine("You dodge the %s's magic missile. ", caster->monster.name.c_str());
         }
     }
     else //no damage done
     {
         if (caster->isPlayer())
         {
-            WorldBuilder::textManager.newLine("The %s dodges your magic missile. ", defender->monster.name.c_str());
+            World.getTextManager().newLine("The %s dodges your magic missile. ", defender->monster.name.c_str());
         }
         if (defender->isPlayer())
         {
             //	if(defender->slots.weapon !=NULL)
-            if (WorldBuilder::monsterManager.monsterItems.GetEquipment(defender, weapon))
+            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon))
             {
-                WorldBuilder::textManager.newLine("The %s's magic missile misses you. ", caster->monster.name.c_str());
+                World.getTextManager().newLine("The %s's magic missile misses you. ", caster->monster.name.c_str());
             }
             else
             {
-                WorldBuilder::textManager.newLine("You dodge the %s's magic missile. ", caster->monster.name.c_str());
+                World.getTextManager().newLine("You dodge the %s's magic missile. ", caster->monster.name.c_str());
             }
         }
     }
@@ -200,62 +213,67 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
     return 1;
 }
 
+// -------------------------------------------------------------------------------------------------------------------------------
+
 int	CastMagic::DragonBreath(monsterData* caster, int x, int y)
 {
-    Monster *d = WorldBuilder::dungeonManager.level[WorldBuilder::GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = WorldBuilder::monsterManager.FindMonsterData(d);
+    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
+    monsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
-    if (defender == NULL || d == NULL) return 0;
+    if (defender == NULL || d == NULL) 
+        return 0;
 
     int attackStrength = caster->AttackStrength();
     int defenceStrength = defender->DefendStrength();
+
+    StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, x, y, '#', (Random::getInt(2,0) == 0 ) ? 255:128, 0, 0);
 
     if (1)
     {
         int damage = 2;
 
-        damage = WorldBuilder::monsterManager.CalculateBrandDamageOnMonster(defender, bFire, damage);
+        damage = World.getMonsterManager().CalculateBrandDamageOnMonster(defender, bFire, damage);
 
         defender->monster.stamina -= damage;
 
         if (damage == 1)
         {
             if (defender->isPlayer())
-                WorldBuilder::textManager.newLine("You partially resist. ");
+                World.getTextManager().newLine("You partially resist. ");
             else
-                WorldBuilder::textManager.newLine("The %s partially resists. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s partially resists. ", defender->monster.name.c_str());
         }
         else if (damage == 0)
         {
             if (defender->isPlayer())
-                WorldBuilder::textManager.newLine("You resist. ");
+                World.getTextManager().newLine("You resist. ");
             else
-                WorldBuilder::textManager.newLine("The %s resists. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s resists. ", defender->monster.name.c_str());
 
         }
         else
         {
             if (defender->isPlayer())
-                WorldBuilder::textManager.newLine("You burn. ");
+                World.getTextManager().newLine("You burn. ");
             else
-                WorldBuilder::textManager.newLine("The %s burns. ", defender->monster.name.c_str());
+                World.getTextManager().newLine("The %s burns. ", defender->monster.name.c_str());
         }
     }
-
-
     else //no damage done
     {
         if (caster->isPlayer())
         {
-            WorldBuilder::textManager.newLine("The %s dodges. ", defender->monster.name.c_str());
+            World.getTextManager().newLine("The %s dodges. ", defender->monster.name.c_str());
         }
         if (defender->isPlayer())
         {
-            WorldBuilder::textManager.newLine("You dodge. ", caster->monster.name.c_str());
+            World.getTextManager().newLine("You dodge. ", caster->monster.name.c_str());
         }
     }
     return 1;
 }
+
+// -------------------------------------------------------------------------------------------------------------------------------
 
 int CastMagic::CalculateDamage(int attackStr, int defenceStr)
 {
@@ -264,24 +282,22 @@ int CastMagic::CalculateDamage(int attackStr, int defenceStr)
     if (diff <= 0)
         return 0;
 
-    int ret = diff / 4 + 1;
+    int damage = 2;
+    
     int crital_hit = Random::getInt(200, 0);
 
-    if (crital_hit == 199)
+    if (crital_hit > 195)
     {
-        WorldBuilder::textManager.newLine("It was a exellent hit! ");
-        ret *= 4;
-    }
-    else if (crital_hit > 195)
-    {
-        WorldBuilder::textManager.newLine("It was a exellent hit! ");
-        ret *= 3;
+        World.getTextManager().newLine("It was a exellent hit! ");
+        damage = +2;
     }
     else if (crital_hit > 190)
     {
-        WorldBuilder::textManager.newLine("It was a good hit! ");;
-        ret *= 2;
+        World.getTextManager().newLine("It was a good hit! ");;
+        damage++;
     }
 
-    return ret;
+    return damage;
 }
+
+// -------------------------------------------------------------------------------------------------------------------------------

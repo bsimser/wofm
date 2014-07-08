@@ -7,20 +7,16 @@
 #endif // _MSC_VER > 1000
 
 #include <vector>
-typedef struct 
-{
-	int x;
-	int y;
-}coord;
 
-typedef std::vector<coord> COORDLIST;
-
-class coordlist
+class Coord
 {
 public:
-	coordlist(){};
-
-COORDLIST coords;
+    Coord() : x(0), y(0){};
+    Coord(int _x, int _y) : x(_x), y(_y){};
+	int x;
+	int y;
 };
+
+typedef std::vector<Coord> COORDLIST;
 
 #endif

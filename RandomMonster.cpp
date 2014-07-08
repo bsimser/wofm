@@ -12,12 +12,6 @@ using namespace Random;
 
 RandomMonster::RandomMonster() :Monster()
 {
-
-}
-
-RandomMonster::~RandomMonster()
-{
-
 }
 
 int RandomMonster::Create(int level)
