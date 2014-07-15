@@ -276,6 +276,8 @@ void OpenGLSceneGen::DrawMap()
     else
         addShadows = true; 
 
+    freetype::prePrintChar(map_font);
+
     for (int h = 0; h < height_scr; h++)
     {
         for (int w = 0; w < width_scr; w++)
@@ -293,7 +295,7 @@ void OpenGLSceneGen::DrawMap()
                 Symbol* symbol = currentCell.getSymbol();
                 glColor3ub(symbol->mColour1, symbol->mColour2, symbol->mColour3);
 
-                freetype::qprint(map_font, calcX(w), calcY(h), symbol->mSymbol);
+                freetype::printChar(map_font, calcX(w), calcY(h), symbol->mSymbol);
             }
             //display creature if lit
             else if ((currentCell.GetMonster() && currentCell.terrain.light) || (currentCell.GetMonster() && showAll))
@@ -301,10 +303,10 @@ void OpenGLSceneGen::DrawMap()
                 Monster* monster = currentCell.GetMonster();
                 glColor3ub(monster->color1, monster->color2, monster->color3);
 
-                freetype::qprint(map_font, calcX(w), calcY(h), monster->symbol);
+                freetype::printChar(map_font, calcX(w), calcY(h), monster->symbol);
 
-                if (World.getMonsterManager().FindMonsterData(monster)->GetState() == asleep && World.getMonsterManager().FindMonsterData(monster)->Name() != "Ghoul")
-                    freetype::qprint(map_font, calcX(w), calcY(h), '-');
+                if (World.getMonsterManager().FindMonsterData(monster)->GetState() == asleep && World.getMonsterManager().FindMonsterData(monster)->Name() != "rotting ghoul")
+                    freetype::printChar(map_font, calcX(w), calcY(h), '-');
 
             }
             //display items
@@ -316,48 +318,10 @@ void OpenGLSceneGen::DrawMap()
                 // update colour on screen if better than item held
                 if (!item->hasBrand() && !item->hasResistance())
                 {
-                    if (item->type == weapon)
-                    {
-                        monsterData* player = World.getMonsterManager().Player();
-                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, weapon);
-
-                        if (!w || item->getAverage_h2h() > w->getAverage_h2h())
-                        {
-                            glColor3ub(0, 128, 255);
-                        }
-                    }
-                    else if (item->type == armour)
-                    {
-                        monsterData* player = World.getMonsterManager().Player();
-                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, armour);
-
-                        if (!w || item->absorb_bonus > w->absorb_bonus)
-                        {
-                            glColor3ub(0, 128, 255);
-                        }
-                    }
-                    else if (item->type == shield)
-                    {
-                        monsterData* player = World.getMonsterManager().Player();
-                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, shield);
-
-                        if (!w || item->absorb_bonus > w->absorb_bonus)
-                        {
-                            glColor3ub(0, 128, 255);
-                        }
-                    }
-                    else if (item->type == projectileWeapon)
-                    {
-                        monsterData* player = World.getMonsterManager().Player();
-                        Item * w = World.getMonsterManager().monsterItems.GetEquipment(player, projectileWeapon);
-
-                        if (!w || item->getAverage_thr() > w->getAverage_thr())
-                        {
-                            glColor3ub(0, 128, 255);
-                        }
-                    }
+                    if(World.getMonsterManager().monsterItems.isBetter(*World.getMonsterManager().Player(), *item))
+                        glColor3ub(0, 128, 255);
                 }
-                freetype::qprint(map_font, calcX(w), calcY(h), currentCell.getItem()->symbol);
+                freetype::printChar(map_font, calcX(w), calcY(h), currentCell.getItem()->symbol);
             }
             else if (currentCell.terrain.light) //display terrain
             {
@@ -375,8 +339,8 @@ void OpenGLSceneGen::DrawMap()
                     else
                         glColor3ub(0, 128, 255);
                 }
-                freetype::qprint(map_font, calcX(w), calcY(h), currentCell.terrain.symbol);
-                //freetype::qprint(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14), '.');
+                freetype::printChar(map_font, calcX(w), calcY(h), currentCell.terrain.symbol);
+                //freetype::printChar(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14), '.');
 
             }
             else if (addShadows)//add night effect
@@ -385,14 +349,14 @@ void OpenGLSceneGen::DrawMap()
                     (GLubyte)(currentCell.terrain.color2*shadowStrength),
                     (GLubyte)(currentCell.terrain.color3*shadowStrength));
 
-                freetype::qprint(map_font, calcX(w), calcY(h), currentCell.terrain.symbol);
-                //freetype::qprint(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14.5f), currentCell.terrain.symbol);
+                freetype::printChar(map_font, calcX(w), calcY(h), currentCell.terrain.symbol);
+                //freetype::printChar(map_font, 0 + (w*9.1f), (float)height_scr_offset - (h*14.5f), currentCell.terrain.symbol);
             }
             //add extra characters
             if (currentCell.show_target != 0) //show target
             {
                 glColor3ub(0xff, 0xff, 0xff);
-                freetype::qprint(map_font, calcX(w), calcY(h), 0);
+                freetype::printChar(map_font, calcX(w), calcY(h), 0);
             }
             if (currentCell.show_path != none) //show target path (overlay)
             {
@@ -400,10 +364,11 @@ void OpenGLSceneGen::DrawMap()
                     glColor3ub(0xff, 0xff, 0xff);
                 else if (currentCell.show_path == blocked)
                     glColor3ub(0xff, 0, 0);
-                freetype::qprint(map_font, calcX(w), calcY(h) , '*');
+                freetype::printChar(map_font, calcX(w), calcY(h) , '*');
             }
         }
     }
+    freetype::postPrintChar();
 }
 /*void OpenGLSceneGen::DrawBigMap()
 {
@@ -454,10 +419,20 @@ void OpenGLSceneGen::DrawTextLines()
 
     glColor3ub(224, 224, 224);
 
+    int health = World.getMonsterManager().Player()->Stamina() * 100 / World.getMonsterManager().Player()->monster.MaxStamina();
+
+    if (health < 10)
+        glColor3ub(255, 50, 50);
+    else if (health < 30)
+        glColor3ub(255, 100, 100);
+
     glPushMatrix();
     glLoadIdentity(); //22,5
 
     freetype::print(our_font, 5, 28, World.getTextManager().display_line1.c_str());
+
+    glColor3ub(224, 224, 224);
+
     freetype::print(our_font, 5, 8, World.getTextManager().GetMessageLine(0)->c_str());
 
     glPopMatrix();

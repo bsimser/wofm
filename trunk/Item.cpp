@@ -6,6 +6,9 @@
 #include "Item.h"
 #include "ItemManager.h"
 #include "numberGenerator.h"
+
+#include "worldbuilder.h" // get all items from manager
+
 #include <string>
 
 using namespace Random;
@@ -16,10 +19,10 @@ Item::Item() :
     skill_bonus(0),
     defence_bonus(0),
     absorb_bonus(0),
-    identified(0),
-    equipped(0),
-    mStackable(0),
-    mWearable(0),
+    identified(false),
+    equipped(false),
+    mStackable(false),
+    mWearable(false),
     type(no_type),
     secondaryType(no_type),
     symbol(0),
@@ -42,7 +45,7 @@ Item::Item() :
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-Item::Item(const Item& rhs) : ResistanceBrands(rhs)
+Item::Item(const Item & rhs) : ResistanceBrands(rhs)
 {
     name = rhs.name;
 
@@ -53,9 +56,9 @@ Item::Item(const Item& rhs) : ResistanceBrands(rhs)
 
     setColor(rhs.color1, rhs.color2, rhs.color3);
 
-    skill_bonus = rhs.skill_bonus;
+    skill_bonus   = rhs.skill_bonus;
     defence_bonus = rhs.defence_bonus;
-    absorb_bonus = rhs.absorb_bonus;
+    absorb_bonus  = rhs.absorb_bonus;
 
 #ifdef _DEBUG
     identified = 1;
@@ -81,12 +84,6 @@ Item::Item(const Item& rhs) : ResistanceBrands(rhs)
 
     postfix = rhs.postfix;
     prefix =  rhs.prefix;
-}
-
-// --------------------------------------------------------------------------------------------------------------------------------
-
-Item::~Item()
-{
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -122,21 +119,24 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
 {
     switch (_type)
     {
-    case corpse:        createCorpse();                         mWearable = 0; break;
-    case weapon:        createWeapon(level, secondary_type);    mWearable = 1; break;
-    case armour:        createArmour(level, secondary_type);    mWearable = 1; break;
-    case key:           createKey(level);                       mWearable = 0; break;
-    case lockedChest:   createLockedChest(level);               mWearable = 0; break;
-    case openChest:     createOpenChest(level);                 mWearable = 0; break;
-    case gold:          createGold(level);                      mWearable = 0; break;
-    case shield:        createShield(level);                    mWearable = 1; break;
-    case cards:         createCards(level);                     mWearable = 0; break;
-    case ration:        createRation();                         mWearable = 0; break;
-    case gem:           createGem();                            mWearable = 0; break;
-    case stake:         createStake();                          mWearable = 0; break;
-    case cheese:        createCheese();                         mWearable = 0; break;
+    case corpse:        createCorpse();                         break;
+    case weapon:        createWeapon(level, secondary_type);    break;
+    case armour:        createArmour(level, secondary_type);    break;
+    case key:           createKey(level);                       break;
+    case lockedChest:   createLockedChest(level);               break;
+    case openChest:     createOpenChest(level);                 break;
+    case gold:          createGold(level);                      break;
+    case shield:        createShield(level);                    break;
+    case cards:         createCards(level);                     break;
+    case provisions:    createProvision();                      break;
+    case gem:           createGem();                            break;
+    case stake:         createStake();                          break;
+    case cheese:        createCheese();                         break;
 
-    default:     char err[128]; sprintf(err, "Invalid item type passed into item creator: %d", _type); throw std::exception(err);
+    default:     
+        char err[128]; 
+        sprintf(err, "Invalid item type passed into item creator: %d", _type); 
+        throw std::exception(err);
     }
 
     type = _type; //type defines behaviour
@@ -146,12 +146,16 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-void Item::createRation()
+void Item::createProvision()
 {
-    symbol = '[';
-    setColor(50, 50, 50);
-    identified = 1;
-    name = ("tower shield");
+    symbol = ';';
+    setColor(185, 122, 87);
+    name = ("provision");
+    itemNumber[1] = 1; // set stack to one
+    identified = true;
+    mStackable = true;
+
+    mWearable = true; // hack to be usable in inventory
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -160,25 +164,33 @@ void Item::createGem()
 {
     symbol = '*';
     setColor(255, 50, 50);
-    name = ("tower shield");
+    name = ("large red gem");
+    mWearable = true; // hack to be usable in inventory
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createStake()
 {
-    symbol = '*';
-    setColor(255, 50, 50);
-    name = ("tower shield");
+    symbol = '|';
+    setColor(185, 122, 87);
+    identified = true;
+    mStackable = true;
+    itemNumber[1] = 1; // set stack to one
+    name = ("wooden stake");
+    mWearable = true; // hack to be usable in inventory
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
 void Item::createCheese()
 {
-    symbol = '*';
-    setColor(255, 50, 50);
-    name = ("tower shield");
+    mStackable = true;
+    identified = true;
+    symbol = ';';
+    setColor(140, 230, 10);
+    name = ("smelly cheese");
+    mWearable = true; // hack to be usable in inventory
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -187,7 +199,7 @@ void Item::createShield(int level)
 {
     symbol = '[';
     setColor(50, 50, 50);
-
+    mWearable = 1;
     int size = getInt(4, 0);
 
     if (getInt(10, 0) == 0 && level > 5 || level > 24)
@@ -265,7 +277,26 @@ void Item::createLockedChest(int level)
 
     if (level == 19)
     {
-        int key1 = getInt(10, 0);
+        std::vector<int> keysNumbers;
+        for (ITEMLIST::iterator it = World.getItemManager().all_items.begin(); it != World.getItemManager().all_items.end(); ++it)
+        {
+            if (it->type == key)
+            {
+                keysNumbers.push_back(it->itemNumber[0]); // key number
+            }
+        }
+        if (keysNumbers.size() < 3)
+            throw std::exception("Not enough keys generated for Zagors chest. ");
+        int keys[3];
+        for (int i = 0; i < 3; i++)
+        {
+            int choice = Random::getInt(keysNumbers.size(), 0);
+            keys[i] = keysNumbers[choice];
+            keysNumbers.erase(keysNumbers.begin() + choice);
+        }
+
+
+        /*int key1 = getInt(10, 0);
         int key2;
         int key3;
 
@@ -277,14 +308,14 @@ void Item::createLockedChest(int level)
 
         key1 = ItemManager::KeySpecial[key1];
         key2 = ItemManager::KeySpecial[key2];
-        key3 = ItemManager::KeySpecial[key3];
+        key3 = ItemManager::KeySpecial[key3];*/
 
-        sprintf(chestName, "large chest (%d) (%d) (%d)", key1, key2, key3);
+        sprintf(chestName, "large chest (%d) (%d) (%d)", keys[0], keys[1], keys[2]);
         weight = 1000;
         setColor(255, 255, 0);
-        itemNumber[0] = key1;
-        itemNumber[1] = key2;
-        itemNumber[2] = key3;
+        itemNumber[0] = keys[0];
+        itemNumber[1] = keys[1];
+        itemNumber[2] = keys[2];
     }
 
     else
@@ -341,6 +372,7 @@ void Item::createCards(int level)
 
 void Item::createWeapon(int level, int secondary_type)
 {
+    mWearable = 1;
     int varient;
     if (secondary_type != 0)
         varient = secondary_type;
@@ -377,12 +409,12 @@ void Item::createWeapon(int level, int secondary_type)
     }
     case axe:
     {
-        int type2 = getInt(2, 0); 
+        int type2 = getInt(3, 0); 
         if (level == 0) 
             type2 = 0; //no battle 
         switch (type2)
         {
-        case 1: name = ("battle axe");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(4, 5); break;
+        case 1: name = ("battle axe");  symbol = '/';    weight = 15; setColor(140, 140, 140); SetDice_h2h(5, 5); break;
         default: name = ("hand axe");   symbol = '/';    weight = 15; setColor(90, 90, 90);    SetDice_h2h(3, 4); break;
         }
         break;
@@ -426,6 +458,8 @@ void Item::createWeapon(int level, int secondary_type)
 
 void Item::createArmour(int level, int secondary_type)
 {
+    mWearable = 1;
+
     int varient;
     if (secondary_type > 0)
     {
@@ -478,9 +512,9 @@ void Item::createArmour(int level, int secondary_type)
         name = "leather armour";
 
         if(absorb_bonus == 0)
-            prefix, "crude ";
+            prefix = "crude ";
         else if(absorb_bonus == 2)
-            prefix, "quality ";
+            prefix = "quality ";
 
         symbol = ']';
         setColor(128, 64, 0);
@@ -493,9 +527,9 @@ void Item::createArmour(int level, int secondary_type)
         name = "chainmail";
 
         if(absorb_bonus == 0)
-            prefix, "orcish ";
+            prefix = "orcish ";
         else if(absorb_bonus == 2)
-            prefix, "dwarven ";
+            prefix = "dwarven ";
 
         symbol = ']'; setColor(100, 100, 100);
         absorb_bonus += 2; //absorb 2-4 
@@ -508,7 +542,7 @@ void Item::createArmour(int level, int secondary_type)
         if(absorb_bonus == 0)
             prefix =  "rusty ";
         else if(absorb_bonus == 2)
-            prefix, "full ";
+            prefix = "full ";
 
         symbol = ']';
         setColor(200, 200, 200);
@@ -581,10 +615,13 @@ std::string Item::GetName()
                 sprintf(tempName, "+%d %s%s%s", skill_bonus, prefix.c_str(), name.c_str(), postfix.c_str()); break;
 
         case projectileWeapon:
-            sprintf(tempName, "+%d %s%s [+%d]%s", skill_bonus, prefix.c_str(), name.c_str(), thrNumDice/*, thrSidesDice*/, postfix.c_str());    break;
+            sprintf(tempName, "+%d %s%s [Att:%d]%s", skill_bonus, prefix.c_str(), name.c_str(), thrNumDice/*, thrSidesDice*/, postfix.c_str());    break;
 
         case shield:
             sprintf(tempName, "%s%s [Blk:%d]%s", prefix.c_str(), name.c_str(), absorb_bonus, postfix.c_str());    break;
+
+        case provisions:
+            sprintf(tempName, "%d %s%s", itemNumber[1], name.c_str(), itemNumber[1] > 1 ? "s" : "");    break;
 
         default:
             sprintf(tempName, "%s", name.c_str()); break;
@@ -597,11 +634,15 @@ std::string Item::GetName()
             sprintf(tempName, "glowing %s%s", name.c_str(), itemNumber[1] > 1 ? "s" : "");
         }
         else
+        {
             sprintf(tempName, "unidentified %s%s", name.c_str(), itemNumber[1] > 1 ? "s" : "");
+        }
     }
 
     if (equipped)
+    {
         strcat(tempName, " (equipped)");
+    }
 
     return std::string(tempName);
 }
@@ -620,7 +661,6 @@ void Item::SetDice_thr(int nDice, int sides)
 {
     thrSidesDice = sides;
     thrNumDice = nDice;
-
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -674,7 +714,9 @@ void Item::AddBrand(bool special)
     }
     
     if (brandType < 91)
+    {
         return;
+    }
     else if (brandType < 93)
     {
         int poison = getInt(4, 1);

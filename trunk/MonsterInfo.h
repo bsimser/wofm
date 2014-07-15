@@ -12,13 +12,10 @@
 class MonsterInfo  
 {
 public:
-	MonsterInfo();
-	virtual ~MonsterInfo();
-
-	void	ShowMonsterInfo(monsterData* monster);
+	void	ShowMonsterInfo(MonsterData* monster);
 private:
-	void	ShowCompleteMonsterInfo(monsterData* monster);
-	void	ShowNormalMonsterInfo(monsterData* monster);
+	void	ShowCompleteMonsterInfo(MonsterData* monster);
+	void	ShowNormalMonsterInfo(MonsterData* monster);
 };
 
 #endif // !defined(AFX_MONSTERINFO_H__986C9E36_E764_4202_9703_0B2CBBA576BF__INCLUDED_)

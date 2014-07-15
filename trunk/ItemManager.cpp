@@ -3,37 +3,23 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "ItemManager.h"
-
 #include "numberGenerator.h"
 
 #include <iostream>
 #include <fstream>
 
-
-using namespace Random;
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int ItemManager::keyLabels[10];
 int ItemManager::KeySpecial[10];
 
-ItemManager::ItemManager()
-{
-
-}
-
-ItemManager::~ItemManager()
-{
-    //all_items.clear();
-}
-
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int ItemManager::Initialise()
 {
     all_items.clear();
-    try{
-
+    try
+    {
         makeKeysLabels();
     }
     catch (...)
@@ -43,23 +29,31 @@ int ItemManager::Initialise()
     return 1;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 Item * ItemManager::CreateRandomItem(int level)
 {
     //use level to get high level items - not use at this stage
+    int type = Random::getInt(7, 1);
 
-    int type = getInt(7, 1);
-
-    //item.CreateItem((eItemType) type,level);
     Item* item = CreateItem(level, type);
 
     if (item->type == projectile)
         item->itemNumber[1] = Random::getInt(10, 5);
 
-    all_items.push_back(*item);
-
-    return &all_items.back();
-
+    return item;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+Item *ItemManager::DuplicateItem(Item * item)
+{
+    Item * new_item = CreateItem(0, item->type, item->secondaryType);
+    *new_item = *item;
+    return new_item;
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item * ItemManager::CreateItem(int level, int type, int secondary_type)
 {
@@ -99,6 +93,7 @@ Item * ItemManager::CreateItem(int level, int type, int secondary_type)
     }
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int ItemManager::CalculateBrandDamage(Item* item, eBrandType brandType, int strength)
 {
@@ -117,11 +112,14 @@ int ItemManager::CalculateBrandDamage(Item* item, eBrandType brandType, int stre
     }
 
     for (int i = 0; i < nDice; i++)
-        Damage += getInt(tDice + 1, 1);
+    {
+        Damage += Random::getInt(tDice + 1, 1);
+    }
 
     return Damage;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void ItemManager::makeKeysLabels()
 {
@@ -133,7 +131,7 @@ void ItemManager::makeKeysLabels()
     {
         do
         {
-            num = getInt(20, 0);
+            num = Random::getInt(20, 0);
             int test = Random::primeNumbers[num];
 
             for (int t = 0; t < 10; t++)
@@ -145,19 +143,17 @@ void ItemManager::makeKeysLabels()
                 }
                 unique = true;
             }
-
         } while (!unique);
 
-        keyLabels[i] = primeNumbers[num];
+        keyLabels[i] = Random::primeNumbers[num];
     }
-
 
     //make special level keys
     for (int i = 0; i < 10; i++)
     {
         do
         {
-            num = getInt(20, 0);
+            num = Random::getInt(20, 0);
             int test = Random::primeNumbers[num];
 
             for (int t = 0; t < 10; t++)
@@ -172,7 +168,7 @@ void ItemManager::makeKeysLabels()
 
         } while (!unique);
 
-        KeySpecial[i] = primeNumbers[num];
+        KeySpecial[i] = Random::primeNumbers[num];
     }
 
 #ifdef _DEBUG
@@ -181,7 +177,6 @@ void ItemManager::makeKeysLabels()
     ofile.open("Debug Files\\keys.txt");
     if (!ofile.is_open())
         throw std::exception("Could not open keys.txt");
-
 
     ofile << "Keys  For debug purposes only" << std::endl;
 
@@ -195,11 +190,11 @@ void ItemManager::makeKeysLabels()
     }
 
     ofile << std::endl;
-
-
     ofile.close();
 #endif
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 void ItemManager::PrintItems()
 {
@@ -227,7 +222,7 @@ void ItemManager::PrintItems()
         item->identified = id;
     }
     ofile.close();
-
 #endif
-
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------

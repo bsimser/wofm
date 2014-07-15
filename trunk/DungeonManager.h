@@ -41,6 +41,7 @@ public:
 	DungeonLevel* Level(int id){return &level[id];};
 
 	DungeonLevel* CurrentLevel();
+    static std::string getLevelName(int level);
 
 private:
 	int AddKeysToDungeon();
@@ -48,3 +49,4 @@ private:
 };
 
 #endif // !defined(AFX_DUNGEONMANAGER_H__AE152525_8D5E_4921_81AF_15FF648CBCC7__INCLUDED_)
+

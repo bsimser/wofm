@@ -21,6 +21,8 @@ public:
 	int makeBarracksDungeon();
 	int makeSpecialItemSpot();
     int makeCrypt();
+    void makeCavern(bool webby = false);
+    
 };
 
 #endif // !defined(AFX_SPECIALLEVELGENERATOR_H__50E5F382_0B44_41F6_8C67_1A1A2BAA53F0__INCLUDED_)

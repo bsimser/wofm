@@ -12,13 +12,8 @@ Action::Action() :
 action_base_speed(10),
 type(aWait)
 {
-
 }
 
-Action::~Action()
-{
-
-}
 
 void Action::CreateAction(eAction _type)
 {

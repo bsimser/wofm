@@ -20,7 +20,7 @@ namespace freetype {
     }
 
     ///Create a display list corresponding to the give character.
-    void make_dlist(FT_Face face, char ch, GLuint list_base, GLuint * tex_base) 
+    void make_dlist(FT_Face face, char ch, GLuint list_base, GLuint * tex_base)
     {
         //The first thing we do is get FreeType to render our character
         //into a bitmap.  This actually requires a couple of FreeType commands:
@@ -44,7 +44,7 @@ namespace freetype {
         // Use our helper function to get the widths of
         // the bitmap data that we will need in order to create
         // our texture.
-        int width  = next_p2(bitmap.width);
+        int width = next_p2(bitmap.width);
         int height = next_p2(bitmap.rows);
 
         //Allocate memory for the texture data.
@@ -58,7 +58,7 @@ namespace freetype {
         //We use the ?: operator so that value which we use
         //will be 0 if we are in the padding zone, and whatever
         //is the the Freetype bitmap otherwise.
-        for (int j = 0; j < height; j++) 
+        for (int j = 0; j < height; j++)
         {
             for (int i = 0; i < width; i++)
             {
@@ -212,7 +212,7 @@ namespace freetype {
 
     ///Much like Nehe's glPrint function, but modified to work
     ///with freetype fonts.
-    void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  
+    void print(const font_data &ft_font, float x, float y, const char *fmt, ...)
     {
         // We want a Coordinate system where things corresponding to window pixels.
         pushScreenCoordinateMatrix();
@@ -275,7 +275,7 @@ namespace freetype {
         //down by h. This is because when each character is
         //draw it modifies the current matrix so that the next character
         //will be drawn immediately after it.  
-        for (unsigned int i = 0; i < lines.size(); i++) 
+        for (unsigned int i = 0; i < lines.size(); i++)
         {
             glPushMatrix();
             glLoadIdentity();
@@ -299,15 +299,15 @@ namespace freetype {
 
         pop_projection_matrix();
     }
-    //void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  {
-    void qprint(const font_data &ft_font, int x, int y, const char c)
+
+
+    void prePrintChar(const font_data &ft_font)
     {
         // We want a Coordinate system where things corresponding to window pixels.
         pushScreenCoordinateMatrix();
 
         GLuint font = ft_font.list_base;
-        float h = ft_font.h / .63f;						//We make the height about 1.5* that of
-   
+
         glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT | GL_ENABLE_BIT | GL_TRANSFORM_BIT);
         glMatrixMode(GL_MODELVIEW);
         glDisable(GL_LIGHTING);
@@ -317,23 +317,27 @@ namespace freetype {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         glListBase(font);
+    }
 
-        float modelview_matrix[16];
-        glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+    void postPrintChar()
+    {
+        glPopAttrib();
+        pop_projection_matrix();
+    }
 
-        glPushMatrix();
+    void printChar(const font_data &ft_font, int x, int y, const char c)
+    {
+        // Not sure what this matrix code does so I am commenting it out.
+        //  float modelview_matrix[16];
+        // glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+        // glPushMatrix();
         glLoadIdentity();
         glTranslatef((GLfloat)x, (GLfloat)y, 0);
-        glMultMatrixf(modelview_matrix);
+        //glMultMatrixf(modelview_matrix);
 
         char ch[1]; ch[0] = c;
         glCallLists(1, GL_UNSIGNED_BYTE, ch);
-        
-        glPopMatrix();
 
-        glPopAttrib();
-
-        pop_projection_matrix();
-
+        // glPopMatrix();
     }
 }

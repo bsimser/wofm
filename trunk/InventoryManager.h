@@ -9,11 +9,17 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-
-
 class InventoryManager  
 {
 public:
+    enum EInvState
+    {
+        eDisplay,
+        eEquip,
+        eDrop,
+        eShowEquipment
+    };
+
 	InventoryManager();
 
 	int ShowInventory(int type);
@@ -25,21 +31,13 @@ public:
 	int Drop(bool *keys);
 	int DropItem(int item);
 	int Unequip(int item);
-    void setState(int state);	
-    
-    enum EInvState
-    {
-        eDisplay,
-        eEquip,
-        eDrop,
-        eShowEquipment
-    };
+    void setState(EInvState state);
 
 private:
-    EInvState mState;
-	bool mShowEquip;
-	bool mShowInv;
-	bool mShowAll;
+    EInvState   mState;
+	bool        mShowEquip;
+	bool        mShowInv;
+	bool        mShowAll;
 };
 
 #endif // !defined(AFX_INVENTORYMANAGER_H__65C8D882_9323_46EC_8A13_BCC5962EC377__INCLUDED_)

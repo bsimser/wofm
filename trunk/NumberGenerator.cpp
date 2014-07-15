@@ -46,9 +46,9 @@ namespace Random
 
         srand(seed);
 
-        std::ofstream myfile;
+     /*   std::ofstream myfile;
         myfile.open("seed.txt");
         myfile << seed;
-        myfile.close();
+        myfile.close();*/
     }
 }

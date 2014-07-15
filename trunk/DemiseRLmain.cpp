@@ -82,6 +82,7 @@ LRESULT CALLBACK WndProc(HWND    hWnd,            // Handle For This Window
     case WM_SIZE:                                // Resize The OpenGL Window
     {
         World.Resize(lParam, wParam);
+        keypress = true;
 
         return 0;                                // Jump Back
     }
@@ -101,16 +102,29 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
 
     keypress = false;
 
-    std::stringstream str;
-    str << lpCmdLine;
-    int temp;
-    str >> temp ;
-    
+    // get seed value
+    int temp = -1;
+    //1404832263
+    if (__argc > 1)
+    {
+        std::stringstream str;
+        str << __argv[1];
+        str >> temp;
+    }
+
     Random::reseed(temp);
 
     try
     {
-        if (!World.Initialise("The Warlock of Firetop Mountain: Roguelike (c) 2014 Corremn"))
+        std::string title = "The Warlock of Firetop Mountain: Roguelike (c) 2014 Corremn";
+#ifdef _DEBUG
+        if (temp != -1)
+        {
+            title += " Seed: ";
+            title += __argv[1];
+        }
+#endif
+        if (!World.Initialise(title.c_str()))
             return 0;
     }
     catch (std::exception & ex)

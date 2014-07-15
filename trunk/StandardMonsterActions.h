@@ -9,23 +9,24 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class monsterData;
+class MonsterData;
 class Item;
 #include "SpellBase.h"
 
 class StandardMonsterActions  
 {
 public:
-	int		MoveMonster(monsterData* monster,int x,int y);
-	int		AttackMonster(monsterData* monster,int x,int y);
+	int		MoveMonster(MonsterData* monster,int x,int y);
+	int		AttackMonster(MonsterData* monster,int x,int y);
 
-	int		FireItem(monsterData* monster,int x,int y);
-	int		CalculateDamage(monsterData* defender, int attackStr, int defenceStr);
-	int		ThrowTarget(monsterData* attacker,int targetX, int targetY,eAction action);
-
-	int		CastSpell(monsterData* caster, int spellID);
-	int		CastTargetSpell(monsterData* caster, eSpellList spell, int TargetX, int TargetY);
-	int		AddBrandDamage(monsterData* attacker,monsterData* defender, Item* attack_weapon);
+	int		FireItem(MonsterData* monster,int x,int y);
+	int		CalculateDamage(MonsterData* defender, int attackStr, int defenceStr);
+    int		ThrowTarget(MonsterData* attacker, int targetX, int targetY, eAction action);
+    int		ThrowItem(MonsterData* attacker, int targetX, int targetY, int inventoryItemRef);
+    
+	int		CastSpell(MonsterData* caster, int spellID);
+	int		CastTargetSpell(MonsterData* caster, eSpellList spell, int TargetX, int TargetY);
+	int		AddBrandDamage(MonsterData* attacker,MonsterData* defender, Item* attack_weapon);
 
     static void ShowTrajectory(int level, int sourceX, int sourceY, int targetX, int targetY, char symbol, int c1, int c2, int c3);
 

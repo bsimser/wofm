@@ -39,7 +39,9 @@ enum eSpecialLevelType
     slBoatHouse,
     slShop,
     slVampire,
-    slTresure,
+    slTreasure,
+    slSpiderCave,
+    slUndead,
     slEncounter = 20,
     slRandom
 };

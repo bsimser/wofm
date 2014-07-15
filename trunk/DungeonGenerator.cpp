@@ -11,17 +11,6 @@
 
 //---------------------------------------------------------------------------------------------------------------------------------
 
-using namespace Random;
-
-//---------------------------------------------------------------------------------------------------------------------------------
-
-DungeonGenerator::DungeonGenerator()
-{
-    getInt(10, 3);
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------
-
 int DungeonGenerator::Create(int _type)
 {
     OpenTrace(true);
@@ -55,10 +44,10 @@ int DungeonGenerator::Create(int _type)
     DumpDungeon();
 
 #ifdef _DEBUG
-    int cX, cY;
-    assert(findTerrainType(cX, cY, '>'));
+    //int cX, cY;
+    //assert(findTerrainType(cX, cY, '>'));
 
-    assert(type == lOutside || findTerrainType(cX, cY, '<'));
+    //assert(type == lOutside || findTerrainType(cX, cY, '<'));
 #endif
     return type;
 }
@@ -95,7 +84,8 @@ int DungeonGenerator::CreateMap()
             DumpDungeon();
             return CreateMap();
         }
-        addSpecialRoom();
+        if (Random::getInt(5,0) == 0)
+            addSpecialRoom();
     }
     else if (type == lSpecial)
     {
@@ -146,7 +136,7 @@ int DungeonGenerator::CreateMap()
         makeRiverDungeon();
 
         for (int i = 0; i < 15; i++)
-            makeRiver(getInt(35, 25));
+            makeRiver(Random::getInt(35, 25));
 
         makeBridge();
         if (!FloodTest())
@@ -240,14 +230,14 @@ int DungeonGenerator::DumpDungeon()
 
 int DungeonGenerator::makeEncounterDungeon()
 {
-    //while(!createUndeadRoom(getInt(20,35),15));
+    //while(!createUndeadRoom(Random::getInt(20,35),15));
 
-    int w_size = getInt(28, 28);
-    int h_size = getInt(8, 8);
+    int w_size = Random::getInt(28, 28);
+    int h_size = Random::getInt(8, 8);
 
     //create room
 
-    int ww = getInt(35, 20);
+    int ww = Random::getInt(35, 20);
 
     buildRoom(ww, 15, w_size, h_size, 0);
     buildRoom(ww, 15, h_size, w_size / 2, 0);
@@ -296,7 +286,7 @@ int DungeonGenerator::makeEncounterDungeon()
 int DungeonGenerator::makeUndeadDungeon()
 {
     //create dungeon
-    const int max_rooms = getInt(7, 5);
+    const int max_rooms = Random::getInt(7, 5);
     int rooms(0);
 
     //create rooms
@@ -305,7 +295,7 @@ int DungeonGenerator::makeUndeadDungeon()
 
     while (rooms < max_rooms + 1)
     {
-        if (createUndeadRoom(rooms, max_rooms, getInt(MAX_X_POS, MIN_X_POS), getInt(MAX_Y_POS, MIN_Y_POS)))
+        if (createUndeadRoom(rooms, max_rooms, Random::getInt(MAX_X_POS, MIN_X_POS), Random::getInt(MAX_Y_POS, MIN_Y_POS)))
             rooms++;
 
         if (dungeon_full++ == 1000) //safety feature - no room left so add stairs
@@ -315,19 +305,19 @@ int DungeonGenerator::makeUndeadDungeon()
     }
 
     // add river
-    int make_river = getInt(10, 0);
-    int complexity = getInt(3, 0);
+    int make_river = Random::getInt(10, 0);
+    int complexity = Random::getInt(3, 0);
     if (make_river > 7)
     {
         for (int i = 0; i < complexity; i++)
-            makeRiver(getInt(10, 0) + 30);
+            makeRiver(Random::getInt(10, 0) + 30);
     }
 
     //add tombs
     for (int i = 0; i < 50; i++)
     {
-        int h = getInt(DUNGEON_SIZE_H - 3, 3);
-        int w = getInt(DUNGEON_SIZE_W - 3, 3);
+        int h = Random::getInt(DUNGEON_SIZE_H - 3, 3);
+        int w = Random::getInt(DUNGEON_SIZE_W - 3, 3);
         makeTomb(w, h);
     };
 
@@ -385,36 +375,36 @@ int DungeonGenerator::makeCavernDungeon()
     makeGrass(1, 1); makeGrass(2, 1); makeGrass(3, 1); makeGrass(4, 1);
 
     //make cavern
-    int max_h = DUNGEON_SIZE_H / 4 + getInt(20, 0);
-    int max_w = DUNGEON_SIZE_W / 4 + getInt(20, 0);
+    int max_h = DUNGEON_SIZE_H / 4 + Random::getInt(20, 0);
+    int max_w = DUNGEON_SIZE_W / 4 + Random::getInt(20, 0);
 
     for (int h = 0; h < max_h; h++)
     {
         for (int w = 0; w < max_w; w++)
         {
-            int r = (int)sqrt((float)(x - w)*(x - w) + (h - y)*(h - y)) + getInt(3, 0);;
+            int r = (int)sqrt((float)(x - w)*(x - w) + (h - y)*(h - y)) + Random::getInt(3, 0);;
             if (r < range) //square is outside radius
                 makeGrass(w, h);
         }
     }
 
-    max_h = DUNGEON_SIZE_H / 4 + getInt(20, 0) + DUNGEON_SIZE_H / 4;
-    max_w = DUNGEON_SIZE_W / 4 + getInt(20, 0);
+    max_h = DUNGEON_SIZE_H / 4 + Random::getInt(20, 0) + DUNGEON_SIZE_H / 4;
+    max_w = DUNGEON_SIZE_W / 4 + Random::getInt(20, 0);
     x = DUNGEON_SIZE_W / 8;
     y = DUNGEON_SIZE_H / 8 + DUNGEON_SIZE_H / 4;;
 
     //make lake
 
-    makeRiver(getInt(40, 65), getInt(8, 5));
-    makeRiver(getInt(35, 55));
+    makeRiver(Random::getInt(40, 65), Random::getInt(8, 5));
+    makeRiver(Random::getInt(35, 55));
 
-    makeRiver(getInt(200, 200), 30);
+    makeRiver(Random::getInt(200, 200), 30);
 
     for (int h = DUNGEON_SIZE_H / 4; h < max_h; h++)
     {
         for (int w = 0; w < max_w; w++)
         {
-            int r = (int)sqrt((float)(x - w)*(x - w) + (h - y)*(h - y)) + getInt(3, 0);;
+            int r = (int)sqrt((float)(x - w)*(x - w) + (h - y)*(h - y)) + Random::getInt(3, 0);;
             if (r < range / 2) //square is outside radius
             {
                 //makeGrass(w,h);
@@ -435,9 +425,9 @@ int DungeonGenerator::makeCavernDungeon()
     }
     //make river
 
-    //	makeRiver(getInt(30,30),20);
+    //	makeRiver(Random::getInt(30,30),20);
     //  int h,w;
-    /*	int top = getInt(10,0)+30;
+    /*	int top = Random::getInt(10,0)+30;
 
         //create grass
         for( h =0;h<DUNGEON_SIZE_H;h++)
@@ -448,28 +438,28 @@ int DungeonGenerator::makeCavernDungeon()
     //plant trees
     for (int i = 0; i < 1000; i++)
     {
-        int h = getInt(DUNGEON_SIZE_H, 0);
-        int w = getInt(DUNGEON_SIZE_W, 0);
+        int h = Random::getInt(DUNGEON_SIZE_H, 0);
+        int w = Random::getInt(DUNGEON_SIZE_W, 0);
         makeTree(w, h);
     }
 
     //more rocks
     for (int i = 0; i < 500; i++)
     {
-        int h = getInt(DUNGEON_SIZE_H, 0);
-        int w = getInt(DUNGEON_SIZE_W, 0);
+        int h = Random::getInt(DUNGEON_SIZE_H, 0);
+        int w = Random::getInt(DUNGEON_SIZE_W, 0);
         if (w != 2 && h != 2) //player pos
             dmap[w][h] = '#';
     }
 
     //create dungeon
-    const int max_rooms = getInt(50, 18);
+    const int max_rooms = Random::getInt(50, 18);
 
     //create rooms
     for (int i = 0; i < max_rooms; i++)
     {
-        int x = getInt(100, 10);
-        int y = getInt(100, 10);
+        int x = Random::getInt(100, 10);
+        int y = Random::getInt(100, 10);
 
         if (x < 20 && y < 20)
         {
@@ -477,8 +467,8 @@ int DungeonGenerator::makeCavernDungeon()
             continue;
         }
 
-        int w_size = getInt(10, 4) + 2;
-        int h_size = getInt(10, 4) + 2;
+        int w_size = Random::getInt(10, 4) + 2;
+        int h_size = Random::getInt(10, 4) + 2;
 
         if ((w_size + x) >= DUNGEON_SIZE_W || (w_size - x) >= 0 || (h_size + y) >= DUNGEON_SIZE_H || (h_size - y) >= 0)
         {
@@ -517,38 +507,38 @@ int DungeonGenerator::makeCavernDungeon()
         }
 
         //create doors
-        if (getInt(2, 0) && dmap[x - w_size / 2][y] == '#')
-            dmap[x - w_size / 2][y + getInt(2, 0)] = '+';		//left
+        if (Random::getInt(2, 0) && dmap[x - w_size / 2][y] == '#')
+            dmap[x - w_size / 2][y + Random::getInt(2, 0)] = '+';		//left
 
         else
-            dmap[x + getInt(2, 0)][y - h_size / 2] = '+';	//top
+            dmap[x + Random::getInt(2, 0)][y - h_size / 2] = '+';	//top
 
-        if (getInt(2, 0) && dmap[x + w_size / 2][y] == '#')
-            dmap[x + (w_size - 1) / 2][y + getInt(2, 0)] = '+'; //right
+        if (Random::getInt(2, 0) && dmap[x + w_size / 2][y] == '#')
+            dmap[x + (w_size - 1) / 2][y + Random::getInt(2, 0)] = '+'; //right
 
         else
-            dmap[x + getInt(2, 0)][y + (h_size - 1) / 2] = '+';	//top
+            dmap[x + Random::getInt(2, 0)][y + (h_size - 1) / 2] = '+';	//top
     }/*
     //make ruins
 
-    createRuin(getInt(20,10) ,getInt(25,5),4,3,4,3);
-    createRuin(getInt(20,10) ,getInt(25,5),5,4,5,4);
+    createRuin(Random::getInt(20,10) ,Random::getInt(25,5),4,3,4,3);
+    createRuin(Random::getInt(20,10) ,Random::getInt(25,5),5,4,5,4);
 
 
     // make mountain
     makeMountain();
 
     //make river*/
-    //	makeRiver(getInt(35,65));
-    /*	makeRiver(getInt(30,30));
+    //	makeRiver(Random::getInt(35,65));
+    /*	makeRiver(Random::getInt(30,30));
 
 
         SafetyReset();
 
         do //make entrance
         {
-        h = getInt(DUNGEON_SIZE_H-2,10);
-        w = getInt(DUNGEON_SIZE_W-2,2);
+        h = Random::getInt(DUNGEON_SIZE_H-2,10);
+        w = Random::getInt(DUNGEON_SIZE_W-2,2);
         Safety("Could not add entrance to mountain");
 
         }while(!(dmap[w][h] == 'M' && (dmap[w-1][h] == 'g' || dmap[w-1][h] == 's')));
@@ -561,7 +551,7 @@ int DungeonGenerator::makeCavernDungeon()
     //	if(dmap[i][h] == '=')
     //		dmap[i][h] = 'b';
 
-    int h = getInt(range, 20);
+    int h = Random::getInt(range, 20);
 
     for (int i = 0; i < range * 2; i++)
     if (dmap[i][h] == '=')
@@ -575,7 +565,7 @@ int DungeonGenerator::makeCavernDungeon()
 int DungeonGenerator::makeOutSideDungeon()
 {
     int h, w;
-    int top = getInt(10, 0) + 30;
+    int top = Random::getInt(10, 0) + 30;
 
     //create grass
     for (h = 0; h < DUNGEON_SIZE_H; h++)
@@ -585,27 +575,27 @@ int DungeonGenerator::makeOutSideDungeon()
     //plant trees
     for (long i = 0; i < 30; i++)
     {
-        h = getInt(DUNGEON_SIZE_H, 0);
-        w = getInt(DUNGEON_SIZE_W / 2 + 15, 0);
+        h = Random::getInt(DUNGEON_SIZE_H, 0);
+        w = Random::getInt(DUNGEON_SIZE_W / 2 + 15, 0);
         dmap[w][h] = 'T';
     }
 
     //make ruins
-    createRuin(getInt(20, 10), getInt(25, 5), 4, 3, 4, 3);
-    createRuin(getInt(20, 10), getInt(25, 5), 5, 4, 5, 4);
+    createRuin(Random::getInt(20, 10), Random::getInt(25, 5), 4, 3, 4, 3);
+    createRuin(Random::getInt(20, 10), Random::getInt(25, 5), 5, 4, 5, 4);
 
     //plant rocks //can box in entrance
     for (int i = 0; i < 15; i++)
     {
-        h = getInt(DUNGEON_SIZE_H, 0);
-        w = getInt(DUNGEON_SIZE_W, DUNGEON_SIZE_W / 2);
+        h = Random::getInt(DUNGEON_SIZE_H, 0);
+        w = Random::getInt(DUNGEON_SIZE_W, DUNGEON_SIZE_W / 2);
         dmap[w][h] = '#';
     }
     //more rocks
     for (int i = 0; i < 15; i++)
     {
-        h = getInt(DUNGEON_SIZE_H, 0);
-        w = getInt(DUNGEON_SIZE_W / 2 + 10, 0);
+        h = Random::getInt(DUNGEON_SIZE_H, 0);
+        w = Random::getInt(DUNGEON_SIZE_W / 2 + 10, 0);
         if (w > 2 && h > 3) //player pos
             dmap[w][h] = '#';
     }
@@ -614,15 +604,15 @@ int DungeonGenerator::makeOutSideDungeon()
     makeMountain();
 
     //make river
-    makeRiver(getInt(43, 43));
-    makeRiver(getInt(37, 37));
+    makeRiver(Random::getInt(43, 43));
+    makeRiver(Random::getInt(37, 37));
 
     SafetyReset();
 
     do //make entrance
     {
-        h = getInt(DUNGEON_SIZE_H - 2, 10);
-        w = getInt(DUNGEON_SIZE_W - 2, 2);
+        h = Random::getInt(DUNGEON_SIZE_H - 2, 10);
+        w = Random::getInt(DUNGEON_SIZE_W - 2, 2);
         Safety("Could not add entrance to mountain");
     } while (!(dmap[w][h] == 'M' && (dmap[w - 1][h] == 'g' || dmap[w - 1][h] == 's')));
 
@@ -665,7 +655,7 @@ void DungeonGenerator::makeMountain()
     int h = 0, w;
     for (h = 0; h < DUNGEON_SIZE_H; h++)
     {
-        int rand = getInt(7, 1) - 3;
+        int rand = Random::getInt(7, 1) - 3;
         top += rand;
 
         //make water
@@ -678,7 +668,7 @@ int DungeonGenerator::makeRiverDungeon()
 {
     //create dungeon
     //create rooms
-    const int max_rooms = getInt(4, 3);
+    const int max_rooms = Random::getInt(4, 3);
     int rooms(0);
     int dungeon_full = 0;
     int left = 1;
@@ -687,7 +677,7 @@ int DungeonGenerator::makeRiverDungeon()
     {
         if (left)
         {
-            if (createRoom(rooms, max_rooms, 7, getInt(MAX_Y_POS, MIN_Y_POS)))
+            if (createRoom(rooms, max_rooms, 7, Random::getInt(MAX_Y_POS, MIN_Y_POS)))
             {
                 rooms++;
                 left = 0;
@@ -695,7 +685,7 @@ int DungeonGenerator::makeRiverDungeon()
         }
         else
         {
-            if (createRoom(rooms, max_rooms, 60, getInt(MAX_Y_POS, MIN_Y_POS)))
+            if (createRoom(rooms, max_rooms, 60, Random::getInt(MAX_Y_POS, MIN_Y_POS)))
             {
                 rooms++;
                 left = 1;
@@ -727,7 +717,7 @@ int DungeonGenerator::makeMazeDungeon()
 
     while (rooms < max_rooms + 1)
     {
-        if (createRoom(rooms, max_rooms, getInt(MAX_X_POS, MIN_X_POS), getInt(MAX_Y_POS, MIN_Y_POS), 5, 3, 5, 3))
+        if (createRoom(rooms, max_rooms, Random::getInt(MAX_X_POS, MIN_X_POS), Random::getInt(MAX_Y_POS, MIN_Y_POS), 5, 3, 5, 3))
             rooms++;
 
         if (dungeon_full++ == 1000) //safety feature - no room left so add stairs
@@ -737,11 +727,11 @@ int DungeonGenerator::makeMazeDungeon()
     }
 
     // add river
-    int make_river = getInt(10, 0);
-    //int complexity = getInt(3,0);
+    int make_river = Random::getInt(10, 0);
+    //int complexity = Random::getInt(3,0);
     if (make_river == 9)
     {
-        makeRiver(getInt(10, 0) + 30);
+        makeRiver(Random::getInt(10, 0) + 30);
     }
 
     return 1;
@@ -752,7 +742,7 @@ int DungeonGenerator::makeMazeDungeon()
 int DungeonGenerator::makeNormalDungeon()
 {
     //create dungeon
-    const int max_rooms = getInt(MAX_ROOMS, MIN_ROOMS);
+    const int max_rooms = Random::getInt(MAX_ROOMS, MIN_ROOMS);
     assert(max_rooms >= MIN_ROOMS);
     int rooms(0);
 
@@ -762,7 +752,7 @@ int DungeonGenerator::makeNormalDungeon()
 
     while (rooms < max_rooms + 1)
     {
-        if (createRoom(rooms, max_rooms, getInt(MAX_X_POS, MIN_X_POS), getInt(MAX_Y_POS, MIN_Y_POS)))
+        if (createRoom(rooms, max_rooms, Random::getInt(MAX_X_POS, MIN_X_POS), Random::getInt(MAX_Y_POS, MIN_Y_POS)))
             rooms++;
 
         if (dungeon_full++ == 1000) //safety feature - no room left so add stairs
@@ -775,12 +765,12 @@ int DungeonGenerator::makeNormalDungeon()
     addLoops(5);
 
     // add river
-    int make_river = getInt(10, 0);
-    int complexity = getInt(3, 0);
+    int make_river = Random::getInt(10, 0);
+    int complexity = Random::getInt(3, 0);
     if (make_river > 7)
     {
         for (int i = 0; i < complexity; i++)
-            makeRiver(getInt(10, 0) + 30);
+            makeRiver(Random::getInt(10, 0) + 30);
     }
 
     return 1;
@@ -791,11 +781,17 @@ int DungeonGenerator::makeNormalDungeon()
 void DungeonGenerator::makeBoatHouse()
 {
     makeSpecialDungeon();
+    
+    DumpDungeon();
+    
     addLoops(2);
+    makeRiver(Random::getInt(10, 0) + 30, 0);
+    DumpDungeon();
 
-    makeRiver(getInt(10, 0) + 30, 0);
     makeBridge();
+    DumpDungeon();
     makeBridge();
+    DumpDungeon();
     makeBridge();
 }
 
@@ -804,7 +800,7 @@ void DungeonGenerator::makeBoatHouse()
 int DungeonGenerator::makeSpecialDungeon()
 {
     //create dungeon
-    const int max_rooms = getInt(MAX_ROOMS, MIN_ROOMS);
+    const int max_rooms = Random::getInt(MAX_ROOMS, MIN_ROOMS);
     int rooms(0);
     assert(max_rooms >= MIN_ROOMS);
 
@@ -813,7 +809,7 @@ int DungeonGenerator::makeSpecialDungeon()
 
     while (rooms < max_rooms + 1)
     {
-        if (createRoom(rooms, max_rooms, getInt(MAX_X_POS, MIN_X_POS), getInt(MAX_Y_POS, MIN_Y_POS)))
+        if (createRoom(rooms, max_rooms, Random::getInt(MAX_X_POS, MIN_X_POS), Random::getInt(MAX_Y_POS, MIN_Y_POS)))
             rooms++;
 
         Safety("make Special Dungeon failed", 10000);
@@ -822,12 +818,12 @@ int DungeonGenerator::makeSpecialDungeon()
     addLoops(2);
 
     // add river
-    int make_river = getInt(10, 0);
-    int complexity = getInt(3, 0);
+    int make_river = Random::getInt(10, 0);
+    int complexity = Random::getInt(3, 0);
     if (make_river > 7)
     {
         for (int i = 0; i < complexity; i++)
-            makeRiver(getInt(10, 0) + 30);
+            makeRiver(Random::getInt(10, 0) + 30);
     }
 
     AddFountain();
@@ -853,7 +849,7 @@ int DungeonGenerator::makeSpecialDungeon()
 
     if (size != 0)
     {
-        int getCoord = getInt(size, 0);
+        int getCoord = Random::getInt(size, 0);
         for (COORDLIST::iterator it = specialSpotCoords.begin(); it != specialSpotCoords.end(); it++, i++)
         {
             if (getCoord == i)
@@ -879,8 +875,8 @@ int DungeonGenerator::makeSpecialDungeon()
 
 int DungeonGenerator::createRuin(int x, int y, int max_w, int min_w, int max_h, int min_h)
 {
-    int w_size = getInt(max_w, min_w);
-    int h_size = getInt(max_h, min_h);
+    int w_size = Random::getInt(max_w, min_w);
+    int h_size = Random::getInt(max_h, min_h);
 
     //check that it is a good spot to put the room 
 
@@ -895,23 +891,23 @@ int DungeonGenerator::createRuin(int x, int y, int max_w, int min_w, int max_h, 
         {
             dmap[x + w - w_size / 2][y + h - h_size / 2] = '.';
 
-            if (w == w_size - 1 && getInt(2, 0))
+            if (w == w_size - 1 && Random::getInt(2, 0))
                 dmap[x + w - w_size / 2 + 1][y + h - h_size / 2] = 'r';
-            if (w == 0 && getInt(2, 0))
+            if (w == 0 && Random::getInt(2, 0))
                 dmap[x + w - w_size / 2 - 1][y + h - h_size / 2] = 'r';
-            if (h == h_size - 1 && getInt(2, 0))
+            if (h == h_size - 1 && Random::getInt(2, 0))
                 dmap[x + w - w_size / 2][y + h - h_size / 2 + 1] = 'r';
-            if (h == 0 && getInt(2, 0))
+            if (h == 0 && Random::getInt(2, 0))
                 dmap[x + w - w_size / 2][y + h - h_size / 2 - 1] = 'r';
         }
     }
-    if (getInt(2, 0))
+    if (Random::getInt(2, 0))
         dmap[x + w_size / 2 + 1][y - h_size / 2 - 1] = 'r';
-    if (getInt(2, 0))
+    if (Random::getInt(2, 0))
         dmap[x + w_size / 2 + 1][y + h_size / 2 + 1] = 'r';
-    if (getInt(2, 0))
+    if (Random::getInt(2, 0))
         dmap[x - w_size / 2 - 1][y - h_size / 2 - 1] = 'r';
-    if (getInt(2, 0))
+    if (Random::getInt(2, 0))
         dmap[x - w_size / 2 - 1][y + h_size / 2 + 1] = 'r';
 
     return 1;
@@ -921,8 +917,8 @@ int DungeonGenerator::createRuin(int x, int y, int max_w, int min_w, int max_h, 
 
 int DungeonGenerator::createRoom(int roomCount, const int maxRooms, int x, int y, int max_w, int min_w, int max_h, int min_h)
 {
-    int w_size = getInt(max_w, min_w);
-    int h_size = getInt(max_h, min_h);
+    int w_size = Random::getInt(max_w, min_w);
+    int h_size = Random::getInt(max_h, min_h);
 
     //check that it is a good spot to put the room 
 
@@ -1018,7 +1014,7 @@ int DungeonGenerator::validRoomPos(int x, int y, int w_size, int h_size)
 
 int DungeonGenerator::createDoor(int x, int y, int chance)
 {
-    int random = getInt(100, 0);
+    int random = Random::getInt(100, 0);
 
     //door sanity check (not yet perfect)
     if (!((dmap[x + 1][y] != '#' &&  dmap[x - 1][y] != '#') || (dmap[x][y - 1] != '#' &&  dmap[x][y + 1] != '#')))
@@ -1060,7 +1056,7 @@ int DungeonGenerator::createPath(int x1, int y1, int x2, int y2)
     else if (y1 < y2)
         dir2 = dNorth;
 
-    int start_dir = getInt(2, 1);
+    int start_dir = Random::getInt(2, 1);
 
     if (start_dir == 1 && dir1 == dNorth) //??
         start_dir = 2;
@@ -1289,8 +1285,8 @@ int DungeonGenerator::findwall(int *x, int *y)
 
     do
     {
-        *x = getInt(DUNGEON_SIZE_W, 0);
-        *y = getInt(DUNGEON_SIZE_H, 0);
+        *x = Random::getInt(DUNGEON_SIZE_W, 0);
+        *y = Random::getInt(DUNGEON_SIZE_H, 0);
 
         if (dmap[*x][*y] == '#')
         {
@@ -1310,7 +1306,7 @@ int DungeonGenerator::findwall(int *x, int *y)
 int DungeonGenerator::createCorridor(int *x, int *y, int dir1)
 {
 
-    int dir = getInt(2, 1);
+    int dir = Random::getInt(2, 1);
 
     if (dir == 1)
     {
@@ -1373,15 +1369,14 @@ void DungeonGenerator::TraceMsg(char * msg)
 
 void DungeonGenerator::makeRiver(int top, int size)
 {
-
     //	int top = 
-    int bottom = 35;//getInt(60,0)+5;
-    int path_side = getInt(2, 0);
+    int bottom = 35;//Random::getInt(60,0)+5;
+    int path_side = Random::getInt(2, 0);
 
     for (int h = 0; h < DUNGEON_SIZE_H; h++)
     {
-        int width = getInt(5, 2) + size;
-        int rand = getInt(4, 1) - 2;
+        int width = Random::getInt(5, 2) + size;
+        int rand = Random::getInt(4, 1) - 2;
         top += rand;
 
         //	if(path_side==0)
@@ -1422,8 +1417,10 @@ void DungeonGenerator::makeWater(int x, int y)
     if (x >= DUNGEON_SIZE_W || y >= DUNGEON_SIZE_H || x < 0 || y < 0)
         return;
 
-    if (dmap[x][y] != '>' && dmap[x][y] != '<' || dmap[x][y] == '(' || dmap[x][y] == 'i' || dmap[x][y] == ')')
-        dmap[x][y] = '=';
+    if (dmap[x][y] == '>' || dmap[x][y] == '<' || dmap[x][y] == '(' || dmap[x][y] == 'i' || dmap[x][y] == ')')
+        return;
+
+    dmap[x][y] = '=';
 
 }
 
@@ -1488,7 +1485,7 @@ void DungeonGenerator::makeBridge()
     int x = 15, y;
     int inc = 1;
 
-    int dir = getInt(2, 0);
+    int dir = Random::getInt(2, 0);
     if (dir == 1)
         inc = -1;
 
@@ -1502,19 +1499,22 @@ void DungeonGenerator::makeBridge()
     {
         if (dmap[x][y] == '=')
         {
-            dmap[x][y] = 'b';
-            dmap[x - 1][y] = 'b';
+            if (dmap[x][y] != '>' && dmap[x ][y] != '<' && dmap[x][y] != '(' && dmap[x][y] != 'i' && dmap[x ][y] != ')')
+                dmap[x][y] = 'b';
+            if (dmap[x - 1][y] != '>' && dmap[x - 1][y] != '<' && dmap[x - 1][y] != '(' && dmap[x - 1][y] != 'i' && dmap[x - 1][y] != ')')
+                dmap[x - 1][y] = 'b';
         }
     }
-    dmap[x + 1][y] = 'b';
+    if (dmap[x + 1][y] != '>' && dmap[x + 1][y] != '<' && dmap[x + 1][y] != '(' && dmap[x + 1][y] != 'i' && dmap[x + 1][y] != ')')
+        dmap[x + 1][y] = 'b';
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------
 
 int DungeonGenerator::createUndeadRoom(int rooms, const int max_rooms, int x, int y, int max_w, int min_w, int max_h, int min_h)
 {
-    int w_size = getInt(max_w, min_w);
-    int h_size = getInt(max_h, min_h);
+    int w_size = Random::getInt(max_w, min_w);
+    int h_size = Random::getInt(max_h, min_h);
 
     //check that it is a good spot to put the room 
 
@@ -1553,7 +1553,7 @@ int DungeonGenerator::createUndeadRoom(int rooms, const int max_rooms, int x, in
 int DungeonGenerator::AddTeleport()
 {
     //tele chance
-    if (getInt(2, 0) == 0) //33%
+    if (Random::getInt(2, 0) == 0) //33%
     {
         COORDLIST free_spaces;
 
@@ -1572,7 +1572,7 @@ int DungeonGenerator::AddTeleport()
         }
         if (free_spaces.size() > 0)
         {
-            int choice = getInt(free_spaces.size(), 0);
+            int choice = Random::getInt(free_spaces.size(), 0);
             int count = 0;
             for (COORDLIST::iterator it = free_spaces.begin(); it != free_spaces.end(); it++, count++)
             {
@@ -1592,7 +1592,7 @@ int DungeonGenerator::AddTeleport()
 int DungeonGenerator::AddFountain()
 {
     //fountain chance
-    if (getInt(3, 0) == 0) //33%
+    if (Random::getInt(3, 0) == 0) //33%
     {
         COORDLIST free_spaces;
 
@@ -1611,7 +1611,7 @@ int DungeonGenerator::AddFountain()
         }
         if (free_spaces.size() > 0)
         {
-            int choice = getInt(free_spaces.size(), 0);
+            int choice = Random::getInt(free_spaces.size(), 0);
             int count = 0;
             for (COORDLIST::iterator it = free_spaces.begin(); it != free_spaces.end(); it++, count++)
             {
@@ -1651,7 +1651,7 @@ bool DungeonGenerator::FloodTest()
     }
     if (free_spaces.size() > 0)
     {
-        int choice = getInt(free_spaces.size(), 0);
+        int choice = Random::getInt(free_spaces.size(), 0);
         int count = 0;
         for (COORDLIST::iterator it = free_spaces.begin(); it != free_spaces.end(); it++, count++)
         {
@@ -1717,7 +1717,7 @@ void DungeonGenerator::FloodFill(int x, int y)
 
 void DungeonGenerator::addLoops(int nLoops)
 {
-    int loops = nLoops; // Random::getInt(nLoops + 1, 1);
+    int loops = nLoops; // Random::Random::getInt(nLoops + 1, 1);
 
     do
     {
@@ -1725,8 +1725,8 @@ void DungeonGenerator::addLoops(int nLoops)
 
         do
         {
-            int x = getInt(DUNGEON_SIZE_W, 1);
-            int y = getInt(DUNGEON_SIZE_H, 1);
+            int x = Random::getInt(DUNGEON_SIZE_W, 1);
+            int y = Random::getInt(DUNGEON_SIZE_H, 1);
 
             if (dmap[x][y] == '.')
             {
@@ -1737,8 +1737,8 @@ void DungeonGenerator::addLoops(int nLoops)
         } while (true);
         do
         {
-            int x = getInt(DUNGEON_SIZE_W, 1);
-            int y = getInt(DUNGEON_SIZE_H, 1);
+            int x = Random::getInt(DUNGEON_SIZE_W, 1);
+            int y = Random::getInt(DUNGEON_SIZE_H, 1);
 
             if (dmap[x][y] == '.')
             {

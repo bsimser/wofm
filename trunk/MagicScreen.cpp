@@ -31,7 +31,7 @@ int MagicScreen::CastSpell(bool *keys)
     {
         if (keys[i] == true)
         {
-            monsterData* player = World.getMonsterManager().Player();
+            MonsterData* player = World.getMonsterManager().Player();
             //ret = World.getSpellManager().CallSpellRoutine(World.getMonsterManager().Player(),i-65);
             ret = player->NextAction(World.getActionManager().UpdateAction(&player->action, aCastSpell, i - 65));
 
@@ -48,7 +48,7 @@ void MagicScreen::Display()
 
     World.getTextManager().ClearDisplayLines();
 
-    monsterData* player = World.getMonsterManager().Player();
+    MonsterData* player = World.getMonsterManager().Player();
 
     World.getTextManager().SetDisplayLine(0, "Spell List");
     World.getTextManager().SetDisplayLine(1, "==========");

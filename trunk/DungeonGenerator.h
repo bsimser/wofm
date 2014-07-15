@@ -52,8 +52,6 @@ typedef enum eDir
 class DungeonGenerator  
 {
 public:
-	DungeonGenerator();
-
 	int CreateMap();
 	virtual int Create(int type);
 	char dmap[DUNGEON_SIZE_W ][DUNGEON_SIZE_H];

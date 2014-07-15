@@ -16,7 +16,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-monsterData* current_monster;
+MonsterData* current_monster;
 
 MonsterAI::MonsterAI()
 {
@@ -28,7 +28,7 @@ MonsterAI::~MonsterAI()
 
 }
 
-int MonsterAI::ProcessIntelligence(monsterData* monster)
+int MonsterAI::ProcessIntelligence(MonsterData* monster)
 {
     current_monster = monster;
 
@@ -47,7 +47,7 @@ int MonsterAI::ProcessIntelligence(monsterData* monster)
     return monster->GetState();
 }
 
-int MonsterAI::ProcessEffects(monsterData* monster)
+int MonsterAI::ProcessEffects(MonsterData* monster)
 {
     EFFECTLIST::iterator it;
 
@@ -86,7 +86,7 @@ int MonsterAI::ProcessEffects(monsterData* monster)
     return move_done; //if > 0 skip move
 }
 
-int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
+int	MonsterAI::EffectAction(MonsterData* monster, eEffect effect, int strength)
 {
     if (strength == 0)
         return 0;
@@ -118,7 +118,7 @@ int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
         {
             World.getTextManager().newLine("You are confused. ");
         }
-        if (monster->isSeen() == 1)
+        else if (monster->isSeen() == 1)
             World.getTextManager().newLine("%s is confused. ", monster->monster.name.c_str());
 
     } break; //70%+10% for strength random move;
@@ -133,7 +133,7 @@ int	MonsterAI::EffectAction(monsterData* monster, eEffect effect, int strength)
     return  move_done;
 }
 
-int	MonsterAI::DetermineAction(monsterData* monster)
+int	MonsterAI::DetermineAction(MonsterData* monster)
 {
     if (monster->GetState() == normal)
     {
@@ -154,7 +154,7 @@ int	MonsterAI::DetermineAction(monsterData* monster)
     return 1;
 }
 
-int MonsterAI::AttackPlayer(monsterData* monster)
+int MonsterAI::AttackPlayer(MonsterData* monster)
 {
     if (monster->is_magic)
         MagicAttackPlayer(monster);
@@ -166,7 +166,7 @@ int MonsterAI::AttackPlayer(monsterData* monster)
 
     return 0;
 }
-int MonsterAI::Detect(monsterData* monster)
+int MonsterAI::Detect(MonsterData* monster)
 {
     //detect player
 
@@ -182,7 +182,7 @@ int MonsterAI::Detect(monsterData* monster)
     return detect;
 }
 
-eMonsterState MonsterAI::UpdateMonsterState(monsterData* monster)
+eMonsterState MonsterAI::UpdateMonsterState(MonsterData* monster)
 {
     eMonsterState state = monster->GetState();
 
@@ -211,10 +211,7 @@ eMonsterState MonsterAI::UpdateMonsterState(monsterData* monster)
     {
         if (detect || monster->wasHit())
         {
-            
-            int luck = World.getMonsterManager().Player()->Luck();
-
-            if (monster->wasHit() == false && Random::getInt(1, 8) + Random::getInt(1, 8) <= luck)
+            if (monster->wasHit() == false && World.getMonsterManager().Player()->TestLuck())
             {
                 World.getTextManager().newLine("The %s snores loudly. ", monster->monster.name.c_str());
             }
@@ -239,7 +236,7 @@ eMonsterState MonsterAI::UpdateMonsterState(monsterData* monster)
     return monster->GetState();
 }
 
-void MonsterAI::DoNothing(monsterData* monster)
+void MonsterAI::DoNothing(MonsterData* monster)
 {
     if (monster->GetState() != dead)
     {
@@ -247,7 +244,7 @@ void MonsterAI::DoNothing(monsterData* monster)
     }
 }
 
-int MonsterAI::RandomMove(monsterData* monster)
+int MonsterAI::RandomMove(MonsterData* monster)
 {
     //if(monster->ref ==0)  //no player commands
     //	return 0;
@@ -307,7 +304,7 @@ int MonsterAI::RandomMove(monsterData* monster)
     return 1;
 }
 
-int MonsterAI::MagicAttackPlayer(monsterData* monster)
+int MonsterAI::MagicAttackPlayer(MonsterData* monster)
 {
     int p_x;
     int p_y;
@@ -364,7 +361,7 @@ int MonsterAI::MagicAttackPlayer(monsterData* monster)
     return 1;
 }
 
-int MonsterAI::DistanceAttackPlayer(monsterData* monster)
+int MonsterAI::DistanceAttackPlayer(MonsterData* monster)
 {
     int p_x;
     int p_y;
@@ -392,7 +389,7 @@ int MonsterAI::DistanceAttackPlayer(monsterData* monster)
 
     return 1;
 }
-int MonsterAI::ChasePlayer(monsterData* monster)
+int MonsterAI::ChasePlayer(MonsterData* monster)
 {
     int sight_range = 10;
     int m_x, m_y; //monster Coord
@@ -688,7 +685,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
 
     //check for enemy - at this stage it just checks player
     //cheat code - passes players position into LOS code and tests if it can be detectec
-    monsterData* player = &(*World.getMonsterManager().Player());
+    MonsterData* player = &(*World.getMonsterManager().Player());
 
     if (sqrt((float)(m_x - player->pos.x)*(m_x - player->pos.x) + (player->pos.y - m_y)*(player->pos.y - m_y)) <= sight)
     {

@@ -16,7 +16,6 @@
 #include ".\effects.h"
 #include <vector>
 
-
 class Monster  : public ResistanceBrands, public Effects
 {
 public:
@@ -26,51 +25,47 @@ public:
 
 	virtual int Create(int type,int level, int level_variation=0);
 
-	virtual int createPlayer();
-	virtual int createOrc(int level);
-	virtual int createWarlock();
-	virtual int createSpecial(int level);
-    virtual int createBridgeMaster(bool wereRat = false);
-    virtual int createWerewolf();
-    virtual int createDigger();
-    virtual void createCrocodile();
+	int     createPlayer();
+	int     createOrc(int level);
+	int     createWarlock();
+	int     createSpecial(int level);
+    int     createBridgeMaster(bool wereRat = false);
+    int     createWerewolf();
+    int     createDigger();
+    void    createCrocodile();
 
-	int dead();
-	int MaxStamina()    {return max_stamina; };
-	void setColor(int c1, int c2, int c3);
-	int newPos(int x,int y);
-	int GetType()   {return type; };
+	int     dead();
+	void    setColor(int c1, int c2, int c3);
+	int     newPos(int x,int y);
 
-    void setDescription(const std::string & about);
+	int     GetType()               {return type; };
+    int     MaxStamina()            { return max_stamina; };
+
+    void    setDescription(const std::string & about);
     const std::string getDescription() const;
 
-	char symbol;
-    unsigned char color1, color2, color3;
+    void    setColour(unsigned char color1, unsigned char color2, unsigned char color3);
 
-	signed char stamina;
-	unsigned char skill;
-    char luck;
+	char            symbol;
+    unsigned char   color1, color2, color3;
+	signed char     stamina;
+	unsigned char   skill;
+    char            luck;
+    unsigned char   sight_range;
+    unsigned char   asleep_sight_Range;
+    std::string     name;
+	bool            humanoid;
+    bool            special;
+    bool            undead;
+	int             experience;
+    unsigned char   max_stamina;
+    signed char     speed;
 
-    unsigned char sight_range;
-    unsigned char asleep_sight_Range;
-
-    std::string name;
-	//char name[64];
-
-	bool humanoid;
-    bool special;
-    bool undead;
-
-	int experience;
-    unsigned char max_stamina;
-
-    signed char speed;
 private:
-
-    unsigned char mLevelVariation;
-    unsigned char mLevel;
-    unsigned char type;
-    unsigned char description;
+    unsigned char   mLevelVariation;
+    unsigned char   mLevel;
+    unsigned char   type;
+    unsigned char   description;
     static std::vector<std::string> descriptions;
 };
 

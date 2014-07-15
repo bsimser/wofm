@@ -98,6 +98,7 @@ enum eDisplayState
     sUse,
     sLeave,
     sMap,
+    sFire,
     sThrow,
     sSelectSpell,
     sTargetSpell,

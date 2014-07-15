@@ -228,21 +228,25 @@ void WorldBuilder::UpdateStatusBar()
     char name[32];
     sprintf(name, "%s  Level %d", player->monster.name.c_str(), player->experience_level);
 
-    //sprintf(line1,"%s Level %d Skill: %2d(%d)  Stamina: %2d     Turns: %4d  DL: %d XP: %d Mode %d",
-    sprintf(line1, "%-20s  Skill: %2d(%d)  Stamina: %2d(%d)  Luck: %-2d(%d)   Dungeon Level:%d  Turns: %d", name,
+    sprintf(line1, "%-20s  Stamina: %2d/%d  Skill: %2d(%+d)  Luck: %-2d(%+d)  Dungeon Level: %s", name,
+
+    //sprintf(line1, "%-20s  Skill: %2d(%+d)  Stamina: %2d/%d  Luck: %-2d(%+d)   Dungeon Level: %s", name,
+
+        //sprintf(line1,"%s Level %d Skill: %2d(%d)  Stamina: %2d     Turns: %4d  DL: %d XP: %d Mode %d",
+        //sprintf(line1, "%-20s  Skill: %2d(%d)  Stamina: %2d(%d)  Luck: %-2d(%d)   Dungeon Level:%d  Turns: %d", name,
         //sprintf(line1,"%-20s  Skill: %2d(%d) Stamina: %2d(%d) Luck: %-2d  X:%d Y:%d" ,name,
 
         //"",player->monster.name,
         //player->experience_level,
+        player->Stamina(), player->monster.MaxStamina(),
         player->AdjustedSkill(),
         player->AdjustedSkill() - player->Skill(),
-        player->Stamina(), player->monster.MaxStamina(),
         player->Luck(),
         player->luck_penalty,
         //player->pos.x,
         //player->pos.y);
-        GetCurrentLevel(),
-        turns);
+        World.getDungeonManager().getLevelName(GetCurrentLevel()).c_str());
+        //turns);
 
     //GetCurrentLevel(),		
     //player->experience,
@@ -276,7 +280,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
 
     int dir;
 
-    monsterData *player = monsterManager.Player();
+    MonsterData *player = monsterManager.Player();
 
     if (!keys[VK_SPACE] && State() != sMore)
     {
@@ -311,9 +315,9 @@ void WorldBuilder::ProcessCommand(bool *keys)
     {
         if (keys[VK_Y])
         {
-            World.getDeathMessage().SetDeathMessage(" left the great mountain. ");
+            World.getDeathMessage().SetDeathMessage("left the great mountain. ");
             World.getDeathMessage().ShowDeath(1);
-            Sleep(1000);
+            Sleep(500);
             World.SetState(sDeath);
         }
         else SetState(sNormal);
@@ -411,11 +415,29 @@ void WorldBuilder::ProcessCommand(bool *keys)
         else return;
     }
 
-    else if (State() == sThrow)
+    else if (State() == sFire)
     {
         if (keys[VK_SPACE] || keys[VK_F]) //target acquired
         {
             if (command.ThrowTarget(aFire))
+                turns++;
+            SetState(sNormal);
+        }
+        else if (!command.Look(keys, true)) //cancelled
+        {
+            SetState(sNormal);
+        }
+        else
+        {
+            return;
+        }
+        dungeonManager.CurrentLevel()->ClearPath();
+    }
+    else if (State() == sThrow)
+    {
+        if (keys[VK_SPACE]) //target acquired
+        {
+            if (command.ThrowTarget(aThrow))
                 turns++;
             SetState(sNormal);
         }
@@ -536,6 +558,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
             turns++;
             keys[VK_Q] = false;
         }
+
     }
 
     //END SHIFT
@@ -585,13 +608,23 @@ void WorldBuilder::ProcessCommand(bool *keys)
     else if (keys[VK_F])
     {
         if (command.ThrowItem())
-            state = sThrow;
+            state = sFire;
         keys[VK_F] = false;
+    }
+    else if (keys[VK_D])
+    {
+        SetState(sInventory);
+
+        inventoryManager.ShowInventory(0);
+        inventoryManager.setState(InventoryManager::eDrop);
+        inventoryManager.DropMessage();
+
+        keys[VK_D] = false;
     }
     /*else if(keys[VK_D] || keys[VK_Q])
     {
     if(command.Drink())
-    state = sThrow;
+    state = sFire;
     keys[VK_D]=keys[VK_Q]=false;
     }*/
     else if (keys[VK_C])

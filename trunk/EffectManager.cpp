@@ -9,7 +9,7 @@ EffectManager::~EffectManager(void)
 {
 }
 
-int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
+int EffectManager::RunEffect(MonsterData *monster, eEffect effect, int strength)
 {
     if (strength == 0)
         return 0;
@@ -105,7 +105,7 @@ int EffectManager::RunEffect(monsterData *monster, eEffect effect, int strength)
 }
 
 
-int EffectManager::TestGetEffect(monsterData *monster, eBrandType brand, int strength)
+int EffectManager::TestGetEffect(MonsterData *monster, eBrandType brand, int strength)
 {
     int monster_resistance = 0;
 
@@ -143,7 +143,7 @@ int EffectManager::TestGetEffect(monsterData *monster, eBrandType brand, int str
 
 }
 
-void EffectManager::AddBrandEffect(monsterData *monster, eBrandType brand, int strength)
+void EffectManager::AddBrandEffect(MonsterData *monster, eBrandType brand, int strength)
 {
     switch (brand)
     {
@@ -160,7 +160,7 @@ void EffectManager::AddBrandEffect(monsterData *monster, eBrandType brand, int s
 
 }
 
-void EffectManager::AddOtherEffect(monsterData *monster, eEffect effect, int strength) //spell/potion/scroll
+void EffectManager::AddOtherEffect(MonsterData *monster, eEffect effect, int strength) //spell/potion/scroll
 {
     monster->monster.AddEffect(effect, strength);
     /*switch(effect)
@@ -170,7 +170,7 @@ void EffectManager::AddOtherEffect(monsterData *monster, eEffect effect, int str
     }*/
 }
 
-int EffectManager::TestEffect(monsterData *monster, eEffect effect, int strength)
+int EffectManager::TestEffect(MonsterData *monster, eEffect effect, int strength)
 {
     int ret = NO_CHANGE;
 
@@ -190,10 +190,9 @@ int EffectManager::TestEffect(monsterData *monster, eEffect effect, int strength
         ret = REMOVED;
 
     return ret;
-
 }
 
-int EffectManager::RunSlowed(monsterData *monster, int strength)
+int EffectManager::RunSlowed(MonsterData *monster, int strength)
 {
     //get Resistance
     int resistance = monster->monster.GetResistance(bSlow);
@@ -223,8 +222,18 @@ int EffectManager::RunSlowed(monsterData *monster, int strength)
     }
 
 }
-int EffectManager::RunPoison(monsterData *monster, int strength)
+int EffectManager::RunPoison(MonsterData *monster, int strength)
 {
+    unsigned char c1 = monster->monster.color1;
+    unsigned char c2 = monster->monster.color2;
+    unsigned char c3 = monster->monster.color3;
+    monster->monster.setColour(0, 255, 0);
+    World.Render();
+    Sleep(20);
+    monster->monster.setColour(c1, c2, c3);
+
+    World.Render();
+
     //get Resistance
     int resistance = monster->monster.GetResistance(EquivalentResistance(poisoned));
 
@@ -266,7 +275,7 @@ int EffectManager::RunPoison(monsterData *monster, int strength)
     return NO_CHANGE;
 }
 
-void EffectManager::RunTeleport(monsterData *monster, int strength)
+void EffectManager::RunTeleport(MonsterData *monster, int strength)
 {
     int resistance = monster->monster.GetResistance(EquivalentResistance(teleportitus));
 
@@ -292,7 +301,7 @@ eBrandType EffectManager::EquivalentResistance(eEffect effect)
     }
 }
 
-const char* EffectManager::EffectName(eEffect effect)
+const std::string EffectManager::EffectName(eEffect effect)
 {
     switch (effect)
     {

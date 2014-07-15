@@ -10,18 +10,10 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-LevelChange::LevelChange()
-{
-}
-
-LevelChange::~LevelChange()
-{
-}
-
 int LevelChange::ClimbSpecial(int dir)
 {
 
-    monsterData* player = World.getMonsterManager().Player();
+    MonsterData* player = World.getMonsterManager().Player();
     Coord * pos = player->getPosition();
     DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
@@ -151,7 +143,7 @@ int LevelChange::ClimbNormal(int dir)
 {
     if (dir == dUp)
     {
-        monsterData* player = World.getMonsterManager().Player();
+        MonsterData* player = World.getMonsterManager().Player();
 
         Coord * pos = player->getPosition();
 
@@ -184,12 +176,14 @@ int LevelChange::ClimbNormal(int dir)
             new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
             player->pos.x = start_pos->x;
             player->pos.y = start_pos->y;
+            player->level = World.GetCurrentLevel();
+
             return 1;
         }
     }
     if (dir == dDown)
     {
-        monsterData* player = World.getMonsterManager().Player();
+        MonsterData* player = World.getMonsterManager().Player();
 
         Coord * pos = player->getPosition();
 
@@ -253,7 +247,7 @@ int LevelChange::ClimbEncounter(int dir)
     }
     if (dir == dDown)
     {
-        monsterData* player = World.getMonsterManager().Player();
+        MonsterData* player = World.getMonsterManager().Player();
 
         Coord * pos = player->getPosition();
 
@@ -293,10 +287,10 @@ int LevelChange::ClimbEncounter(int dir)
     return 0;
 }
 
-int LevelChange::ChangeLevel(int dir, monsterData * monster)
+int LevelChange::ChangeLevel(int dir, MonsterData * monster)
 {
     DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
-    monsterData* player = World.getMonsterManager().Player();
+    MonsterData* player = World.getMonsterManager().Player();
     Coord * pos = player->getPosition();
 
     if (World.GetCurrentLevel() == 20) //encounter level
@@ -342,9 +336,8 @@ int LevelChange::ChangeLevel(int dir, monsterData * monster)
 
 void LevelChange::DebugLevel(int dir)
 {
-
     DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
-    monsterData* player = World.getMonsterManager().Player();
+    MonsterData* player = World.getMonsterManager().Player();
     Coord * pos = player->getPosition();
 
     if (dir == 1)
@@ -403,10 +396,12 @@ void LevelChange::DebugLevel(int dir)
         }
 
     }
-    else return;
+    else 
+        return;
     //place player on new map
     new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
 
     player->pos.x = start_pos->x;
     player->pos.y = start_pos->y;
+    player->level = World.GetCurrentLevel();
 }

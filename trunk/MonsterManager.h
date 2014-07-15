@@ -45,21 +45,19 @@ enum eMonsterMajorType
 	Item * weapon;
 };*/
 
-typedef std::vector<monsterData> MONSTERLIST;
+typedef std::vector<MonsterData> MONSTERLIST;
 
 class MonsterManager  
 {
 public:
-	
 	MonsterManager();
-	virtual ~MonsterManager();
 
 	int Initialise();
-	monsterData*  CreateMonster(int major_type, int minor_type,  int level, int x, int y);
+	MonsterData*  CreateMonster(int major_type, int minor_type,  int level, int x, int y);
 	int DestroyMonster(int ref);
 	int DestroyMonster(MONSTERLIST::iterator it);
-	monsterData * FindMonsterData(Monster * monster);
-	monsterData* Player();
+	MonsterData * FindMonsterData(Monster * monster);
+	MonsterData* Player();
 
 	int UpdateMonsters(DungeonLevel* dungeonLevel,ActionManager* actionManager);
 
@@ -71,8 +69,8 @@ public:
 
 	void PrintMonsters();
 
-	int CalculateBrandDamageOnMonster(monsterData *defender, eBrandType brandType, int damage);
-	void RunEffects(monsterData * monster);
+	int CalculateBrandDamageOnMonster(MonsterData *defender, eBrandType brandType, int damage);
+	void RunEffects(MonsterData * monster);
 
     const std::string getDescription(const Monster & monster) const;
 

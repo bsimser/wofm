@@ -14,14 +14,8 @@ RestLevel::RestLevel() :
 rest_count(0),
 encounterFlag(0)
 {
-
     for (int i = 0; i < 4; i++)
         restComplete[i] = 0;
-}
-
-RestLevel::~RestLevel()
-{
-
 }
 
 void RestLevel::Rest(int level)
@@ -31,6 +25,7 @@ void RestLevel::Rest(int level)
     World.getTextManager().SetDisplayLine(0, "Descending into the mountain");
     World.getTextManager().SetDisplayLine(1, "============================");
     World.getTextManager().SetDisplayLine(2, "");
+    
     if (level == 1)
     {
         World.getTextManager().SetDisplayLine(3, "Peering into the gloom you see dark, slimy walls with pools of water on the stone floor.");
@@ -73,9 +68,9 @@ int RestLevel::Resting(int level)
     if (rest_count > 10)
         return 0;
 
-    monsterData* player = World.getMonsterManager().Player();
+    MonsterData* player = World.getMonsterManager().Player();
 
-    if (player->monster.stamina == player->monster.MaxStamina() && player->luck_counter <= 0)
+    if (player->monster.stamina == player->monster.MaxStamina() && player->luck_penalty >= 0)
         return 0;
 
     Rest(level);
@@ -109,17 +104,19 @@ int RestLevel::Resting(int level)
     sleep.append("z");
     World.getTextManager().SetDisplayLine(9, (char *)sleep.c_str());
 
-
-    if (player->monster.stamina != player->monster.MaxStamina())// && rest_count%3 ==0)
+    if (player->monster.stamina != player->monster.MaxStamina())
     {
         player->monster.stamina++;
-
     }
     else if (rest_count == 10 && player->monster.stamina != player->monster.MaxStamina())
         player->monster.stamina++;
 
+    if (player->luck_penalty < 0 && (rest_count % 2) == 0)
+    {
+        player->luck_penalty++;
+    }
+
     player->flee_count = 0;
-    player->luck_counter -= 150;
 
     World.getTextManager().SetDisplayLine(39, "Resting");
 
@@ -128,7 +125,7 @@ int RestLevel::Resting(int level)
 
 void RestLevel::Encounter()
 {
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
     Coord * pos = player->getPosition();
     DungeonLevel * current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
 

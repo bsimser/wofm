@@ -5,7 +5,7 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 0.2.1c"
+#define VERSION "version 0.2.2"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -29,7 +29,7 @@ void StartScreen::Display()
     World.getTextManager().ClearDisplayLines();
 
     World.getTextManager().SetDisplayLine(0, "The Warlock of FIRETOP MOUNTAIN: Roguelike by Corremn");
-    World.getTextManager().SetDisplayLine(1, "=============================================");
+    World.getTextManager().SetDisplayLine(1, "=====================================================");
     World.getTextManager().SetDisplayLine(3, VERSION);
 
     World.getTextManager().SetDisplayLine(5, "Deep in the caverns beneath Firetop Mountain lies an untold wealth of treasure,");
@@ -74,6 +74,7 @@ void StartScreen::Display()
     World.getTextManager().SetDisplayLine(32, "Based on the book by Ian Livingstone & Steve Jackson - 1982.");
     World.getTextManager().SetDisplayLine(33, "Press '?' to get help on commands. Good Luck!");
     World.getTextManager().SetDisplayLine(34, "Press 'F1' for fullscreen.");
+    World.getTextManager().SetDisplayLine(34, "corremn@gmail.com");
 
     World.getTextManager().SetDisplayLine(39, "[space] to Start");
 }

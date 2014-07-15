@@ -20,7 +20,7 @@ void SpellManager::CreateSpell(eSpellList type)
         all_spells.push_back(s);
 }
 
-int SpellManager::CallSpellRoutine(monsterData* caster, int spell) //call spell from list;
+int SpellManager::CallSpellRoutine(MonsterData* caster, int spell) //call spell from list;
 {
     //GetSpell from caster spell list
 
@@ -43,7 +43,7 @@ int SpellManager::CallSpellRoutine(monsterData* caster, int spell) //call spell 
     return 0;
 }
 
-int SpellManager::AddMonsterSpell(monsterData* caster, eSpellList spell)
+int SpellManager::AddMonsterSpell(MonsterData* caster, eSpellList spell)
 {
     SPELLLIST::iterator sp;
 
@@ -65,7 +65,7 @@ int SpellManager::AddMonsterSpell(monsterData* caster, eSpellList spell)
     return 1;
 }
 
-SpellBase* SpellManager::GetMonsterSpell(monsterData*caster, int random_spell)
+SpellBase* SpellManager::GetMonsterSpell(MonsterData*caster, int random_spell)
 {
     MONSTERSPELLLIST::iterator sp;
 
@@ -78,7 +78,7 @@ SpellBase* SpellManager::GetMonsterSpell(monsterData*caster, int random_spell)
     return NULL;
 }
 
-int SpellManager::CastSpell(monsterData* caster, int spell)
+int SpellManager::CastSpell(MonsterData* caster, int spell)
 {
     CastMagic s;
 
@@ -130,7 +130,7 @@ int SpellManager::CastSpell(monsterData* caster, int spell)
     return CANCELED; //never get here
 }
 
-void SpellManager::SpellText(monsterData* caster, const char * spell_name)
+void SpellManager::SpellText(MonsterData* caster, const char * spell_name)
 {
     if (caster->isPlayer())
         World.getTextManager().newLine("You cast %s. ", spell_name);
@@ -138,7 +138,7 @@ void SpellManager::SpellText(monsterData* caster, const char * spell_name)
         World.getTextManager().newLine("The %s %s. ", caster->Name().c_str(), spell_name);
 }
 
-int SpellManager::CastCurrentSpell(monsterData* caster, int targetX, int targetY) //target select spells
+int SpellManager::CastCurrentSpell(MonsterData* caster, int targetX, int targetY) //target select spells
 {
     //CastSpellAt(caster,x,y,currentSpell);
 

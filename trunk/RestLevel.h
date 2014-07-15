@@ -13,7 +13,6 @@ class RestLevel
 {
 public:
 	RestLevel();
-	virtual ~RestLevel();
 
 	void Rest(int level);
 	int Resting(int level);

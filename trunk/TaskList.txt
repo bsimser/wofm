@@ -4,12 +4,15 @@ Warlock Of Firetop Mountain RL (c) Corremn 2014
 Task List
 ---------
 
-Some ideas
-* Make the Maze more confusing. DONE
-* Fix the Enter Name screen.
+Throw cheese (use/target to throw) (pig carcass)
+Eye of Cyclops (use/target - removes one spell and reducess skill by two)
+Wooden stakes (use/direction - double damage to Vampires (4))
+silver arrow (equip - kills undead instantly & breaks)
+DiMaggio's book (use - stops dragon from breathing fire)
 
-glowing prefix to magic items.
+Add rats (chase cheese)
 
+Make enemies (bosses/specials/special items) generate away from start pos.
 
 From the book
 
@@ -18,18 +21,19 @@ wight - imune to weapons need silver
 giant bats - double speed
 winged gremlin
 giant rats
-old man is warewolf
+
 barbarian battle axe
-magic tools?
-crocodile
 maze master
 
 eye of cyclops
-cheese
-y-shaped stick
-potion of invisibility
-silver arrow
 DiMaggio's book
+cheese
+
+MAKE bosses drop special items
+potion of invisibility
+y-shaped stick
 holy water - restore life, luck skill
 rum some health
+
+
  

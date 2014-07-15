@@ -101,6 +101,13 @@ int Monster::dead()
     return 1;
 }
 
+void Monster::setColour(unsigned char c1, unsigned char c2, unsigned char c3)
+{
+    color1 = c1;
+    color2 = c2;
+    color3 = c3;
+}
+
 int Monster::createPlayer()
 {
     symbol = '@';
@@ -111,7 +118,7 @@ int Monster::createPlayer()
     color2 = 200;
     color3 = 40;
 
-    skill = 7 + getInt(5, 1); //8-11
+    skill = 7 + getInt(4, 1); //8-11
     //stamina = getInt(7,1)+ getInt(7,1) + (12-skill); //8 - 18
     stamina = (12 - skill) * 2 + 8 + getInt(3, 1);  //9-18
 
@@ -119,7 +126,8 @@ int Monster::createPlayer()
         luck = 11 + Random::getInt(2, 0);
     if (skill == 11)
         luck = 7 + Random::getInt(2, 0);
-    else luck = 12 - skill + 6 + Random::getInt(3, 0);
+    else 
+        luck = 12 - skill + 6 + Random::getInt(3, 0);
 
     sight_range = 6;
     max_stamina = stamina;
@@ -141,7 +149,7 @@ int Monster::createSpecial(int level)
 
     sight_range = getInt(10, 5);
 
-    special = 1;
+    special = true;
 
     experience = type / 5;
 
@@ -410,7 +418,7 @@ int Monster::createOrc(int level)
         name = ("orc");
         setDescription("A basic orc whose only job is to stop people like you getting in the mountain. ");
 
-        color2 = 200;
+        color2 = 255;
         sight_range = 18;
 
         skill = getInt(9, 6);
@@ -448,7 +456,7 @@ int Monster::createOrc(int level)
     }
     else if (varient < 6)
     {
-        name = ("orc sentry"); color2 = 200;
+        name = ("orc sentry"); color2 = 128;
         setDescription("A slightly better equipped orc than most. He looks like he has been on guard duty a long time. ");
         experience = 6;
     }

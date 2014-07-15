@@ -12,39 +12,38 @@
 #include "monsterManager.h"
 #include "item.h"
 
-class monsterData;
+class MonsterData;
 class Item;
 
 class MonsterItems  
 {
 public:
-	MonsterItems();
-	virtual ~MonsterItems();
 
-	int EquipMonster(monsterData *monster,int level);
-	int EquipPlayer(monsterData *player);
+	int EquipMonster(MonsterData *monster,int level);
+	int EquipPlayer(MonsterData *player);
 
-	int EquipItem(monsterData *monster,int item);
-	int RemoveItem(monsterData *monster);
-	int UseItem(monsterData *monster);
-	int DropItem(monsterData *monster,int item, bool erace_from_inv = true);
-	int PickupItem(monsterData *monster);
-	int DropRandomItems(monsterData *monster);
+	int EquipItem(MonsterData *monster,int item);
+	int RemoveItem(MonsterData *monster);
+    int UseItem(MonsterData *monster, Item & item);
+	int DropItem(MonsterData *monster,int item, bool erace_from_inv = true);
+	int PickupItem(MonsterData *monster);
+	int DropRandomItems(MonsterData *monster);
 
-	int AttemptDropItem(monsterData *monster,Item *item,int x, int y);
+	int AttemptDropItem(MonsterData *monster,Item *item,int x, int y);
 
-	Item * GetEquipment(monsterData *monster,eItemType equip_type);
-	Item * GetInventoryItem(monsterData *monster,eItemType equip_type);
+	Item * GetEquipment(MonsterData *monster,eItemType equip_type);
+	Item * GetInventoryItem(MonsterData *monster,eItemType equip_type);
 
+    bool isBetter(MonsterData &monster, Item &item);
 private:
 
-	int DropItem(monsterData *monster,Item *item,int x, int y);
-	int DropStackableItem(monsterData *monster,Item *item,int x, int y);
+	int DropItem(MonsterData *monster,Item *item,int x, int y);
+	int DropStackableItem(MonsterData *monster,Item *item,int x, int y);
 
-	int moveFromInvToEquipList(monsterData *monster);
-	int moveFromEquipToInvList(monsterData *monster);
-	int moveFromInvToAllList(monsterData *monster);
-	int moveFromAllToInvList(monsterData *monster);
+	int moveFromInvToEquipList(MonsterData *monster);
+	int moveFromEquipToInvList(MonsterData *monster);
+	int moveFromInvToAllList(MonsterData *monster);
+	int moveFromAllToInvList(MonsterData *monster);
 };
 
 #endif // !defined(AFX_MONSTERITEMS_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_)
