@@ -12,7 +12,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-int StandardMonsterActions::ThrowTarget(monsterData* attacker, int targetX, int targetY, eAction action)
+int StandardMonsterActions::ThrowTarget(MonsterData* attacker, int targetX, int targetY, eAction action)
 {
     int ret;
     COORDLIST::iterator it;
@@ -55,12 +55,12 @@ void StandardMonsterActions::ShowTrajectory(int level, int sourceX, int sourceY,
     {
          dungeonLevel.map[it->x][it->y].setSymbol(vSymbol);
         World.Render();
-        Sleep(10);
+        Sleep(32);
         dungeonLevel.map[it->x][it->y].clearSymbol();
     }
 }
 
-int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
+int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 {
     Item* projectilePile = World.getMonsterManager().monsterItems.GetEquipment(attacker, projectile);
     Item* projectileLauncher = World.getMonsterManager().monsterItems.GetEquipment(attacker, projectileWeapon);
@@ -125,7 +125,7 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
     actualProjectile->equipped = 0;
 
     Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = World.getMonsterManager().FindMonsterData(d);
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
     std::string throw_name = actualProjectile->BaseName();
 
@@ -255,7 +255,7 @@ int	StandardMonsterActions::FireItem(monsterData* attacker, int x, int y)
     return 1;
 }
 
-int	StandardMonsterActions::MoveMonster(monsterData* monster, int new_x, int new_y)
+int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new_y)
 {
     if (monster->monster.GetEffect(paralysis))
         return 0;
@@ -293,15 +293,32 @@ int	StandardMonsterActions::MoveMonster(monsterData* monster, int new_x, int new
     //open door
     if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type == closedDoor)   //open door
     {
-        World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
-        if (monster->isPlayer())
-            World.getTextManager().newLine("You open the door. ");
-        else if (monster->isSeen() == 1)
+        if (monster->isHumanoid())
         {
-            World.getTextManager().newLine("The %s opens the door. ", monster->monster.name.c_str());
+            World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
+            if (monster->isPlayer())
+                World.getTextManager().newLine("You open the door. ");
+            else if (monster->isSeen() == 1)
+            {
+                World.getTextManager().newLine("The %s opens the door. ", monster->monster.name.c_str());
+            }
+            else if (monster->isSeen() == 2)
+                World.getTextManager().newLine("A door squeaks. ");
         }
-        else if (monster->isSeen() == 2)
-            World.getTextManager().newLine("A door squeaks. ");
+        else
+        {
+            if (monster->isPlayer())
+                World.getTextManager().newLine("You bang at the door. ");
+            else if (monster->isSeen() == 1)
+                World.getTextManager().newLine("The %s %s at the door. ", monster->monster.name.c_str(), Random::getInt(2, 0) ? "scratches":"bangs");
+            else if (monster->isSeen() == 2)
+                World.getTextManager().newLine("You hear banging. ");
+
+            if (Random::getInt(10, 0) == 0)
+            {
+                World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
+            }
+        }
         return 3;
     }
 
@@ -343,9 +360,9 @@ int	StandardMonsterActions::MoveMonster(monsterData* monster, int new_x, int new
     return 1;
 }
 
-int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
+int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
 {
-    monsterData* defender = World.getMonsterManager().FindMonsterData(World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster());
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster());
 
     if (defender == NULL) 
         return 0;
@@ -453,7 +470,7 @@ int	StandardMonsterActions::AttackMonster(monsterData* attacker, int x, int y)
 }
 
 
-int	StandardMonsterActions::CalculateDamage(monsterData* defender, int attackStr, int defenceStr)
+int	StandardMonsterActions::CalculateDamage(MonsterData* defender, int attackStr, int defenceStr)
 {
     int diff = attackStr - defenceStr;
 
@@ -473,10 +490,10 @@ int	StandardMonsterActions::CalculateDamage(monsterData* defender, int attackStr
 
             return 1;
         }
-        // check luck 50% of time
-        if (Random::getInt(2, 0) == 1)
+        // check luck 66% of time
+        if (Random::getInt(3, 0))
         {
-            if (defender->isPlayer() && defender->Stamina() < 4 && (Random::getInt(7, 1) + Random::getInt(7, 1)) < defender->Luck())
+            if (defender->isPlayer() && defender->Stamina() < 4 && defender->TestLuck(true))
             {
                 World.getTextManager().newLine("Your shield *luckily* partially blocks the attack. ");
                 return 1;
@@ -486,7 +503,7 @@ int	StandardMonsterActions::CalculateDamage(monsterData* defender, int attackStr
     return 2;
 }
 
-int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* defender, Item* attack_weapon)
+int StandardMonsterActions::AddBrandDamage(MonsterData* attacker, MonsterData* defender, Item* attack_weapon)
 {
     int extra_damage = 0;
     int taken_effect = 0;
@@ -557,13 +574,58 @@ int StandardMonsterActions::AddBrandDamage(monsterData* attacker, monsterData* d
 
 }
 
-int	StandardMonsterActions::CastSpell(monsterData*caster, int spellID)
+int	StandardMonsterActions::CastSpell(MonsterData*caster, int spellID)
 {
     return World.getSpellManager().CallSpellRoutine(caster, spellID);
 }
 
-int	StandardMonsterActions::CastTargetSpell(monsterData* caster, eSpellList spell, int TargetX, int TargetY)
+int	StandardMonsterActions::CastTargetSpell(MonsterData* caster, eSpellList spell, int TargetX, int TargetY)
 {
     return World.getSpellManager().CastCurrentSpell(caster, TargetX, TargetY);
     //return caster->NextAction(World.getActionManager().UpdateAction(&caster->action,aCastSpell,TargetX,TargetY));
+}
+
+int	StandardMonsterActions::ThrowItem(MonsterData* attacker, int targetX, int targetY, int inventoryItemRef)
+{
+    // check if has item
+    ITEMLIST::iterator it;
+    Item * throwItem = NULL;
+    for (it = attacker->inventory.begin(); it != attacker->inventory.end(); it++)
+    {
+        if (it->ref == inventoryItemRef)
+        {
+            throwItem = &(*it);
+            break;
+        }
+    }
+    if (!throwItem)
+    {
+        World.getTextManager().newLine("You dont have that item. ");
+        return 0;
+    }
+
+    //remove projectile from inventory and add to ground
+    throwItem->itemNumber[1]--;
+    if (throwItem->itemNumber[1] <= 0) //delete from inventory
+    {
+        attacker->inventory.erase(it);
+    }
+
+    Item* newItem = World.getItemManager().DuplicateItem(throwItem);
+    newItem->itemNumber[1] = 1;
+
+    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, targetX, targetY, throwItem->symbol, throwItem->color1, throwItem->color2, throwItem->color2);
+
+    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[targetX][targetY].GetMonster();
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
+    if (defender)
+    {
+        World.getTextManager().newLine("The %s hits the %s. ", newItem->BaseName().c_str(), defender->Name());
+    }
+    else
+        World.getTextManager().newLine("The %s hits the ground. ", newItem->BaseName().c_str());
+
+    World.getMonsterManager().monsterItems.AttemptDropItem(NULL, newItem, targetX, targetY);
+
+    return 1;
 }

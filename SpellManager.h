@@ -4,7 +4,7 @@
 #include <map>
 #include "SpellBase.h"
 
-class monsterData;
+class MonsterData;
 
 typedef std::list <SpellBase> SPELLLIST;
 typedef std::list <SpellBase*> MONSTERSPELLLIST;
@@ -18,13 +18,13 @@ public:
 
     void CreateSpell(eSpellList type);
 
-    int AddMonsterSpell(monsterData* caster, eSpellList spell);
-    SpellBase* GetMonsterSpell(monsterData*caster, int random_spell);
+    int AddMonsterSpell(MonsterData* caster, eSpellList spell);
+    SpellBase* GetMonsterSpell(MonsterData*caster, int random_spell);
 
 
-    int CallSpellRoutine(monsterData *caster, int spell);
-    int SpellManager::CastSpell(monsterData* caster, int spell);
-    int CastCurrentSpell(monsterData* caster, int x, int y);
+    int CallSpellRoutine(MonsterData *caster, int spell);
+    int SpellManager::CastSpell(MonsterData* caster, int spell);
+    int CastCurrentSpell(MonsterData* caster, int x, int y);
 
     char * GetSpellName(eSpellList id);
 
@@ -34,7 +34,7 @@ private:
     eSpellList currentSpell;
     int CalculateDamage(int attackStr, int defenceStr);
 
-    void SpellText(monsterData* caster, const char * spell_name);
+    void SpellText(MonsterData* caster, const char * spell_name);
 
     //	SPELLMAP spellMap; //contains every of spell
     SPELLLIST all_spells;

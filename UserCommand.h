@@ -32,18 +32,20 @@ public:
 	int UseItem();
 	int UseItem(bool *keys);
 	int Debug(bool *keys);
-	int ThrowItem();
+	int ThrowItem(bool itemCheck = true);
 	int ThrowTarget(eAction action);
 	int CastSpellAtTarget();
 	int Flee();
 	void FleeCommand();
 
+    static void Throw(Item * throwItem);
 private:
     Coord autoTarget();
 
     static Coord look_pos;
 	static int run_dir;
-    static monsterData * lastTarget;
+    static MonsterData * lastTarget;
+    static Item * toThrow;
 };
 
 #endif // !defined(AFX_USERCOMMAND_H__BC2EA827_3C5A_4DA9_B6FE_038B9255531C__INCLUDED_)

@@ -10,16 +10,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-MonsterInfo::MonsterInfo()
-{
-}
-
-MonsterInfo::~MonsterInfo()
-{
-}
-
-
-void MonsterInfo::ShowMonsterInfo(monsterData* monster)
+void MonsterInfo::ShowMonsterInfo(MonsterData* monster)
 {
     //#ifdef _DEBUG
     //	ShowCompleteMonsterInfo(monster);
@@ -28,7 +19,7 @@ void MonsterInfo::ShowMonsterInfo(monsterData* monster)
     //#endif
 
 }
-void MonsterInfo::ShowNormalMonsterInfo(monsterData* monster)
+void MonsterInfo::ShowNormalMonsterInfo(MonsterData* monster)
 {
     World.getTextManager().ClearDisplayLines();
 
@@ -97,11 +88,16 @@ void MonsterInfo::ShowNormalMonsterInfo(monsterData* monster)
     int i = 10;
     for (it = monster->inventory.begin(); it != monster->inventory.end(); it++, i++)
     {
+#ifdef _DEBUG
+        World.getTextManager().SetDisplayLine(i, "%s", it->GetName().c_str());
+#else
         if (it->equipped)
         {
             World.getTextManager().SetDisplayLine(i, "%s", it->GetName().c_str());
         }
-        else i--;
+        else
+            i--;
+#endif
     }
 
     i++;
@@ -132,20 +128,10 @@ void MonsterInfo::ShowNormalMonsterInfo(monsterData* monster)
     {
         World.getTextManager().SetDisplayLine(i, "  %s (%d)", ResistanceBrands::GetResistanceName(resist_it->first), resist_it->second);
     }
-
-    /*EFFECTMAP_CITERATOR eff;
-    for(eff=monster->monster.effectMap.begin();eff != monster->monster.effectMap.end();it++,i++)
-    {
-    if(eff->second > 0)
-    World.getTextManager().SetDisplayLine(i,(char*)effectManager.EffectName(eff->first));
-
-    }*/
     World.getTextManager().SetDisplayLine(39, "[x] to Return to looking.");
-
 }
 
-
-void MonsterInfo::ShowCompleteMonsterInfo(monsterData* monster)
+void MonsterInfo::ShowCompleteMonsterInfo(MonsterData* monster)
 {
     int i;
     for (i = 3; i < 30; i++)
@@ -164,14 +150,13 @@ void MonsterInfo::ShowCompleteMonsterInfo(monsterData* monster)
     sprintf(buf, "Skill: %d(+%d)", monster->AdjustedSkill(), monster->AdjustedSkill() - monster->Skill());
     World.getTextManager().SetDisplayLine(6, buf);
 
-
     switch (monster->GetState())
     {
-    case asleep: sprintf(buf, "State: asleep"); break;
-    case sentry: sprintf(buf, "State: sentry"); break;
-    case normal: sprintf(buf, "State: normal"); break;
+    case asleep: sprintf(buf,  "State: asleep"); break;
+    case sentry: sprintf(buf,  "State: sentry"); break;
+    case normal: sprintf(buf,  "State: normal"); break;
     case hostile: sprintf(buf, "State: hostile"); break;
-    case dead: sprintf(buf, "State: dead"); break;
+    case dead: sprintf(buf,    "State: dead"); break;
     }
 
     World.getTextManager().SetDisplayLine(7, buf);
@@ -212,14 +197,14 @@ void MonsterInfo::ShowCompleteMonsterInfo(monsterData* monster)
     for (eff = monster->monster.effectList.begin(); eff != monster->monster.effectList.end(); eff++, i++)
     {
         if (eff->strength > 0)
-            World.getTextManager().SetDisplayLine(i, (char*)effectManager.EffectName(eff->type));
+            World.getTextManager().SetDisplayLine(i, (char*)effectManager.EffectName(eff->type).c_str());
     }
 
     /*EFFECTMAP_CITERATOR eff;
     for(eff=monster->monster.effectMap.begin();eff != monster->monster.effectMap.end();it++,i++)
     {
     if(eff->second > 0)
-    World.getTextManager().SetDisplayLine(i,(char*)effectManager.EffectName(eff->first));
+    World.getTextManager().SetDisplayLine(i,(char*)effectManager.EffectName(eff->first).c_str());
 
     }*/
 

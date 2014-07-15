@@ -1,20 +1,25 @@
 
 #include "WorldBuilder.h"
-#include ".\monsterdata.h"
+#include ".\MonsterData.h"
 #include "monsterAI.h"
 
-int terrain_attack;
+bool terrain_attack;
 using namespace Random;
 
-monsterData::monsterData(void) :
-experience(0), is_archer(0), kills(0), is_magic(0), miss_turn(0), fleeing(false), flee_count(0), luck_penalty(0), luck_counter(0)
-
+MonsterData::MonsterData(void) :
+experience(0), 
+is_archer(0), 
+kills(0), 
+is_magic(0), 
+miss_turn(0), 
+fleeing(false), 
+flee_count(0), 
+luck_penalty(0)
 {
-    terrain_attack = 1;
-
+    terrain_attack = true;
 }
 
-monsterData::~monsterData(void)
+MonsterData::~MonsterData(void)
 {
 }
 
@@ -23,7 +28,7 @@ monsterData::~monsterData(void)
 
 
 
-int monsterData::NextAction(Action *action)
+int MonsterData::NextAction(Action *action)
 {
     int success = 0;
     static int player_finished_last_action = 1;
@@ -49,11 +54,14 @@ int monsterData::NextAction(Action *action)
     case aDrop:  success = World.getMonsterManager().monsterItems.DropItem(this, action->param1); break;
     case aFire:  success = World.getActionManager().monsterAction.FireItem(this, action->param1, action->param2); break;
     case aCastSpell:  success = World.getActionManager().monsterAction.CastSpell(this, action->param1); break;
-
+    case aThrow:  success = World.getActionManager().monsterAction.ThrowItem(this, action->param1, action->param2, action->param3); break;
+        
     }
 
     if (terrain_attack)
+    {
         TerrainAttack(pos.x, pos.y);
+    }
 
     if (success)
     {
@@ -69,37 +77,19 @@ int monsterData::NextAction(Action *action)
                 monster.color3 = 40;
             }
         }
-        if (luck_penalty < 0)
-        {
-            luck_counter--;
-            if (luck_counter % 1000 == 0)
-                luck_penalty++;
-        }
     }
 
     return success;
 }
 
-int monsterData::TerrainAttack(int x, int y)
+int MonsterData::TerrainAttack(int x, int y)
 {
-
-    terrain_attack = 0;
+    terrain_attack = false;
 
     if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == deepWater && Name() != "crocodile")
     {
-        //	if(pack weight > 100) //drown
-        //	{
-        //		if(stamina == 1)
-        //			World.getTextManager().newLine("Glug Glug!. ");
-        //		else
-        ///		{
-        //			World.getTextManager().newLine("You are drowning. ");
-        //		}
-        //		stamina--;
-        //	}
-
         //Piranhas 
-        int piranhas_attack = getInt(20, 0);//+World.GetCurrentLevel()/2;
+        int piranhas_attack = getInt(20, 0) + World.GetCurrentLevel() / 4;
         if (piranhas_attack > 18)
         {
             if (isPlayer())
@@ -119,9 +109,9 @@ int monsterData::TerrainAttack(int x, int y)
                 World.getTextManager().newLine("There's something in the water!! ");//("Something nibbles at you armour. ");
             else if (isSeen() == 1 && state != asleep)
             {
-                if (isHumanoid())
+                if (isHumanoid() && isSeen() == 1)
                     World.getTextManager().newLine("The %s curses at the water. ", monster.name.c_str());
-                else
+                else if (isSeen() == 1)
                     World.getTextManager().newLine("The %s splashes around frantically. ", monster.name.c_str());
             }
             else if (isSeen() == 2 && state != asleep)
@@ -206,23 +196,22 @@ int monsterData::TerrainAttack(int x, int y)
             }
             else break;
         } while ((slow_swept + 1) > 0);
-
     }
 
-    terrain_attack = 1;
+    terrain_attack = true;
     return 1;
 }
 
-int monsterData::isPlayer()
+int MonsterData::isPlayer()
 {
     if (this == &(*World.getMonsterManager().Player()))
         return 1;
     else return 0;
 }
 
-int monsterData::isSeen()
+int MonsterData::isSeen()
 {
-    monsterData *player = World.getMonsterManager().Player();
+    MonsterData *player = World.getMonsterManager().Player();
     int hear_range = 20;
 
     if (level != World.GetCurrentLevel())
@@ -247,17 +236,13 @@ int monsterData::isSeen()
 
     else return 0;
 }
-void monsterData::UpdateSightRange()
+void MonsterData::UpdateSightRange()
 {
     if (World.GetCurrentLevel() >= 0)
         World.getDungeonManager().level[World.GetCurrentLevel()].LightDungeon(pos.x, pos.y, monster.sight_range);
-    else
-    {
-        int x = 0;
-    }
 }
 
-void monsterData::XP()
+void MonsterData::XP()
 {
     if (experience < 50)
     {
@@ -265,7 +250,7 @@ void monsterData::XP()
 
     else if (experience < 100)
     {
-        if (experience_level != 1)
+        if (experience_level < 1)
         {
             experience_level = 1;
             if (isPlayer())
@@ -273,14 +258,12 @@ void monsterData::XP()
             monster.stamina++;
             monster.max_stamina++;
             World.getSpellManager().AddMonsterSpell(this, spRepelMissiles);
-
-
         }
     }
 
     else if (experience < 200)
     {
-        if (experience_level != 2)
+        if (experience_level < 2)
         {
             experience_level = 2;
             if (isPlayer())
@@ -288,29 +271,27 @@ void monsterData::XP()
             monster.stamina++;
             monster.max_stamina++;
             World.getSpellManager().AddMonsterSpell(this, spSlowEnemies);
-
         }
     }
 
-
     else if (experience < 400)
     {
-        if (experience_level != 3)
+        if (experience_level < 3)
         {
             experience_level = 3;
             if (isPlayer())
                 World.getTextManager().newLine("You gain a level. You feel more skillful. ");
-            monster.skill++;
+            if (monster.skill < 12)
+                monster.skill++;
             monster.stamina++;
             monster.max_stamina++;
             World.getSpellManager().AddMonsterSpell(this, spTeleport);
-
         }
     }
 
     else if (experience < 800)
     {
-        if (experience_level != 4)
+        if (experience_level < 4)
         {
             experience_level = 4;
             if (isPlayer())
@@ -322,7 +303,7 @@ void monsterData::XP()
 
     else if (experience < 1600)
     {
-        if (experience_level != 5)
+        if (experience_level < 5)
         {
             experience_level = 5;
             if (isPlayer())
@@ -335,7 +316,7 @@ void monsterData::XP()
 
     else
     {
-        if (experience_level != 6)
+        if (experience_level < 6)
         {
             experience_level = 6;
             if (isPlayer())
@@ -346,7 +327,7 @@ void monsterData::XP()
 
 }
 
-int monsterData::Items()
+int MonsterData::Items()
 {
     int n = 0;
     ITEMLIST::iterator it;
@@ -359,18 +340,18 @@ int monsterData::Items()
     return n;
 }
 
-int monsterData::Skill()
+int MonsterData::Skill()
 {
     return monster.skill;
 }
 
-std::string monsterData::Name()
+std::string MonsterData::Name()
 {
     return monster.name;
 }
 
 
-int monsterData::AdjustedSkill()
+int MonsterData::AdjustedSkill()
 {
     int skill = monster.skill;
 
@@ -383,12 +364,12 @@ int monsterData::AdjustedSkill()
     return skill;
 }
 
-int monsterData::Stamina()
+int MonsterData::Stamina()
 {
     return monster.stamina;
 }
 
-int monsterData::AttackStrength()
+int MonsterData::AttackStrength()
 {
     int attack = monster.skill;
 
@@ -412,7 +393,7 @@ int monsterData::AttackStrength()
     return attack;
 }
 
-int monsterData::DefendStrength()
+int MonsterData::DefendStrength()
 {
     //defend strength with weapon not armour
     if (state == asleep)
@@ -436,7 +417,31 @@ int monsterData::DefendStrength()
     return defend;
 }
 
-bool monsterData::AbsorbTest()
+bool  MonsterData::TestLuck(bool reduceOnSuccess)
+{
+    bool success = false;
+    if (Random::getInt(7, 1) + Random::getInt(7, 1) <= Luck())
+        success = true;
+
+    if (reduceOnSuccess && success)
+    {
+        if (Luck() > 2)
+            luck_penalty--;
+    }
+
+    return success;
+}
+
+int MonsterData::Luck()
+{ 
+    int currentLuck = monster.luck + luck_penalty; 
+    if (currentLuck < 3)
+        currentLuck = 2;
+    
+    return currentLuck;
+};
+
+bool MonsterData::AbsorbTest()
 {
     bool absorb = false;
 
@@ -453,21 +458,18 @@ bool monsterData::AbsorbTest()
         }
         else
         {
-            // check luck 33% of time
-            if (isPlayer() && Random::getInt(3, 0) == 1)
+            // save player
+            if (isPlayer() && Stamina() < 4 && TestLuck(true))
             {
-                if (Stamina() < 4 && (Random::getInt(7, 1) + Random::getInt(7, 1)) < Luck())
-                {
-                    World.getTextManager().newLine("You feel lucky! ");
-                    absorb = true;
-                }
+                World.getTextManager().newLine("You feel *lucky*! ");
+                absorb = true;
             }
         }
     }
     return absorb;
 }
 
-int monsterData::EquipKey(int level)
+int MonsterData::EquipKey(int level)
 {
     //Item *item = 	World.getItemManager().CreateItem(level,key);
     //	inventory.push_back(*item);
@@ -478,12 +480,15 @@ int monsterData::EquipKey(int level)
     if (level == 4 || level == 9)
         inventory.push_back(*World.getItemManager().CreateItem(level + 10, key)); //special keys
 
+    if (level > 10 && level != 14 && level != 19)
+        inventory.push_back(*World.getItemManager().CreateItem(level, key)); //special keys
+
     return 1;
 }
 
 
 
-void monsterData::Heal()
+void MonsterData::Heal()
 {
     int heal_test = getInt(501, 0);
 
@@ -508,32 +513,32 @@ void monsterData::Heal()
         monster.stamina = monster.MaxStamina();
 }
 
-int monsterData::TestArcher()
+bool MonsterData::TestArcher()
 {
     Item* p = World.getMonsterManager().monsterItems.GetEquipment(this, projectile);
     Item* pw = World.getMonsterManager().monsterItems.GetEquipment(this, projectileWeapon);
 
     if (!p) //no projectiles
     {
-        is_archer = 0;
-        return 0;
+        is_archer = false;
+        return false;
     }
     if (!pw)  //no projectile weapon
     {
         if (p->itemNumber[0] != 0)
         {
-            is_archer = 0;
-            return 0;
+            is_archer = false;
+            return false;
         }
     }
     else if (pw) //projectile weapon
     {
         if (p->itemNumber[0] != pw->itemNumber[0])  //wrong projectiles
         {
-            is_archer = 0;
-            return 0;
+            is_archer = false;
+            return false;
         }
     }
-    is_archer = 1;
-    return 1;
+    is_archer = true;
+    return true;
 }

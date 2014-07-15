@@ -4,6 +4,7 @@
 
 #include "InventoryManager.h"
 #include "WorldBuilder.h"
+#include <algorithm>
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
@@ -191,6 +192,7 @@ int InventoryManager::ShowInventory(int type)
             World.getTextManager().SetDisplayLine(12,buf);*/
     }
 
+    //std::sort(inventory->begin(), inventory->end());
     inventory->sort();
     i = 3;
 
@@ -223,7 +225,7 @@ int InventoryManager::ShowInventory(int type)
 
 int InventoryManager::EquipMessage()
 {
-    World.getTextManager().SetDisplayLine(39, "Choose a item to equip\\unequip, [x] cancel");
+    World.getTextManager().SetDisplayLine(39, "Choose a item to use\\unequip, [x] cancel");
     return 1;
 }
 
@@ -251,7 +253,7 @@ int InventoryManager::Unequip(int item)
     ITEMLIST::iterator it;
 
     ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
-    monsterData *player = World.getMonsterManager().Player();
+    MonsterData *player = World.getMonsterManager().Player();
 
     int i = 0;
 
@@ -271,3 +273,8 @@ int InventoryManager::Unequip(int item)
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
+
+void InventoryManager::setState(EInvState newState)
+{
+    mState = newState;
+}

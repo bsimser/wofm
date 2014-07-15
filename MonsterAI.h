@@ -26,23 +26,23 @@ public:
 	MonsterAI();
 	virtual ~MonsterAI();
 
-	int ProcessIntelligence(monsterData* monster);
+	int ProcessIntelligence(MonsterData* monster);
 
 private:
 	
-	eMonsterState UpdateMonsterState(monsterData* monster);
-	int Detect(monsterData* monster);
-	int	DetermineAction(monsterData* monster);
-	int RandomMove(monsterData* monster);
-	int ChasePlayer(monsterData* monster);
-	int AttackPlayer(monsterData* monster);
-	int DistanceAttackMonster(monsterData* monster);
-	void DoNothing(monsterData* monster);
-	int DistanceAttackPlayer(monsterData* monster);
-	int MagicAttackPlayer(monsterData* monster);
+	eMonsterState UpdateMonsterState(MonsterData* monster);
+	int Detect(MonsterData* monster);
+	int	DetermineAction(MonsterData* monster);
+	int RandomMove(MonsterData* monster);
+	int ChasePlayer(MonsterData* monster);
+	int AttackPlayer(MonsterData* monster);
+	int DistanceAttackMonster(MonsterData* monster);
+	void DoNothing(MonsterData* monster);
+	int DistanceAttackPlayer(MonsterData* monster);
+	int MagicAttackPlayer(MonsterData* monster);
 	
-	int ProcessEffects(monsterData* monster);
-	int	EffectAction(monsterData* monster,eEffect effect,int strength); //run effects I.e confused
+	int ProcessEffects(MonsterData* monster);
+	int	EffectAction(MonsterData* monster,eEffect effect,int strength); //run effects I.e confused
 
 	
 	int DetectPlayer(int m_x,int m_y,int *p_x,int *p_y);

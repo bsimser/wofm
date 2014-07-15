@@ -30,7 +30,6 @@ int DungeonManager::BuildCompleteDungeon(int max_num_levels)
             CreateDungeon(i, i);
             PopulateDungeon(i);
         }
-
     }
     catch (const std::exception & ex)
     {
@@ -44,7 +43,6 @@ int DungeonManager::BuildCompleteDungeon(int max_num_levels)
         std::stringstream err;
         err << "Unknown exception while creating and populating standard dungeon" << " on level: " << i;
         throw std::exception(err.str().c_str());
-
     }
 
     CreateLockedDungeon();
@@ -52,7 +50,7 @@ int DungeonManager::BuildCompleteDungeon(int max_num_levels)
     try
     {
         CreateSpecialDungeon();
-        AddKeysToDungeon();
+        //AddKeysToDungeon(); move to before zagors chest is created
     }
     catch (const std::exception&)
     {
@@ -141,6 +139,28 @@ int DungeonManager::AddItems(int lev)
         }
     }
 
+    Coord * pos = level[lev].FreeTerrainPosition(random);
+
+    if (pos)
+    {
+        switch (Random::getInt(5,0))
+        {
+        case 0: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, corpse)); break;
+        case 1: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, weapon)); break;
+        case 2: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, armour)); break;
+        case 3: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, shield)); break;
+        case 4: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, projectile)); break;
+
+        default: level[lev].map[pos->x][pos->y].terrain.Create(fountain); break;
+
+        }
+        if (Random::getInt(2, 0))
+        {
+            World.getMonsterManager().CreateMonster(mRandom, 0, 20, pos->x, pos->y)->SetState(sentry);
+        }
+        
+    }
+
     /*	if(lev==1)
         {
         Coord* pos = level[lev].NewItemPosition();
@@ -161,7 +181,9 @@ int DungeonManager::PopulateDungeon(int lev)
     if (lev == 0) //first level add player
     {
         Coord *start = level[lev].getStartPos(); //get starting point (up stairs)
-        monsterData* player = World.getMonsterManager().CreateMonster(mPlayer, sub_type, 0, start->x, start->y);
+        MonsterData* player = World.getMonsterManager().CreateMonster(mPlayer, sub_type, 0, start->x, start->y);
+
+        player->SetState(normal);
 
         if (fopen("Zagor", "r"))
         {
@@ -190,7 +212,7 @@ int DungeonManager::PopulateDungeon(int lev)
             int type = mUndead;//Random::getInt(1,1);
 
             Coord *pos = NewMonsterPosition(lev); //??
-            monsterData *mob = World.getMonsterManager().CreateMonster(type, Random::getInt(4, 0), lev, pos->x, pos->y);
+            MonsterData *mob = World.getMonsterManager().CreateMonster(type, Random::getInt(4, 0), lev, pos->x, pos->y);
 
             	std::string name = mob->Name();
             //	if(name.find("Ghoul") !=-1 )
@@ -207,7 +229,7 @@ int DungeonManager::PopulateDungeon(int lev)
         if (!pos)
             pos = NewMonsterPosition(lev);
 
-        monsterData *gog = World.getMonsterManager().CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
+        MonsterData *gog = World.getMonsterManager().CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
 
         pos = NewBridgePosition(lev); //??
         if (!pos)
@@ -279,7 +301,7 @@ int DungeonManager::PopulateDungeon(int lev)
         // create level guardian
         Coord *pos = NewMonsterPosition(lev); //??
         if (lev != 9)
-            monsterData * special = World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
+            MonsterData * special = World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
     }
     if (lev == 4) //river level
     {
@@ -298,7 +320,7 @@ int DungeonManager::PopulateDungeon(int lev)
     if (lev == 9) //end level
     {
         Coord *pos = NewMonsterPosition(lev); //??
-        monsterData* wiz = World.getMonsterManager().CreateMonster(mWizard, sub_type, lev, pos->x, pos->y);
+        MonsterData* wiz = World.getMonsterManager().CreateMonster(mWizard, sub_type, lev, pos->x, pos->y);
         World.getSpellManager().AddMonsterSpell(wiz, spRepelMissiles);
         World.getSpellManager().AddMonsterSpell(wiz, spTeleport);
         World.getSpellManager().AddMonsterSpell(wiz, spFlyingWeapon);
@@ -318,10 +340,10 @@ int DungeonManager::PopulateDungeon(int lev)
     {
         //	Coord* pos = level[lev].NewItemPosition();
         //level[lev].map[3][3].AssignItem( World.getItemManager().CreateItem(lev,lockedChest));
-
     }
 
 #endif
+
 
     return 1;
 }
@@ -360,7 +382,8 @@ void DungeonManager::CreateSpecialDungeon()
             }
             else if (i == 1 || i == 2 || i == 3)
             {
-                if (/*getInt(1, 1) == 1 &&*/ i == 1) // %100
+                // barracks
+                if (/*getInt(1, 1) == 1 &&*/ i == 1) // %100 
                 {
                     CreateDungeon(i + 10, slBarracks);
                     PopulateSpecialDungeon(i + 10, slBarracks);
@@ -372,9 +395,10 @@ void DungeonManager::CreateSpecialDungeon()
 
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
-                else if (i == 2 && special_type1 == 0 && Random::getInt(2,0)) // 50%
+                // troll cave
+                else if (i == 2 && special_type1 == 0 && Random::getInt(2, 0)) // 50%
                 {
-                    CreateDungeon(i + 10, i + 10);
+                    CreateDungeon(i + 10, slTrollCave);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
@@ -386,6 +410,7 @@ void DungeonManager::CreateSpecialDungeon()
                     pos = level[i + 10].NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
+                // ogre cave
                 else if (i == 3 && special_type1 == 0) // 50 %
                 {
                     CreateDungeon(i + 10, i + 10);
@@ -401,7 +426,8 @@ void DungeonManager::CreateSpecialDungeon()
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
-            else if (i == 4) // boat house - skeletons
+            // boat house - skeletons
+            else if (i == 4) 
             {
                 Coord *pos;
                 CreateDungeon(i + 10, slBoatHouse);
@@ -423,12 +449,13 @@ void DungeonManager::CreateSpecialDungeon()
                 //pos = level[i + 10].NewSpecialItemPosition(); //??
                 World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
             }
+            // spider cave
             else if (i == 5 || i == 6)
             {
                 if (i == 5 && getInt(2, 0) == 1)
                 {
-                    CreateDungeon(i + 10, i + 10);
-                    PopulateSpecialDungeon(i + 10, slRandom);
+                    CreateDungeon(i + 10, slSpiderCave);
+                    PopulateSpecialDungeon(i + 10, slSpiderCave);
                     //choose one entrances
                     Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
@@ -440,6 +467,7 @@ void DungeonManager::CreateSpecialDungeon()
                     pos = level[i + 10].NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
+                // sandworm
                 else if (i == 6 && special_type2 == 0)
                 {
                     CreateDungeon(i + 10, i + 10);
@@ -457,10 +485,11 @@ void DungeonManager::CreateSpecialDungeon()
             }
             else if (i == 7 || i == 8)
             {
+                // undead
                 if (i == 7 && getInt(2, 0) == 1)
                 {
-                    CreateDungeon(i + 10, i + 10);
-                    PopulateSpecialDungeon(i + 10, slRandom);
+                    CreateDungeon(i + 10, slUndead);
+                    PopulateSpecialDungeon(i + 10, slUndead);
                     //choose special undead level
                     Coord *pos = NewMonsterPosition(i);
                     level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
@@ -472,6 +501,7 @@ void DungeonManager::CreateSpecialDungeon()
                     pos = level[i + 10].NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
+                // minotaur
                 else if (i == 8 && special_type3 == 0)
                 {
                     CreateDungeon(i + 10, i + 10);
@@ -487,6 +517,7 @@ void DungeonManager::CreateSpecialDungeon()
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
+            //dragon
             else if (i == 9)
             {
                 CreateDungeon(i + 10, i + 10);
@@ -496,11 +527,14 @@ void DungeonManager::CreateSpecialDungeon()
                 Coord *pos = NewMonsterPosition(i);
                 level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
 
+                AddKeysToDungeon();
+
+                // zagor locked chest
                 pos = level[i + 10].NewSpecialItemPosition();
                 level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                 pos = level[i + 10].NewSpecialItemPosition(); //??
-                monsterData *dragon = World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
+                MonsterData *dragon = World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
 
                 World.getSpellManager().AddMonsterSpell(dragon, spDragonFire);
 
@@ -613,7 +647,26 @@ void DungeonManager::PopulateSpecialDungeon(int lev, int type)
             World.getMonsterManager().CreateMonster(type, skeleton, lev, pos->x, pos->y);
         }
     }
-     
+    else if (type == slSpiderCave) //skeleton level
+    {
+        int max_monsters = Random::getInt(15, 12);
+
+        for (int i = 0; i < max_monsters; i++)
+        {
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(mRandom, RandomMonster::spider, lev, pos->x, pos->y);
+        }
+    }
+    else if (type == slUndead) //skeleton level
+    {
+        int max_monsters = Random::getInt(15, 12);
+
+        for (int i = 0; i < max_monsters; i++)
+        {
+            Coord *pos = NewMonsterPosition(lev); //??
+            World.getMonsterManager().CreateMonster(mUndead, Random::getInt(vampire+1, skeleton), lev, pos->x, pos->y);
+        }
+    }
     else	//random level
     {
         int max_monsters = Random::getInt(10, 6);
@@ -651,7 +704,7 @@ int DungeonManager::AddKeysToDungeon()
     //////add keys//////
     for (int ind = 10; ind < 20; ind++)
     {
-        int rand_level = Random::getInt(ind - 1, 1); //key can be anywhere below current level. 
+        int rand_level = Random::getInt(ind - 1, 1); // key can be anywhere below current level. 
         //I.e key for level 15 (special level 5) can be anywhere below level 150
         if (!level[rand_level].initialised)
         {
@@ -690,12 +743,38 @@ int DungeonManager::AddKeysToDungeon()
             ind--;
         }
     }
+
     return 1;
 }
-
 
 DungeonLevel* DungeonManager::CurrentLevel()
 {
     return &level[World.GetCurrentLevel()];
 }
 
+std::string DungeonManager::getLevelName(int level)
+{
+    if (level == 0)
+    {
+        return "outside";
+    }
+    else if (level == 1) return "1";
+    else if (level == 2) return "2";
+    else if (level == 3) return "3";
+    else if (level == 4) return "4";
+    else if (level == 5) return "5";
+    else if (level == 6) return "6";
+    else if (level == 7) return "7";
+    else if (level == 8) return "maze";
+    else if (level == 9) return "9";
+    else if (level == 11) return "barracks";
+    else if (level == 12) return "cave";
+    else if (level == 13) return "cave";
+    else if (level == 14) return "boathouse";
+    else if (level == 15) return "dusty cave";
+    else if (level == 16) return "cave";
+    else if (level == 17) return "musty rooms";
+    else if (level == 18) return "deep rooms";
+    else if (level == 19) return "treasure rooms";
+    return "unknown";
+}

@@ -4,7 +4,6 @@
 
 #pragma warning(disable : 4786) 
 
-
 #include "WorldBuilder.h"
 
 #include "monsterAi.h"
@@ -20,14 +19,9 @@ using namespace Random;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-MonsterManager::MonsterManager()
+MonsterManager::MonsterManager():
+m_monsterNum(0)
 {
-    m_monsterNum = 0;
-}
-
-MonsterManager::~MonsterManager()
-{
-
 }
 
 int MonsterManager::Initialise()
@@ -36,10 +30,9 @@ int MonsterManager::Initialise()
     return 1;
 }
 
-
-monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int level, int x, int y)
+MonsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int level, int x, int y)
 {
-    monsterData new_monster;
+    MonsterData new_monster;
 
     //select monsters
     switch (major_type)
@@ -52,11 +45,9 @@ monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     case mWizard:	new_monster.monster.Create(mSpecial, level); break;
     case mPlayer:	new_monster.monster.Create(mPlayer, level); break;
     case mBridgeMaster:	new_monster.monster.Create(mBridgeMaster, level); break; //special case
-    case mRandom:{	RandomMonster random; random.Create(level); new_monster.monster = random; }break;
+    case mRandom:{	RandomMonster random; random.Create(level, minor_type); new_monster.monster = random; }break;
 
     default: new_monster.monster.Create(major_type, level); break;
-
-
     }
     new_monster.experience_level = level;
 
@@ -83,17 +74,16 @@ monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     //monster ref
     new_monster.ref = m_monsterNum++;
 
-
     //set special states
     if (new_monster.monster.name == "orc sentry")
         new_monster.SetState(sentry);
 
     int asleep_test = getInt(100, 0);
-    if (new_monster.GetState() == sentry) asleep_test += 40; //40 %more chance that sentry will be asleep
+    if (new_monster.GetState() == sentry) 
+        asleep_test += 40; //40 %more chance that sentry will be asleep
 
     if (asleep_test > 90 + level && major_type != 0) //10% - level that creature will be asleep
         new_monster.SetState(asleep);
-
 
     //monster will not chase player unless seen
     new_monster.go_to.x = -1;
@@ -106,14 +96,12 @@ monsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     // natural resistances
     if (new_monster.isUndead())
     {
-
     }
 
     //put monster in list //cannot use isPlayer until after this
     monster_list.push_back(new_monster);
 
     return &monster_list.back();
-
 }
 
 int MonsterManager::DestroyMonster(int ref)
@@ -130,14 +118,11 @@ int MonsterManager::DestroyMonster(int ref)
             return 1;
         }
     }
-
     return 0;
-
 }
 
 int MonsterManager::DestroyMonster(MONSTERLIST::iterator it)
 {
-
     //remove from map;
     Coord * pos = it->getPosition();
     World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
@@ -145,25 +130,20 @@ int MonsterManager::DestroyMonster(MONSTERLIST::iterator it)
     monster_list.erase(it); //remove from list
 
     return 1;
-
 }
 
-monsterData * /*MONSTERLIST::iterator */MonsterManager::Player()
+MonsterData * /*MONSTERLIST::iterator */MonsterManager::Player()
 {
-    static monsterData * player = &(*monster_list.begin());
+    static MonsterData * player = &(*monster_list.begin());
     return player;
 }
-
 
 int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* actionManager)
 {
     dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
 
     //check status
-
-    MONSTERLIST::iterator r_it;
-
-    for (r_it = monster_list.begin(); r_it != monster_list.end();)
+    for (MONSTERLIST::iterator r_it = monster_list.begin(); r_it != monster_list.end();)
     {
         if (r_it->monster.stamina < 1) //death
         {
@@ -171,7 +151,24 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
             {
                 World.getTextManager().newLine("You die. ");
                 World.getDeathMessage().ShowDeath(0);
-                Sleep(1000);
+
+                // death flash
+                int c1 = r_it->monster.color1;
+                int c2 = r_it->monster.color2;
+                int c3 = r_it->monster.color3;
+                for (int i = 0; i < 10; i++)
+                {
+                    r_it->monster.color1 = 255;
+                    r_it->monster.color2 = 0;
+                    r_it->monster.color3 = 0;
+                    World.Render();
+                    Sleep(50 );
+                    r_it->monster.color1 = c1;
+                    r_it->monster.color2 = c2;
+                    r_it->monster.color3 = c3;
+                    World.Render();
+                    Sleep(50);
+                }
                 World.SetState(sDeath);
                 return 0;
             }
@@ -196,22 +193,19 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
                 World.getTextManager().newLine("'And the mad wizard falls...hahaha'. ");
             }
 
-            //DestroyMonster(r_it->ref);
-
             //remove from map;
             Coord * pos = r_it->getPosition();
             World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
 
             r_it = monster_list.erase(r_it); //remove from list
-
         }
-        else 
+        else
+        {
             r_it++;
+        }
     }
 
     //update monster/player with new positions
-
-
     for (MONSTERLIST::iterator it = monster_list.begin(); it != monster_list.end(); it++)
     {
         //RunEffects(&(*it));
@@ -229,11 +223,8 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
                 //it->monster.AddEffect(paralysis,3);
                 //it->monster.AddEffect(teleportitus,3);
                 //it->monster.AddEffect(confused,3);
-
-
                 //	gogo =1;
             }
-
         }
         else
         {
@@ -265,7 +256,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
 
     if (World.getMonsterManager().monster_list.size() == 1 && World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), gold) != NULL)
     {
-        World.getDeathMessage().SetDeathMessage(" killed all that moved and acquired the treasure. WOW!");
+        World.getDeathMessage().SetDeathMessage("killed all that moved and acquired the treasure. WOW!");
         World.getDeathMessage().ShowDeath(1);
         Sleep(1000);
         World.SetState(sDeath);
@@ -274,7 +265,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
     return 1;
 }
 
-monsterData * MonsterManager::FindMonsterData(Monster * monster)
+MonsterData * MonsterManager::FindMonsterData(Monster * monster)
 {
     if (monster == NULL)
         return NULL;
@@ -289,7 +280,7 @@ monsterData * MonsterManager::FindMonsterData(Monster * monster)
     return NULL;
 }
 
-int MonsterManager::CalculateBrandDamageOnMonster(monsterData *defender, eBrandType brandType, int damage)
+int MonsterManager::CalculateBrandDamageOnMonster(MonsterData *defender, eBrandType brandType, int damage)
 {
     int new_damage = damage;
     int monster_resistance = 0;
@@ -312,7 +303,6 @@ int MonsterManager::CalculateBrandDamageOnMonster(monsterData *defender, eBrandT
         int res = it->GetResistance(brandType);
         if (res > highest_res)
             highest_res = res;
-
     }
 
 
@@ -324,11 +314,10 @@ int MonsterManager::CalculateBrandDamageOnMonster(monsterData *defender, eBrandT
 
     new_damage = (int)((damage* modifier) + .5f);
 
-
     return new_damage;
 }
 
-void MonsterManager::RunEffects(monsterData * monster)
+void MonsterManager::RunEffects(MonsterData * monster)
 {
     /*EFFECTMAP_CITERATOR it;
     EffectManager effectManager;
@@ -352,13 +341,13 @@ void MonsterManager::PrintMonsters()
 
     ofile << "Creatures" << std::endl;
 
-    ofile << "Name Level Skill Stamina" << std::endl;
+    ofile << "Name,Skill,Stamina,Humanoid" << std::endl;
 
     MONSTERLIST::iterator it;
 
     for (it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
     {
-        ofile << it->monster.name << " " << it->level << " " << it->monster.skill << " " << it->monster.stamina << " X:" << it->pos.x << " Y:" << it->pos.y;
+        ofile << it->monster.name << "," << (int)it->monster.skill << "," << (int)it->monster.stamina << "," << (it->isHumanoid()?"true":"false");
         ofile << std::endl;
     }
     ofile.close();

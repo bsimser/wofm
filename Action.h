@@ -18,7 +18,8 @@ enum eAction
 	aPickup,
 	aDrop,
 	aCastSpell,
-	aFire
+    aFire,
+    aThrow
 };
 
 
@@ -26,7 +27,6 @@ class Action
 {
 public:
 	Action();
-	virtual ~Action();
 
 	void CreateAction(eAction _type);
 

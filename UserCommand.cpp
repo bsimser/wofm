@@ -16,11 +16,12 @@
 
 Coord UserCommand::look_pos;
 int UserCommand::run_dir;
-monsterData * UserCommand::lastTarget = NULL;
+MonsterData * UserCommand::lastTarget = NULL;
+Item * UserCommand::toThrow = NULL;
 
 Coord UserCommand::autoTarget()
 {
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
     DungeonLevel * level = World.getDungeonManager().Level(player->level);
 
     int pX = player->pos.x;
@@ -56,16 +57,16 @@ Coord UserCommand::autoTarget()
     return lastTarget ? lastTarget->pos : player->pos;
 }
 
-int UserCommand::ThrowItem()
+int UserCommand::ThrowItem(bool itemCheck)
 {
     UnLook();
-    if (!World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), projectile))
+    if (itemCheck && !World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), projectile))
     {
         World.getTextManager().newLine("Nothing to fire. ");
         return 0;
     }
     look_pos = autoTarget();
-    
+
     bool keys[256] = { 0 };
     Look(keys, true);
 
@@ -81,19 +82,19 @@ int UserCommand::ThrowTarget(eAction action)
     // set auto target
 
     DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
-    monsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
 
     if (monster)
         lastTarget = monster;
     //else
     //    lastTarget = NULL;
 
-     return World.getActionManager().monsterAction.ThrowTarget(World.getMonsterManager().Player(), look_pos.x, look_pos.y, action);
+    return World.getActionManager().monsterAction.ThrowTarget(World.getMonsterManager().Player(), look_pos.x, look_pos.y, action);
 }
 
 int UserCommand::Flee()
 {
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
     if (player->fleeing == true)
     {
         World.getTextManager().newLine("You are already fleeing. ");
@@ -111,7 +112,7 @@ int UserCommand::CastSpellAtTarget()
     UnLook();
 
     DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
-    monsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
 
     if (monster)
         lastTarget = monster;
@@ -187,10 +188,10 @@ int UserCommand::Look(bool *keys, bool show_path)
         case dSouthWest: look_pos.x--; look_pos.y++; break;
         case dNorthWest: look_pos.x--; look_pos.y--; break;
 
-        default: 
+        default:
             if (show_path)
             {
-                monsterData * player = World.getMonsterManager().Player();
+                MonsterData * player = World.getMonsterManager().Player();
                 int p_x = player->pos.x;
                 int p_y = player->pos.y;
                 DungeonLevel *lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
@@ -205,11 +206,11 @@ int UserCommand::Look(bool *keys, bool show_path)
         if (look_pos.y < 0) look_pos.y = 0;
         if (look_pos.y > DUNGEON_SIZE_H - 1) look_pos.y = DUNGEON_SIZE_H - 1;
 
-        if (World.State() == sThrow || World.State() == sTargetSpell) //throwing not looking
+        if (World.State() == sFire || World.State() == sThrow || World.State() == sTargetSpell) //throwing not looking
         {
             if (show_path)
             {
-                monsterData * player = World.getMonsterManager().Player();
+                MonsterData * player = World.getMonsterManager().Player();
                 int p_x = player->pos.x;
                 int p_y = player->pos.y;
                 DungeonLevel *lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
@@ -225,13 +226,13 @@ int UserCommand::Look(bool *keys, bool show_path)
             level->map[look_pos.x][look_pos.y].show_target = 1;
     }
 
-    if (!level->map[look_pos.x][look_pos.y].terrain.found ) //dont show
+    if (!level->map[look_pos.x][look_pos.y].terrain.found) //dont show
     {
         World.getTextManager().newLine("You have not been here yet. ");
     }
     else if (level->map[look_pos.x][look_pos.y].GetMonster() && level->map[look_pos.x][look_pos.y].terrain.light) //display monsters
     {
-        monsterData * monster = World.getMonsterManager().FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster());
+        MonsterData * monster = World.getMonsterManager().FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster());
 
         if (World.State() == sLookMore)
         {
@@ -265,7 +266,7 @@ int UserCommand::Look(bool *keys, bool show_path)
             switch (state)
             {
             case normal:	strcpy(status, "It does not care about you"); break;
-            case sentry:	strcpy(status, "It appears asleep"); break;
+            case sentry:	strcpy(status, "It appears sleepy"); break;
             case hostile:	strcpy(status, "It is hostile"); break;
             case waking:	strcpy(status, "It looked annoyed"); break;
             case asleep:	strcpy(status, "It is asleep"); break;
@@ -279,17 +280,23 @@ int UserCommand::Look(bool *keys, bool show_path)
     }
     else if (level->map[look_pos.x][look_pos.y].getItem()) //display items
     {
+        Item * item = level->map[look_pos.x][look_pos.y].getItem();
         if (level->map[look_pos.x][look_pos.y].terrain.light)
         {
-            if (level->map[look_pos.x][look_pos.y].getItem()->stackable() && level->map[look_pos.x][look_pos.y].getItem()->itemNumber[1] > 1)
-                World.getTextManager().newLine("You see some %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName().c_str());
+            if (item->stackable() && item->itemNumber[1] > 1)
+            {
+                if (item->identified)
+                    World.getTextManager().newLine("You see %s here.", item->GetName().c_str());
+                else
+                    World.getTextManager().newLine("You see some %s here.", item->GetName().c_str());
+            }
             else if (level->map[look_pos.x][look_pos.y].getItem()->identified)
-                World.getTextManager().newLine("You see a %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName().c_str());
+                World.getTextManager().newLine("You see a %s.", item->GetName().c_str());
             else
-                World.getTextManager().newLine("You see an %s.", level->map[look_pos.x][look_pos.y].getItem()->GetName().c_str());
+                World.getTextManager().newLine("You see an %s.", item->GetName().c_str());
         }
         else
-            World.getTextManager().newLine("Last time you looks this was a %s.", level->map[look_pos.x][look_pos.y].getItem()->BaseName().c_str());
+            World.getTextManager().newLine("Last time you looks this was a %s.", item->BaseName().c_str());
     }
     else //display terrain
     {
@@ -314,7 +321,7 @@ int UserCommand::Look()
 {
     World.getTextManager().newLine("Use direction keys to look[dir]. [x] to cancel. ");
 
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
 
     Coord * pos = player->getPosition();
 
@@ -397,7 +404,7 @@ int UserCommand::GetDirection(bool *keys)
 
 int UserCommand::FleeCommand(int  dir)
 {
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
 
 
     if (player->fleeing == true)
@@ -442,7 +449,7 @@ int UserCommand::FleeCommand(int  dir)
         if (player->NextAction(World.getActionManager().UpdateAction(&player->action, aMove, new_pos.x, new_pos.y)))
         {
             //FleeTest
-            if (Random::getInt(7, 1) + Random::getInt(7, 1) > player->Luck())
+            if (!player->TestLuck(false))
             {
                 World.getTextManager().newLine("You fail to flee. ");
                 return 1;
@@ -456,9 +463,7 @@ int UserCommand::FleeCommand(int  dir)
             player->monster.color2 = 128;
             player->monster.color3 = 64;
 
-            player->luck_counter += 1000;//Random::getInt(1000,800);
-            if (player->Luck() > 5) //5 is luck min
-                player->luck_penalty--;
+            player->luck_penalty--;
 
             return 0; //return 0 to get a free movement turn.
         }
@@ -471,7 +476,7 @@ int UserCommand::FleeCommand(int  dir)
 
 int UserCommand::MoveCommand(int  dir)
 {
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
 
     Coord * pos = player->getPosition();
     Coord new_pos;
@@ -515,10 +520,10 @@ int UserCommand::MoveCommand(int  dir)
                 {
                     Item* projectilePile = World.getMonsterManager().monsterItems.GetEquipment(player, projectile);
                     if (projectilePile && projectilePile->secondaryType == item->secondaryType &&
-                        projectilePile->skill_bonus     == item->skill_bonus  &&
-                        projectilePile->BaseName()      == item->BaseName()   &&
-                        projectilePile->getPrefix()     == item->getPrefix()  &&
-                        projectilePile->getPostfix()    == item->getPostfix() &&
+                        projectilePile->skill_bonus == item->skill_bonus  &&
+                        projectilePile->BaseName() == item->BaseName() &&
+                        projectilePile->getPrefix() == item->getPrefix() &&
+                        projectilePile->getPostfix() == item->getPostfix() &&
                         item->identified)
                     {
                         player->NextAction(World.getActionManager().UpdateAction(&player->action, aPickup, new_pos.x, new_pos.y));
@@ -526,11 +531,22 @@ int UserCommand::MoveCommand(int  dir)
                     }
 
                 }
+                /*  else if (item->type == key)
+                  {
+                  player->NextAction(World.getActionManager().UpdateAction(&player->action, aPickup, new_pos.x, new_pos.y));
+                  pickup = true;
+                  }*/
+
                 if (!pickup)
                 {
                     DungeonLevel* level = &World.getDungeonManager().level[World.GetCurrentLevel()];
                     if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->itemNumber[1] > 1)
-                        World.getTextManager().newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                    {
+                        if (item->identified)
+                            World.getTextManager().newLine("You see %s here.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                        else
+                            World.getTextManager().newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                    }
                     else if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->identified)
                         World.getTextManager().newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
                     else
@@ -561,7 +577,7 @@ int UserCommand::Close(bool *keys)
         return -1;
     }
 
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
 
     Coord * pos = player->getPosition();
     Coord new_pos;
@@ -625,7 +641,7 @@ int UserCommand::RunDirection(int dir)
 int UserCommand::Run()
 {
 
-    monsterData *player = World.getMonsterManager().Player();
+    MonsterData *player = World.getMonsterManager().Player();
 
     Coord * pos = player->getPosition();
     Coord new_pos;
@@ -657,8 +673,8 @@ int UserCommand::Run()
     for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
     { //is this too slow? seems OK to me
         if (it->level == World.GetCurrentLevel() && !it->isPlayer())
-        if (it->isSeen() == 1)
-            return 0;
+            if (it->isSeen() == 1)
+                return 0;
     }
 
 
@@ -732,7 +748,7 @@ int UserCommand::DisplayHelpAbout()
     World.getTextManager().SetDisplayLine(5, "This game was originally created for the 2007 seven-day roguelike competition. ");
     World.getTextManager().SetDisplayLine(5, "See changelog.txt for recent developments. ");
 
-    World.getTextManager().SetDisplayLine(9,  "You are seeking the Warlock Zagor's Treasure. In your way are the inhabitants");
+    World.getTextManager().SetDisplayLine(9, "You are seeking the Warlock Zagor's Treasure. In your way are the inhabitants");
     World.getTextManager().SetDisplayLine(10, "of the mountain, underground rivers, locked gates and of course the warlock himself.");
     World.getTextManager().SetDisplayLine(11, "Of course you will find plenty of items within the mountain to help you in your quest.");
 
@@ -777,16 +793,16 @@ int UserCommand::DisplayHelp()
     World.getTextManager().SetDisplayLine(8, " fire ranged weapon - [numpad f]");
     World.getTextManager().SetDisplayLine(9, " flee               - [F]");
     World.getTextManager().SetDisplayLine(10, " pickup             - [g] or [,]");
-    World.getTextManager().SetDisplayLine(11, " look               - [l] + [dir]");
     World.getTextManager().SetDisplayLine(12, " close              - [c]");
-    World.getTextManager().SetDisplayLine(13, " unlock             - [u] + [dir]");
-    World.getTextManager().SetDisplayLine(14, " use magic          - [z]");
-    World.getTextManager().SetDisplayLine(15, " climb up           - [<]");
-    World.getTextManager().SetDisplayLine(16, " climb down         - [>]");
+    World.getTextManager().SetDisplayLine(13, " unlock/use         - [u] + [dir]");
+    World.getTextManager().SetDisplayLine(14, " climb up           - [<]");
+    World.getTextManager().SetDisplayLine(15, " climb down         - [>]");
+    World.getTextManager().SetDisplayLine(16, " use magic          - [z]");
 
-    World.getTextManager().SetDisplayLine(18, " message history    - [ctrl-p]");
-    World.getTextManager().SetDisplayLine(19, " view inventory     - [i]");
-    World.getTextManager().SetDisplayLine(20, " view quipment      - [e]");
+    World.getTextManager().SetDisplayLine(11, " look around        - [l] + [dir]");
+    World.getTextManager().SetDisplayLine(18, " view inventory     - [i]");
+    World.getTextManager().SetDisplayLine(19, " view equipment     - [e]");
+    World.getTextManager().SetDisplayLine(20, " message history    - [ctrl-p]");
 
     World.getTextManager().SetDisplayLine(21, " toggle Full Screen - [F1]");
 
@@ -850,7 +866,7 @@ int UserCommand::UseItem(bool *keys)
 int  UserCommand::UseItem(Item*item, int dir)
 {
     DungeonLevel *dlevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
-    monsterData * player = World.getMonsterManager().Player();
+    MonsterData * player = World.getMonsterManager().Player();
 
     Coord * pos = player->getPosition();
     Coord new_pos;
@@ -889,7 +905,7 @@ int  UserCommand::UseItem(Item*item, int dir)
 
             for (it = inventory->begin(); it != inventory->end(); it++)
             {
-                if (it->BaseName() ==  buf)
+                if (it->BaseName() == buf)
                     match = 1;
             }
             if (match == 0)
@@ -973,7 +989,7 @@ int  UserCommand::UseItem(Item*item, int dir)
                         if (World.GetCurrentLevel() > 9) //create special item
                         {
                             int item_boost = 0;
-                            if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
+                            if (player->TestLuck())
                             {
                                 item_boost += 50;
                             }
@@ -1004,11 +1020,11 @@ int  UserCommand::UseItem(Item*item, int dir)
                             for (int i = 0; i < random_items; i++)
                             {
                                 int item_boost = 0; //lucky items
-                                if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
+                                if (player->TestLuck())
                                 {
                                     item_boost += 15;
 
-                                    if ((Random::getInt(7, 1) + Random::getInt(7, 1)) < player->Luck())
+                                    if (player->TestLuck())
                                     {
                                         item_boost += 15;
                                     }
@@ -1088,11 +1104,9 @@ int  UserCommand::UseItem(Item*item, int dir)
 
 }
 
-
 //some debug commands
 int UserCommand::Debug(bool *keys)
 {
-
     try{
         LevelChange change;
         if (keys[VK_1])
@@ -1107,4 +1121,9 @@ int UserCommand::Debug(bool *keys)
     }
 
     return 1;
+}
+
+void UserCommand::Throw(Item * throwItem)
+{
+    toThrow = throwItem;
 }

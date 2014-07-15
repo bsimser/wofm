@@ -16,14 +16,14 @@ You approach the shadow of the great mountain.
 
 The local villages have warned you that the entrance is well guarded...
 
-You character '@' starts outsite the mountains entrance with the goal of entering and decending down the depths to destroy the "evil" warlock Zagor with the purpose of aquiring weath and power.
+You character '@' starts outside the mountains entrance with the goal of entering and descending down the depths to destroy the "evil" warlock Zagor with the purpose of acquiring wealth and power.
 
 Good luck!
 
 
 Winning
 -------
-You win the game by aquiring the warlocks treasure and escaping the mountain (walk off the edge of the map).
+You win the game by acquiring the warlocks treasure and escaping the mountain (walk off the edge of the map).
 
 Skill
 -----
@@ -36,18 +36,24 @@ This represents your health. When it reaches 0 you die. You can restore stamina 
 Luck
 ----
 Luck is used to determine if special events are successful or not. These events include fleeing, sneaking past sleeping guards and even can save you from death.
-Luck can effect the quality of items found in chests too.
+Luck can affect the quality of items found in chests too.
+Each time your luck saves you from harm (fleeing or combat) your luck will be reduced by one. You can’t rely on your luck for ever, however luck can be restored by resting.
 
 Combat
 ------
 When attacking your skill and weapon effect your chances of a successful hit as well as the skill and weapon values of your enemy. 
-Both the weapons base attack value (shown as [Att:x]) and and the bonus skill value (shown as +x) will be used for determining attacks.
+Both the weapons base attack value (shown as [Att:x]) and the bonus skill value (shown as +x) will be used for determining attacks.
 The higher values the better.
 
 Defence
 -------
 If you are wearing armour there is a chance that the attack will be deflected or blocked by your armour and no damage will be taken. 
 The armours defence value is shown in the [Def:x] and the higher the better.
+
+Resting
+-------
+Certain times of the game you will be given the option of resting. This gives you a breather and prepares you for things to come.
+Your stamina and luck will be replenished during resting.
 
 
 Hints on how to play
@@ -74,7 +80,7 @@ Use in game help '?': key bindings
     climb down         - [>]
     message history    - [ctrl-p]
     view inventory     - [i]
-    view quipment      - [e]
+    view equipment     - [e]
     quit               - [Q]
     toggle Full Screen - [F1]
 
@@ -98,4 +104,5 @@ DemiseRL: https://sites.google.com/site/corremn/
 This game uses a version 0.1.4 of the DemiseRL engine.  
 It uses openGL and the GNU FreeType library for anti-aliased true types fonts (try fullscreen 'F1'), 
 
-If you like this game and wish to see it continued please tell me, also any bugs, ideas, etc send my way.
+If you like this game and wish to see it continued please tell me, also any bugs, ideas, etc. send my way.
+

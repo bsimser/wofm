@@ -76,7 +76,8 @@ int DungeonLevel::Initialise(int level_type)
             case 'r':map[w][h].terrain.Create(ruins); break;
             case 'f':map[w][h].terrain.Create(fountain); break;
             case 'v':map[w][h].terrain.Create(teleport); break;
-            case 'S':map[w][h].terrain.Create(fountain); break;
+            case 'S':map[w][h].terrain.Create(random); break;
+            case 'W':map[w][h].terrain.Create(spiderWeb); break;
 
             default:map[w][h].terrain.Create(stone); break;
             }

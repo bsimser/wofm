@@ -199,8 +199,8 @@ int SpecialGuardians::createGuard(int level)
     }
     else if (level == 7)
     {
-        symbol = 'Z';
-        name = ("undead guard");
+        symbol = 'V';
+        name = ("wight");
 
         setDescription("Just another of the undead set to guard what ever is in that chest. ");
 

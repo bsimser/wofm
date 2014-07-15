@@ -20,13 +20,11 @@ typedef std::list<Item> ITEMLIST;
 class ItemManager  
 {
 public:
-	ItemManager();
-	virtual ~ItemManager();
-
 	int Initialise();
 
 	Item * CreateRandomItem(int level);
-	Item * CreateItem(int level, int type,int secondary_type=0);
+    Item * CreateItem(int level, int type, int secondary_type = 0);
+    Item * DuplicateItem(Item * item);
 	void makeKeysLabels();
 
 	ITEMLIST all_items;

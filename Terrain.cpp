@@ -17,15 +17,9 @@ found(0)
     makeStone();
 }
 
-Terrain::~Terrain()
-{
-
-}
-
 int Terrain::Create(int type)
 {
-
-    switch (type)
+        switch (type)
     {
     case stone:			makeStone();		break;
     case rock:			makeRock();			break;
@@ -52,7 +46,9 @@ int Terrain::Create(int type)
     case fountain:      makeFountain();     break;
     case dryFountain:   makeDryFountain();  break;
     case teleport:      makeTeleport();     break;
-
+    case random:        makeRandom();     break;
+    case spiderWeb:        makeSpiderWeb();     break;
+        
     default:  	char err[128];
         sprintf(err, "Invalid terrain type passed into Terrain constructor: %d", type);
         throw std::exception(err);
@@ -85,8 +81,30 @@ void Terrain::makeFountain()
     symbol = '^';
 
     strcpy(name, "a fountain");
-
 }
+
+void Terrain::makeSpiderWeb()
+{
+    type = dfloor;
+
+    if (Random::getInt(2, 0))
+    {
+        color1 = 200;
+        color2 = 200;
+        color3 = 200;
+    }
+    else
+    {
+        color1 = 245;
+        color2 = 245;
+        color3 = 244;
+    }
+
+    symbol = '#';
+
+    strcpy(name, "spider web");
+}
+
 void Terrain::makeDryFountain()
 {
     type = dfloor;
@@ -110,6 +128,19 @@ void Terrain::makeTeleport()
 
     symbol = '^';
     strcpy(name, "a teleport");
+}
+
+void Terrain::makeRandom()
+{
+    type = random;
+
+    color1 = 102;
+    color2 = 102;
+    color3 = 102;
+
+    symbol = '.';
+
+    strcpy(name, "floor");
 }
 
 void Terrain::makeRuins()

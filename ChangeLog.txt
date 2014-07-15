@@ -4,21 +4,37 @@ Warlock of Firetop Mountain (c) 2014 Corremn
 
 Change log
 
-version x.x.x xx/xx/2014
+version 0.2.2 12/07/2014
 ========================
-- added 1 extra monster.
+- Improved rendering speed.
+- reworked luck (see readme.txt)
+- added provision (+4 stamina)
+- tinkered with some special levels
+
+
+version 0.2.1c 12/07/2014
+=========================
+- added some extra monsters.
 - reward for <spoiler>.
-- Chests and keys now generate mostly in rooms not corridoors.
+- Chests and keys now generate mostly in rooms (not corridoors).
 - Ranged attacks now have animation.
 - Removed "red level" outside of mountain
 - Tweaked some other "red levels"
 - Removed spurious "confused" messages
-- Sleepy monsters are now obvious 
+- Sleepy monsters are now obvious (mostly)
+- Switching to fullscreen now updates window correctly
 - Fixed some more dungeon build crashes.
+- removed self-targeting for <a particular ability>
+- only some creatures can open doors
+- extra dungeon feature
+- minor poison/death animation
+- removed item reference overflow - may magically transmute items
+- drop command from main screen
+- final locks are guarenteed to have generated keys
 
 
-version 0.2.1b 3/07/2014
-========================
+version 0.2.1b 03/07/2014
+=========================
 - Fix bug in flood fill test
 - Items cant be dropped on teleport or fountain
 - Removed chance of empty chest upon opening
@@ -32,8 +48,8 @@ version 0.2.1b 3/07/2014
 - Auto-pickup of arrows/bolts
 
 
-version 0.2.1 1/07/2014
-=======================
+version 0.2.1 01/07/2014
+========================
 - Modified Maze 
 - Fixed name entering
 - Quality name prefix for armour and glowing prefix for magic items

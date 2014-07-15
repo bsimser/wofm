@@ -37,6 +37,8 @@ enum eTerrainType
 	fountain,
 	dryFountain,
     teleport,
+    random,
+    spiderWeb,
 	/*stone = 0,
 	rock,
 	dfloor,
@@ -65,8 +67,6 @@ class Terrain
 {
 public:
 	Terrain();
-	virtual ~Terrain();
-
 	int Create(int type);
 
 	int type;
@@ -107,6 +107,8 @@ private:
 	void makeFountain();	
 	void makeDryFountain();	
     void makeTeleport();
+    void makeRandom();
+    void makeSpiderWeb();
 
 	void setColor(int c1, int c2, int c3);
 };

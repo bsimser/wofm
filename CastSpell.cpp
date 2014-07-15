@@ -3,7 +3,7 @@
 
 // -------------------------------------------------------------------------------------------------------------------------------
 
-int	CastMagic::SlowEnemies(monsterData* caster)
+int	CastMagic::SlowEnemies(MonsterData* caster)
 {
     if (caster->isPlayer())
     {
@@ -26,7 +26,7 @@ int	CastMagic::SlowEnemies(monsterData* caster)
     }
     else //cast on player
     {
-        monsterData* player = World.getMonsterManager().Player();
+        MonsterData* player = World.getMonsterManager().Player();
         int resistance = player->monster.GetResistance(bSlow);
         if (Random::getInt(10, 0) + resistance < 5)
         {
@@ -41,7 +41,7 @@ int	CastMagic::SlowEnemies(monsterData* caster)
 
 // -------------------------------------------------------------------------------------------------------------------------------
 
-int	CastMagic::RepelMissiles(monsterData* caster) //glow blue?
+int	CastMagic::RepelMissiles(MonsterData* caster) //glow blue?
 {
     if (caster->isPlayer())
     {
@@ -70,7 +70,7 @@ int	CastMagic::RepelMissiles(monsterData* caster) //glow blue?
 
 // -------------------------------------------------------------------------------------------------------------------------------
 
-int	CastMagic::Teleport(monsterData* caster)
+int	CastMagic::Teleport(MonsterData* caster)
 {
     DungeonLevel* level = World.getDungeonManager().CurrentLevel();
 
@@ -95,11 +95,9 @@ int	CastMagic::Teleport(monsterData* caster)
     } while (failed || level->map[new_x][new_y].terrain.type == stone || level->map[new_x][new_y].monsterExists());
 
     // hack to show traj on map
-    WorldBuilder & world = World;
-    world.getScene().DisplayMap(true);
-    StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, new_x, new_y, '@', Random::getInt(2, 0) ? 255 : 128, 0, 255);
-
     level->map[caster->pos.x][caster->pos.y].RemoveMonsterRef();
+    World.getScene().DisplayMap(true);
+    StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, new_x, new_y, '@', Random::getInt(2, 0) ? 255 : 128, 0, 255);
 
     caster->NextAction(World.getActionManager().UpdateAction(&caster->action, aMove, new_x, new_y));
 
@@ -109,11 +107,16 @@ int	CastMagic::Teleport(monsterData* caster)
 
 // -------------------------------------------------------------------------------------------------------------------------------
 
-int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
+int CastMagic::FlyingWeapon(MonsterData* caster, int x, int y)
 {
     Monster * d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = World.getMonsterManager().FindMonsterData(d);
-
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
+    if (caster == defender)
+    {
+        if (caster->isPlayer())
+            World.getTextManager().newLine("Not a good idea. ");
+        return 0;
+    }
     WorldBuilder & world = World;
     StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, x, y, '*', Random::getInt(2,0) ? 255:128, 0, 255);
 
@@ -215,10 +218,10 @@ int CastMagic::FlyingWeapon(monsterData* caster, int x, int y)
 
 // -------------------------------------------------------------------------------------------------------------------------------
 
-int	CastMagic::DragonBreath(monsterData* caster, int x, int y)
+int	CastMagic::DragonBreath(MonsterData* caster, int x, int y)
 {
     Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
-    monsterData* defender = World.getMonsterManager().FindMonsterData(d);
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
     if (defender == NULL || d == NULL) 
         return 0;

@@ -210,6 +210,7 @@
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CellularAutomata.cpp" />
     <ClCompile Include="FreeTypeFont.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug_non|Win32'">Disabled</Optimization>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug_non|Win32'">freetype\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -512,6 +513,7 @@
     <ClCompile Include="SpellBase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CellularAutomata.h" />
     <ClInclude Include="FreeTypeFont.h" />
     <ClInclude Include="OpenGLSceneGen.h" />
     <ClInclude Include="SceneGenerator.h" />

@@ -26,7 +26,7 @@ enum eItemType
     cards,
     gold,
     key,
-    ration,
+    provisions,
     gem,
     stake,
     cheese,
@@ -57,8 +57,6 @@ public:
     Item(const Item& rhs);
     bool operator< (const Item& rhs);
     
-	virtual ~Item();
-
 	virtual int CreateItem(eItemType type,int level, int secondary_type=no_type);
 
 	void createCorpse();
@@ -70,7 +68,7 @@ public:
 	void createGold(int level);
 	void createShield(int level);
     void createCards(int level);
-    void createRation();
+    void createProvision();
     void createGem();
     void createStake();
     void createCheese();
@@ -115,7 +113,7 @@ public:
 
 	bool identified;
     bool equipped;
-    unsigned char ref;
+    unsigned int ref;
     unsigned char itemNumber[3];
 
 protected:

@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "SpecialLevelGenerator.h"
+#include "CellularAutomata.h"
 #include "Dungeonlevel.h"
 #include "NumberGenerator.h"
 
@@ -26,14 +27,17 @@ int SpecialLevelGenerator::Create(int _type)
 
     switch (_type)
     {
-    case	slTrollCave: makeSpecialDungeon(); break;
-    case	slPrison:	 makeSpecialDungeon(); break;
-    case	slBoatHouse: makeBoatHouse(); break;
-    case	slShop:		 makeSpecialDungeon(); break;
-    case	slVampire:   makeCrypt(); break;
-    case	slTresure:   makeSpecialDungeon(); break;
-    case	slEncounter: makeEncounterDungeon(); break;
-    case	slBarracks:  makeBarracksDungeon(); break;
+    case	slTrollCave:    makeCavern(); break;
+    case	slPrison:	    makeSpecialDungeon(); break;
+    case	slBoatHouse:    makeBoatHouse(); break;
+    case	slShop:		    makeSpecialDungeon(); break;
+    case	slVampire:      makeCrypt(); break;
+    case	slTreasure:     makeSpecialDungeon(); break;
+    case	slEncounter:    makeEncounterDungeon(); break;
+    case	slBarracks:     makeBarracksDungeon(); break;
+    case	slSpiderCave:   makeCavern(true); break;
+    case	slUndead:       makeSpecialDungeon(); break;
+        
     default: makeSpecialDungeon();
 
     }
@@ -79,6 +83,36 @@ int SpecialLevelGenerator::makeCrypt()
     return 1;
 }
 
+void SpecialLevelGenerator::makeCavern(bool webby)
+{
+    CellularAutomata cavern;
+    cavern.SetType(CA_LARGE_CAVERN);
+    cavern.Create();
+
+    for (int x = 0; x < DUNGEON_SIZE_W; x++)
+    {
+        for (int y = 0; y < DUNGEON_SIZE_H; y++)
+        {
+            dmap[x][y] = cavern.getCell(x, y) ? '#' : '.';
+        }
+    }
+
+    int x, y;
+    findTerrainType(x, y, '.');
+    dmap[x][y] = ('(');
+    makeSpecialItemSpot();
+
+    if (webby)
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            if (!findTerrainType(x, y, '.'))
+                break;
+            dmap[x][y] = 'W';
+        }
+    }
+}
+    
 int SpecialLevelGenerator::makeBarracksDungeon()
 {
     //create dungeon

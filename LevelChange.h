@@ -9,15 +9,12 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class monsterData;
+class MonsterData;
 
 class LevelChange  
 {
 public:
-	LevelChange();
-	virtual ~LevelChange();
-
-	int LevelChange::ChangeLevel(int dir,monsterData * monster);
+	int LevelChange::ChangeLevel(int dir,MonsterData * monster);
 
 	int ClimbSpecial(int dir);
 	int ClimbNormal(int dir);
