@@ -14,23 +14,22 @@ using namespace Random;
 
 UndeadMonster::UndeadMonster() :Monster()
 {
-
 }
 
 UndeadMonster::~UndeadMonster()
 {
-
 }
 
-
-int UndeadMonster::Create(int type, int level)
+int UndeadMonster::Create(int subtype, int level)
 {
+    type = 1; //mUndead;
+
     SetResistance(bPoison, 10);
     SetResistance(bFire, -5);
     SetResistance(bLightning, -5);
 
     undead = 1;
-    switch (type)
+    switch (subtype)
     {
     case skeleton:	return	createSkeleton();
     case zombie:	return  createZombie();

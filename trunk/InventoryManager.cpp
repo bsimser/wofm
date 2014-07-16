@@ -237,10 +237,11 @@ int InventoryManager::Equip(bool *keys)
     {
         if (keys[i] == true)
         {
-            World.getMonsterManager().monsterItems.EquipItem(&(*World.getMonsterManager().Player()), i - 65);
+            int ret = World.getMonsterManager().monsterItems.EquipItem(&(*World.getMonsterManager().Player()), i - 65);
             mState = eDisplay;
             keys[i] = false;
             ShowInventory(-1);
+            return ret;
         }
     }
     return 1;

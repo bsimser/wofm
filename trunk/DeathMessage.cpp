@@ -117,6 +117,11 @@ int DeathMessage::ShowDeath(int success)
         World.getTextManager().SetDisplayLine(i, "He discovered the maze of Zagor.");
         i++;
     }
+    if (done.cheese)
+    {
+        World.getTextManager().SetDisplayLine(i, "You threw cheese at a wizard.");
+        i++;
+    }
     if (done.zagor)
     {
         World.getTextManager().SetDisplayLine(i, "He defeated Zagor the evil Warlock.");

@@ -17,7 +17,7 @@ Make enemies (bosses/specials/special items) generate away from start pos.
 From the book
 
 Giant - throws a pig carcass at you.test luck.
-wight - imune to weapons need silver
+wight - immune to weapons, need silver weapon
 giant bats - double speed
 winged gremlin
 giant rats

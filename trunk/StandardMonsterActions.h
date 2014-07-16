@@ -22,7 +22,7 @@ public:
 	int		FireItem(MonsterData* monster,int x,int y);
 	int		CalculateDamage(MonsterData* defender, int attackStr, int defenceStr);
     int		ThrowTarget(MonsterData* attacker, int targetX, int targetY, eAction action);
-    int		ThrowItem(MonsterData* attacker, int targetX, int targetY, int inventoryItemRef);
+    int		ThrowItem(MonsterData* attacker, const unsigned int targetX, const unsigned int targetY, const unsigned int inventoryItemRef);
     
 	int		CastSpell(MonsterData* caster, int spellID);
 	int		CastTargetSpell(MonsterData* caster, eSpellList spell, int TargetX, int TargetY);

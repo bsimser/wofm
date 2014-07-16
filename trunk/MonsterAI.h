@@ -43,9 +43,10 @@ private:
 	
 	int ProcessEffects(MonsterData* monster);
 	int	EffectAction(MonsterData* monster,eEffect effect,int strength); //run effects I.e confused
-
 	
-	int DetectPlayer(int m_x,int m_y,int *p_x,int *p_y);
+    int DetectPlayer(int m_x, int m_y, int *p_x, int *p_y);
+    int DetectCheese(int m_x, int m_y, int &p_x, int &p_y);
+    int ProcessRat(MonsterData* monster);
 	int MoveCloserToPlayer(int m_x,int m_y,int p_x,int p_y);
 	int LOS(int x,int y,int x2,int y2, int range);
 	int CheckValidMove(int m_x,int m_y,int dir);

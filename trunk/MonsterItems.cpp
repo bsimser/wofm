@@ -130,6 +130,20 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
         monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour));
         monster->inventory.back().equipped = 1;
     }
+
+    if (monster->monster.GetType() == mSpecial || monster->monster.GetType() == mGuards)
+    {
+       // if (Random::getInt(2, 0))
+        {
+            int itemType = Random::getInt(cheese+1, provisions);
+            item = World.getItemManager().CreateItem(level, itemType, 0);
+            if (itemType == stake)
+                item->itemNumber[1] = Random::getInt(3, 1);
+
+            monster->inventory.push_back(*item);
+        }
+    }
+
     return 1;
 }
 
@@ -158,7 +172,7 @@ int MonsterItems::EquipPlayer(MonsterData *player)
     item = World.getItemManager().CreateItem(level, cheese);
     player->inventory.push_back(*item);
 
-    
+
     //player->inventory.push_back(*World.getItemManager().CreateItem(level,cards,0)); //give magic to player
 
     //shield
@@ -220,20 +234,19 @@ int MonsterItems::EquipItem(MonsterData *monster, int item)
             if (it->equipped == 1) //unequip
             {
                 it->equipped = 0;
-
             }
             else	//equip //unequip privious item
             {
                 switch (it->type)
                 {
-                case projectile: 
+                case projectile:
                 {
                     Item *eq = GetEquipment(monster, projectile);
                     if (eq != NULL)
                         eq->equipped = 0;
                     break;
                 }
-                case projectileWeapon: 
+                case projectileWeapon:
                 {
                     Item *eq = GetEquipment(monster, projectileWeapon);
                     if (eq != NULL)
@@ -246,31 +259,32 @@ int MonsterItems::EquipItem(MonsterData *monster, int item)
                 }
                 case cheese:
                 {
-                    return UseItem(monster, *it);
+                    UseItem(monster, *it);
+                    return 0;
                 }
-                case armour: 
+                case armour:
                 {
-                                 Item *eq = GetEquipment(monster, armour);
-                                 if (eq != NULL)
-                                     eq->equipped = 0;
-                                 break;
+                    Item *eq = GetEquipment(monster, armour);
+                    if (eq != NULL)
+                        eq->equipped = 0;
+                    break;
                 }
                 case shield: {
-                                 Item *eq = GetEquipment(monster, shield);
-                                 if (eq != NULL)
-                                     eq->equipped = 0;
-                                 break;
+                    Item *eq = GetEquipment(monster, shield);
+                    if (eq != NULL)
+                        eq->equipped = 0;
+                    break;
                 }
 
                 case weapon:{//if(monster->slots.weapon != NULL)
-                                Item *eq = GetEquipment(monster, weapon);
-                                if (eq != NULL)
-                                    eq->equipped = 0;
-                                //		 {
-                                //			monster->slots.weapon->equipped = 0;
-                                //		 } */
-                                //	monster->slots.weapon = &(*it);
-                                break;
+                    Item *eq = GetEquipment(monster, weapon);
+                    if (eq != NULL)
+                        eq->equipped = 0;
+                    //		 {
+                    //			monster->slots.weapon->equipped = 0;
+                    //		 } */
+                    //	monster->slots.weapon = &(*it);
+                    break;
                 }
                 }
 
@@ -309,7 +323,7 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
             if (item.itemNumber[1] == 0)
             {
                 //delete from inventory
-                if (item.itemNumber[1] == 0) 
+                if (item.itemNumber[1] == 0)
                 {
                     for (ITEMLIST::iterator it = monster->inventory.begin(); it != monster->inventory.end(); it++)
                     {
@@ -412,7 +426,7 @@ int MonsterItems::PickupItem(MonsterData *monster)
 
     //delete reference from map but item is still in all items list
     World.getDungeonManager().level[monster->level].map[monster->pos.x][monster->pos.y].RemoveItemRef();
- 
+
     if (monster->isPlayer())
         World.getTextManager().newLine("You pick up the %s%s", item.GetName().c_str(), item.itemNumber[1] > 1 ? ". " : ". ");
     else
@@ -528,7 +542,7 @@ int MonsterItems::DropStackableItem(MonsterData *monster, Item *item, int x, int
 int MonsterItems::DropItem(MonsterData *monster, Item *item, int x, int y)
 {
     int dungeonLevel = monster ? monster->level : World.GetCurrentLevel();
-    
+
     if (std::string("a fountain") == World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.name)
         int test = 0;
 

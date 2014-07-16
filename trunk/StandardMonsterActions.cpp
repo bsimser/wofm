@@ -585,7 +585,7 @@ int	StandardMonsterActions::CastTargetSpell(MonsterData* caster, eSpellList spel
     //return caster->NextAction(World.getActionManager().UpdateAction(&caster->action,aCastSpell,TargetX,TargetY));
 }
 
-int	StandardMonsterActions::ThrowItem(MonsterData* attacker, int targetX, int targetY, int inventoryItemRef)
+int	StandardMonsterActions::ThrowItem(MonsterData* attacker, const unsigned int targetX, const unsigned int targetY, const unsigned int inventoryItemRef)
 {
     // check if has item
     ITEMLIST::iterator it;
@@ -618,9 +618,14 @@ int	StandardMonsterActions::ThrowItem(MonsterData* attacker, int targetX, int ta
 
     Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[targetX][targetY].GetMonster();
     MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
-    if (defender)
+    if (defender && defender != attacker)
     {
-        World.getTextManager().newLine("The %s hits the %s. ", newItem->BaseName().c_str(), defender->Name());
+        World.getTextManager().newLine("The %s bounces off the %s. ", newItem->BaseName().c_str(), defender->Name().c_str());
+        if (defender->Name() == "Zagor")
+        {
+            World.getTextManager().newLine("Zagor laughs at you! ");
+            World.getDeathMessage().done.cheese = 1;
+        }
     }
     else
         World.getTextManager().newLine("The %s hits the ground. ", newItem->BaseName().c_str());

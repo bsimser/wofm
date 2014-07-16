@@ -57,7 +57,7 @@ Coord UserCommand::autoTarget()
     return lastTarget ? lastTarget->pos : player->pos;
 }
 
-int UserCommand::ThrowItem(bool itemCheck)
+int UserCommand::FireItem(bool itemCheck)
 {
     UnLook();
     if (itemCheck && !World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), projectile))
@@ -72,6 +72,27 @@ int UserCommand::ThrowItem(bool itemCheck)
 
     World.getTextManager().newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
     return 1;
+}
+
+int UserCommand::ThrowItem()
+{
+    World.getTextManager().clear();
+
+    UnLook();
+    // set auto target
+
+    DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
+    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+
+    if (monster)
+        lastTarget = monster;
+    //else
+    //    lastTarget = NULL;
+    int ret = 0;
+    if (toThrow)
+        ret =  World.getActionManager().monsterAction.ThrowItem(World.getMonsterManager().Player(), look_pos.x, look_pos.y, toThrow->ref);
+    toThrow = NULL;
+    return ret;
 }
 
 int UserCommand::ThrowTarget(eAction action)
@@ -1125,5 +1146,10 @@ int UserCommand::Debug(bool *keys)
 
 void UserCommand::Throw(Item * throwItem)
 {
+    //UnLook();
+    look_pos.x = World.getMonsterManager().Player()->pos.x;
+    look_pos.y = World.getMonsterManager().Player()->pos.y;
+    World.getTextManager().newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
+
     toThrow = throwItem;
 }

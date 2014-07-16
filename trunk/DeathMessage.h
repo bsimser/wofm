@@ -17,7 +17,8 @@ typedef struct
 	bool barracks;
 	bool river;
 	bool undead;
-	bool maze;
+    bool maze;
+    bool cheese;
 	bool entered;
 	bool zagor;
 	int level;

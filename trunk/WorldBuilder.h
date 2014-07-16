@@ -105,6 +105,7 @@ enum eDisplayState
     sRest,
     sResting,
     sFlee,
+    sQuitting
 };
 
 // WorldBuilder class - where the magic is contained
