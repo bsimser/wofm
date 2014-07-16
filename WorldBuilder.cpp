@@ -435,9 +435,10 @@ void WorldBuilder::ProcessCommand(bool *keys)
     }
     else if (State() == sThrow)
     {
+        //command.FireItem();
         if (keys[VK_SPACE]) //target acquired
         {
-            if (command.ThrowTarget(aThrow))
+             if (command.ThrowItem())
                 turns++;
             SetState(sNormal);
         }
@@ -494,7 +495,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
         }
         else if (ret == SELECT_TARGET)
         {
-            command.ThrowItem();
+            command.FireItem(false);
             SetState(sTargetSpell);
 
         }
@@ -516,7 +517,17 @@ void WorldBuilder::ProcessCommand(bool *keys)
             return; //clear all keys
         dungeonManager.CurrentLevel()->ClearPath();
     }
-
+    else if (State() == sQuitting)
+    {
+        if (keys[VK_Y])
+        {
+            monsterManager.Player()->monster.stamina = 0;
+            World.getDeathMessage().SetDeathMessage("gave up. ");
+            turns++;
+        }
+        else
+            SetState(sNormal);
+    }
     //SHIFT COMMANDS FIRST
     else if (keys[VK_SHIFT])
     {
@@ -524,9 +535,9 @@ void WorldBuilder::ProcessCommand(bool *keys)
         {
             if (command.ClimbStairs(dUp))
             {
-                int l = GetCurrentLevel();
-                if (l != 1 && l != 4 && l != 7 && l != 10)
-                    turns++; //monsters get first attack except coming from rest level
+                //int l = GetCurrentLevel();
+                //if (l != 1 && l != 4 && l != 7 && l != 10)
+                 //   turns++; //monsters get first attack except coming from rest level
             }
             keys[VC_COMMA] = false;
             keys[VK_SHIFT] = false;
@@ -553,12 +564,11 @@ void WorldBuilder::ProcessCommand(bool *keys)
         }
         else if (keys[VK_Q])
         {
-            monsterManager.Player()->monster.stamina = 0;
-            World.getDeathMessage().SetDeathMessage("gave up. ");
-            turns++;
-            keys[VK_Q] = false;
-        }
+            state = sQuitting;
 
+            keys[VK_Q] = false;
+            textManager.newLine("Really quit? Press [y] to quit. ");
+        }
     }
 
     //END SHIFT
@@ -607,7 +617,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
     }
     else if (keys[VK_F])
     {
-        if (command.ThrowItem())
+        if (command.FireItem())
             state = sFire;
         keys[VK_F] = false;
     }

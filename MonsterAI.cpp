@@ -28,6 +28,7 @@ MonsterAI::~MonsterAI()
 
 }
 
+
 int MonsterAI::ProcessIntelligence(MonsterData* monster)
 {
     current_monster = monster;
@@ -37,6 +38,12 @@ int MonsterAI::ProcessIntelligence(MonsterData* monster)
 
     if (monster->isPlayer())
         return 0; //player no AI
+
+    if (monster->monster.GetType() == mRandom && monster->Name() == "rat")
+    {
+        if (ProcessRat(monster))
+            return 1;
+    }
 
     Detect(monster);
 
@@ -84,6 +91,26 @@ int MonsterAI::ProcessEffects(MonsterData* monster)
     }*/
 
     return move_done; //if > 0 skip move
+}
+
+int MonsterAI::ProcessRat(MonsterData* monster)
+{
+    int x = 0;
+    int y = 0;
+    if (DetectCheese(monster->pos.x, monster->pos.y, x, y))
+    {
+        if (monster->GetState() == asleep && Random::getInt(5, 0) == 0)
+        {
+            monster->SetState(normal);
+        }
+        else if (x != 0 && y != 0)
+        {
+            if (!MoveCloserToPlayer(monster->pos.x, monster->pos.y, x, y))
+                return RandomMove(monster);
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int	MonsterAI::EffectAction(MonsterData* monster, eEffect effect, int strength)
@@ -650,6 +677,34 @@ int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
     return 1;
 }
 
+int MonsterAI::DetectCheese(int m_x, int m_y, int &p_x, int &p_y)
+{
+    p_x = 0;
+    p_y = 0;
+
+    int smell_range = 10;
+
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+
+    for (int x = m_x - 10; x < (m_x + 10); x++)
+    {
+        for (int y = m_y - 10;  y < (m_y + 10); y++)
+        {
+            // valid cell
+            if (x > 0 && y > 0 && x < DUNGEON_SIZE_W - 1 && y < DUNGEON_SIZE_H - 1)
+            {
+                Item * item = dungeonLevel->map[x][y].getItem();
+                if (item && item->type == cheese)
+                {
+                    p_x = x;
+                    p_y = y;
+                    return 1;
+                }
+            }
+        }
+    }
+    return 0;
+}
 
 int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
 {

@@ -32,7 +32,8 @@ public:
 	int UseItem();
 	int UseItem(bool *keys);
 	int Debug(bool *keys);
-	int ThrowItem(bool itemCheck = true);
+    int FireItem(bool itemCheck = true);
+    int ThrowItem();
 	int ThrowTarget(eAction action);
 	int CastSpellAtTarget();
 	int Flee();

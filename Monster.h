@@ -61,7 +61,7 @@ public:
     unsigned char   max_stamina;
     signed char     speed;
 
-private:
+protected:
     unsigned char   mLevelVariation;
     unsigned char   mLevel;
     unsigned char   type;

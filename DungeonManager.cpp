@@ -241,6 +241,13 @@ int DungeonManager::PopulateDungeon(int lev)
         pos = level[lev].GetEndPosition();
 
         World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
+
+        // rat nest
+        pos = NewMonsterPosition(lev);
+        for (int i = 0; i < 6; i++)
+        {
+            World.getMonsterManager().CreateMonster(mRandom, RandomMonster::rat, lev, pos->x, pos->y);
+        }
     }
 
     else if (lev == 20) //encounter level
@@ -280,6 +287,15 @@ int DungeonManager::PopulateDungeon(int lev)
                 World.getMonsterManager().CreateMonster(mDigger, sub_type, lev, pos->x, pos->y);
             }
         }
+        if ((lev != 8 && lev > 1 && Random::getInt(10, 0) == 0) || lev == 2 || lev == 6)
+        {
+            Coord *pos = NewMonsterPosition(lev);
+            for (int i = 0; i < 6; i++)
+            {
+                World.getMonsterManager().CreateMonster(mRandom, RandomMonster::rat, lev, pos->x, pos->y);
+            }
+        }
+
         // crocodiles!!
         if (lev > 1)
         {

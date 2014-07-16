@@ -8,8 +8,10 @@ version 0.2.2 12/07/2014
 ========================
 - Improved rendering speed.
 - reworked luck (see readme.txt)
-- added provision (+4 stamina)
+- added provisions (+4 stamina)
 - tinkered with some special levels
+- Now asks if you want to quit
+- some extra items
 
 
 version 0.2.1c 12/07/2014

@@ -21,9 +21,12 @@ SpecialGuardians::~SpecialGuardians()
 
 }
 
-int SpecialGuardians::Create(int type, int level)
+int SpecialGuardians::Create(int minorType, int level)
 {
-    switch (type)
+
+    type = 7; //mGuards;
+    
+    switch (minorType)
     {
     case 0:	return	createGuard(level); break;
     case 1:	return  createGuard(level); break;

@@ -26,8 +26,8 @@ enum eItemType
     cards,
     gold,
     key,
-    provisions,
     gem,
+    provisions,
     stake,
     cheese,
 };
