@@ -69,7 +69,7 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
 
         switch (random_weapon)
         {
-        case 0: p = bolt; pw = crossbow; monster->monster.name = "orc bolter"; break;
+        case 0: p = bolt; pw = crossbow; monster->monster.name = "orc crossbower"; break;
         case 1: p = arrow; pw = bow;     monster->monster.name = "orc archer"; break;
         case 2: p = arrow; pw = longbow; monster->monster.name = "orc archer"; break;
         }
@@ -140,7 +140,7 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
 
     if (monster->monster.GetType() == mSpecial || monster->monster.GetType() == mGuards)
     {
-       // if (Random::getInt(2, 0))
+        if (level > 1)
         {
             int itemType = Random::getInt(silverArrow + 1, provisions);
             if (itemType = silverArrow)
@@ -188,12 +188,16 @@ int MonsterItems::EquipPlayer(MonsterData *player)
     item->itemNumber[1] = 4;
     player->inventory.push_back(*item);
 
-    item = World.getItemManager().CreateItem(level, cheese);
+    /*item = World.getItemManager().CreateItem(level, cheese);
     item->itemNumber[1] = 4;
     player->inventory.push_back(*item);
-    
+
     item = World.getItemManager().CreateItem(level, DiMaggio);
     player->inventory.push_back(*item);
+
+    item = World.getItemManager().CreateItem(level, gem);
+    player->inventory.push_back(*item);*/
+
     //player->inventory.push_back(*World.getItemManager().CreateItem(level,cards,0)); //give magic to player
 
     //shield
@@ -286,7 +290,11 @@ int MonsterItems::EquipItem(MonsterData *monster, int item)
                 case DiMaggio:
                 {
                     return UseItem(monster, *it);
-                }     
+                }
+                case gem:
+                {
+                    return UseItem(monster, *it);
+                }
                 case armour:
                 {
                     Item *eq = GetEquipment(monster, armour);
@@ -321,9 +329,17 @@ int MonsterItems::EquipItem(MonsterData *monster, int item)
     return 0;
 }
 
-int MonsterItems::RemoveItem(MonsterData *monster)
+int MonsterItems::RemoveItem(MonsterData *monster, int ref)
 {
-    return 1;
+    for (ITEMLIST::iterator it = monster->inventory.begin(); it != monster->inventory.end(); it++)
+    {
+        if (it->ref == ref)
+        {
+            monster->inventory.erase(it);
+            return 1;
+        }
+    }
+    return 0;
 }
 
 int MonsterItems::UseItem(MonsterData *monster, Item & item)
@@ -350,15 +366,8 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
                 //delete from inventory
                 if (item.itemNumber[1] == 0)
                 {
-                    for (ITEMLIST::iterator it = monster->inventory.begin(); it != monster->inventory.end(); it++)
-                    {
-                        if (it->ref == item.ref)
-                        {
-                            World.getTextManager().newLine("You have no more provisions. ");
-                            monster->inventory.erase(it);
-                            break;
-                        }
-                    }
+                    RemoveItem(monster, item.ref);
+                    World.getTextManager().newLine("You have no more provisions. ");
                 }
             }
             return 1;
@@ -387,10 +396,34 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
                     it->monster.color3 = 200;
                     it->monster.resistanceMap.clear();
                 }
-                else 
+                else
                     World.getTextManager().newLine("Nothing happens. ");
             }
         }
+        return 3; // return to main screen
+    }
+    else if (item.type == gem)
+    {
+        bool done = false;
+        for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); ++it)
+        {
+            if (it->isSeen() == 1 && !it->isPlayer() )
+            {
+                it->spellList.clear();
+                World.getTextManager().newLine("The %s is weakened! ", it->Name().c_str());
+                it->monster.skill -= 4;
+                it->monster.stamina = (it->monster.stamina * 70) / 100;
+                done = true;
+            }
+        }
+        // remove gem.
+        if (done)
+        {
+            RemoveItem(monster, item.ref);
+        }
+        else
+            World.getTextManager().newLine("Nothing happens. ");
+
         return 3; // return to main screen
     }
     return 0;

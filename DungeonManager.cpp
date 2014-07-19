@@ -155,7 +155,12 @@ int DungeonManager::AddItems(int lev)
         case 1: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, weapon)); break;
         case 2: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, armour)); break;
         case 3: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, shield)); break;
-        case 4: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, projectile)); break;
+        case 4:
+        {
+            Item * item = World.getItemManager().CreateItem(lev + 25, projectile);
+            item->itemNumber[1] = 10;
+            level[lev].map[pos->x][pos->y].AssignItem(item);
+        }break;
 
         default: level[lev].map[pos->x][pos->y].terrain.Create(fountain); break;
 
@@ -249,11 +254,11 @@ int DungeonManager::PopulateDungeon(int lev)
         World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
 
         // rat nest
-        pos = NewMonsterPosition(lev);
+       /* pos = NewMonsterPosition(lev);
         for (int i = 0; i < 6; i++)
         {
             World.getMonsterManager().CreateMonster(mRandom, RandomMonster::rat, lev, pos->x, pos->y);
-        }
+        }*/
     }
 
     else if (lev == 20) //encounter level
@@ -293,7 +298,7 @@ int DungeonManager::PopulateDungeon(int lev)
                 World.getMonsterManager().CreateMonster(mDigger, sub_type, lev, pos->x, pos->y);
             }
         }
-        if ((lev != 8 && lev > 1 && Random::getInt(10, 0) == 0) || lev == 2 || lev == 6)
+        if ((lev != 8 && lev > 1 && Random::getInt(10, 0) == 0) || lev == 6)
         {
             Coord *pos = NewMonsterPosition(lev);
             for (int i = 0; i < 6; i++)
