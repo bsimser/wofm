@@ -1,6 +1,12 @@
-// InventoryManager.h: interface for the InventoryManager class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 #if !defined(AFX_INVENTORYMANAGER_H__65C8D882_9323_46EC_8A13_BCC5962EC377__INCLUDED_)
 #define AFX_INVENTORYMANAGER_H__65C8D882_9323_46EC_8A13_BCC5962EC377__INCLUDED_

@@ -1,6 +1,13 @@
-// WorldBuilder.h: interface for the WorldBuilder class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_WORLDBUILDER_H__685DBA95_20E8_4392_B7C8_CEF79C98C238__INCLUDED_)
 #define AFX_WORLDBUILDER_H__685DBA95_20E8_4392_B7C8_CEF79C98C238__INCLUDED_

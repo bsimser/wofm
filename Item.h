@@ -1,6 +1,13 @@
-// Item.h: interface for the Item class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_ITEM_H__B4B8BC25_65E3_47B9_A8D8_1ACF01097435__INCLUDED_)
 #define AFX_ITEM_H__B4B8BC25_65E3_47B9_A8D8_1ACF01097435__INCLUDED_
@@ -29,7 +36,10 @@ enum eItemType
     gem,
     provisions,
     stake,
+    DiMaggio,
     cheese,
+    silverArrow,
+    carcass,
 };
 
 enum eWeaponType
@@ -72,6 +82,8 @@ public:
     void createGem();
     void createStake();
     void createCheese();
+    void createCarcass();
+    void createDiMaggio();
 
 	void setColor(int c1, int c2, int c3);
     std::string GetName();
@@ -114,7 +126,7 @@ public:
 	bool identified;
     bool equipped;
     unsigned int ref;
-    unsigned char itemNumber[3];
+    int itemNumber[3];
 
 protected:
     std::string name;

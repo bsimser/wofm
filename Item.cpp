@@ -1,6 +1,13 @@
-// Item.cpp: implementation of the Item class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 #pragma warning(disable : 4786) 
 
 #include "Item.h"
@@ -132,6 +139,8 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
     case gem:           createGem();                            break;
     case stake:         createStake();                          break;
     case cheese:        createCheese();                         break;
+    case carcass:       createCarcass();                        break;
+    case DiMaggio:      createDiMaggio();                        break;
 
     default:     
         char err[128]; 
@@ -166,6 +175,28 @@ void Item::createGem()
     setColor(255, 50, 50);
     name = ("large red gem");
     mWearable = true; // hack to be usable in inventory
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+void Item::createDiMaggio()
+{
+    symbol = '+';
+    setColor(255, 50, 50);
+    name = ("book");
+    postfix = " of DiMaggio";
+    mWearable = true; // hack to be usable in inventory
+}
+
+// --------------------------------------------------------------------------------------------------------------------------------
+
+void Item::createCarcass()
+{
+    symbol = 'c';
+    name = ("pig carcass");
+    identified = 1;
+    weight = 15;
+    setColor(255, 151, 185);
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -623,8 +654,17 @@ std::string Item::GetName()
         case provisions:
             sprintf(tempName, "%d %s%s", itemNumber[1], name.c_str(), itemNumber[1] > 1 ? "s" : "");    break;
 
+        case cheese:
+            sprintf(tempName, "%d %s%s", itemNumber[1], name.c_str(), itemNumber[1] > 1 ? "s" : "");    break;
+
         default:
-            sprintf(tempName, "%s", name.c_str()); break;
+            if (itemNumber[1] > 0)
+                sprintf(tempName, "%d %s%s%s%s", itemNumber[1], prefix.c_str(), name.c_str(), itemNumber[1] > 1 ? "s" : "", postfix.c_str());
+            else
+                sprintf(tempName, "%s%s%s", prefix.c_str(), name.c_str(), postfix.c_str());
+            break;
+
+            //sprintf(tempName, "%s", name.c_str()); break;
         }
     }
     else

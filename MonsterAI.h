@@ -1,6 +1,13 @@
-// MonsterAI.h: interface for the MonsterAI class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_MONSTERAI_H__63120427_CA91_4CCC_9525_1E2F1D16AE39__INCLUDED_)
 #define AFX_MONSTERAI_H__63120427_CA91_4CCC_9525_1E2F1D16AE39__INCLUDED_
@@ -23,9 +30,6 @@ enum eActionList
 class MonsterAI 
 {
 public:
-	MonsterAI();
-	virtual ~MonsterAI();
-
 	int ProcessIntelligence(MonsterData* monster);
 
 private:

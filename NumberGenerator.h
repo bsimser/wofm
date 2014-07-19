@@ -1,6 +1,13 @@
-// NumberGenerator.h: interface for the NumberGenerator class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_NUMBERGENERATOR_H__8F93E679_F7BB_4428_93A5_1AF31F278037__INCLUDED_)
 #define AFX_NUMBERGENERATOR_H__8F93E679_F7BB_4428_93A5_1AF31F278037__INCLUDED_

@@ -1,6 +1,13 @@
-// DungeonGenerator.h: interface for the DungeonGenerator class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_DUNGEONGENERATOR_H__D49B02F6_8AA1_4C67_8264_6171D1953767__INCLUDED_)
 #define AFX_DUNGEONGENERATOR_H__D49B02F6_8AA1_4C67_8264_6171D1953767__INCLUDED_

@@ -1,6 +1,12 @@
-// LevelChange.cpp: implementation of the LevelChange class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 #include "WorldBuilder.h"
 #include "LevelChange.h"
@@ -12,7 +18,6 @@
 
 int LevelChange::ClimbSpecial(int dir)
 {
-
     MonsterData* player = World.getMonsterManager().Player();
     Coord * pos = player->getPosition();
     DungeonLevel *current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];

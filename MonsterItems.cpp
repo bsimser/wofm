@@ -1,6 +1,13 @@
-// MonsterItems.cpp: implementation of the MonsterItems class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #include "WorldBuilder.h"
 #include "MonsterItems.h"
@@ -135,12 +142,24 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
     {
        // if (Random::getInt(2, 0))
         {
-            int itemType = Random::getInt(cheese+1, provisions);
-            item = World.getItemManager().CreateItem(level, itemType, 0);
-            if (itemType == stake)
-                item->itemNumber[1] = Random::getInt(3, 1);
+            int itemType = Random::getInt(silverArrow + 1, provisions);
+            if (itemType = silverArrow)
+            {
+                item = World.getItemManager().CreateItem(level, projectile, silver);
+            }
+            else
+            {
+                item = World.getItemManager().CreateItem(level, itemType, 0);
+                if (itemType == stake)
+                    item->itemNumber[1] = Random::getInt(3, 1);
+            }
 
             monster->inventory.push_back(*item);
+        }
+        if (monster->Name() == "ogre")
+        {
+            monster->inventory.push_back(*World.getItemManager().CreateItem(level, carcass));
+
         }
     }
 
@@ -170,9 +189,11 @@ int MonsterItems::EquipPlayer(MonsterData *player)
     player->inventory.push_back(*item);
 
     item = World.getItemManager().CreateItem(level, cheese);
+    item->itemNumber[1] = 4;
     player->inventory.push_back(*item);
-
-
+    
+    item = World.getItemManager().CreateItem(level, DiMaggio);
+    player->inventory.push_back(*item);
     //player->inventory.push_back(*World.getItemManager().CreateItem(level,cards,0)); //give magic to player
 
     //shield
@@ -262,6 +283,10 @@ int MonsterItems::EquipItem(MonsterData *monster, int item)
                     UseItem(monster, *it);
                     return 0;
                 }
+                case DiMaggio:
+                {
+                    return UseItem(monster, *it);
+                }     
                 case armour:
                 {
                     Item *eq = GetEquipment(monster, armour);
@@ -344,6 +369,29 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
         World.SetState(sThrow);
         UserCommand::Throw(&item);
         return 1;
+    }
+    if (item.type == DiMaggio)
+    {
+        // DRAGON
+        for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); ++it)
+        {
+            if (it->monster.name == "dragon")
+            {
+                if (it->isSeen() == 1 && it->spellList.size() > 0)
+                {
+                    it->spellList.clear();
+                    World.getTextManager().newLine("The dragon shakes it's head violently and smoke comes out it's ears! ");
+                    it->monster.stamina -= 5;
+                    it->monster.color1 = 200;
+                    it->monster.color2 = 200;
+                    it->monster.color3 = 200;
+                    it->monster.resistanceMap.clear();
+                }
+                else 
+                    World.getTextManager().newLine("Nothing happens. ");
+            }
+        }
+        return 3; // return to main screen
     }
     return 0;
 }

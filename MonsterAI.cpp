@@ -1,6 +1,13 @@
-// MonsterAI.cpp: implementation of the MonsterAI class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 #pragma warning(disable : 4786) 
 
 #include "MonsterAI.h"
@@ -17,17 +24,6 @@
 //////////////////////////////////////////////////////////////////////
 
 MonsterData* current_monster;
-
-MonsterAI::MonsterAI()
-{
-
-}
-
-MonsterAI::~MonsterAI()
-{
-
-}
-
 
 int MonsterAI::ProcessIntelligence(MonsterData* monster)
 {
@@ -187,9 +183,21 @@ int MonsterAI::AttackPlayer(MonsterData* monster)
         MagicAttackPlayer(monster);
     else if (monster->is_archer)
         DistanceAttackPlayer(monster);
-
     else
-        ChasePlayer(monster);
+    {
+        if (monster->Name() == "ogre" && World.getMonsterManager().monsterItems.GetInventoryItem(monster, carcass))
+        {
+            if (monster->isSeen())
+            {
+                return World.getActionManager().monsterAction.ThrowItem(monster,
+                                                                        World.getMonsterManager().Player()->pos.x,
+                                                                        World.getMonsterManager().Player()->pos.y,
+                                                                        World.getMonsterManager().monsterItems.GetInventoryItem(monster, carcass)->ref);
+            }
+        }
+        else
+            ChasePlayer(monster);
+    }
 
     return 0;
 }

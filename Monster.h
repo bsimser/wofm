@@ -1,6 +1,13 @@
-// Monster.h: interface for the Monster class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_MONSTER_H__88C4B4AD_2D3B_4EB8_ABA1_07FEFBF7C2F1__INCLUDED_)
 #define AFX_MONSTER_H__88C4B4AD_2D3B_4EB8_ABA1_07FEFBF7C2F1__INCLUDED_

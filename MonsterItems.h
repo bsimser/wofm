@@ -1,6 +1,13 @@
-// MonsterItems.h: interface for the MonsterItems class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_MONSTERITEMS_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_)
 #define AFX_MONSTERITEMS_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_

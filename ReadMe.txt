@@ -1,7 +1,7 @@
-Warlock Of Firetop Mountain RL (c) Corremn 2014
-===============================================
+Warlock Of Firetop Mountain : The Roguelike (c) Corremn 2014
+============================================================
 
-version 0.2 win32
+version 1.0 win32
 -----------------
 
 About
@@ -31,7 +31,7 @@ This is you skill in combat. The higher the more chance of hitting your target.
 
 Stamina
 -------
-This represents your health. When it reaches 0 you die. You can restore stamina from special resting stages and fountains.
+This represents your health. When it reaches 0 you die. You can restore stamina from special resting stages, eating and fountains.
 
 Luck
 ----
@@ -41,14 +41,15 @@ Each time your luck saves you from harm (fleeing or combat) your luck will be re
 
 Combat
 ------
-When attacking your skill and weapon effect your chances of a successful hit as well as the skill and weapon values of your enemy. 
+Your weapons and skill value determine if your are successful in combat.
 Both the weapons base attack value (shown as [Att:x]) and the bonus skill value (shown as +x) will be used for determining attacks.
 The higher values the better.
 
 Defence
 -------
-If you are wearing armour there is a chance that the attack will be deflected or blocked by your armour and no damage will be taken. 
+If you are wearing armour there is a chance that the attack will be blocked or deflected by your armour and no damage will be taken. 
 The armours defence value is shown in the [Def:x] and the higher the better.
+Shields also have a chance of reducing the damage taken by a hit. The higher their block value, [Blk:x], the better.
 
 Resting
 -------
@@ -104,5 +105,10 @@ DemiseRL: https://sites.google.com/site/corremn/
 This game uses a version 0.1.4 of the DemiseRL engine.  
 It uses openGL and the GNU FreeType library for anti-aliased true types fonts (try fullscreen 'F1'), 
 
-If you like this game and wish to see it continued please tell me, also any bugs, ideas, etc. send my way.
+If you like this game let me know however if you encounter bugs/problems or just some ideas please tell me.
+
+Thank you for playing. <support roguelike developers :) >
+
+Cheers
+corremn.
 

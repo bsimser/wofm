@@ -1,6 +1,13 @@
-// DungeonManager.h: interface for the DungeonManager class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_DUNGEONMANAGER_H__AE152525_8D5E_4921_81AF_15FF648CBCC7__INCLUDED_)
 #define AFX_DUNGEONMANAGER_H__AE152525_8D5E_4921_81AF_15FF648CBCC7__INCLUDED_

@@ -1,6 +1,13 @@
-// UserCommand.h: interface for the UserCommand class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_USERCOMMAND_H__BC2EA827_3C5A_4DA9_B6FE_038B9255531C__INCLUDED_)
 #define AFX_USERCOMMAND_H__BC2EA827_3C5A_4DA9_B6FE_038B9255531C__INCLUDED_

@@ -1,7 +1,12 @@
-// SpecialLevelGenerator.h: interface for the SpecialLevelGenerator class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
-
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
 #if !defined(AFX_SPECIALLEVELGENERATOR_H__50E5F382_0B44_41F6_8C67_1A1A2BAA53F0__INCLUDED_)
 #define AFX_SPECIALLEVELGENERATOR_H__50E5F382_0B44_41F6_8C67_1A1A2BAA53F0__INCLUDED_
 

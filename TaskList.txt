@@ -16,7 +16,7 @@ Make enemies (bosses/specials/special items) generate away from start pos.
 
 From the book
 
-Giant - throws a pig carcass at you.test luck.
+Giant - throws a pig carcass at you.test luck. (Ogre - DONE)
 wight - immune to weapons, need silver weapon
 giant bats - double speed
 winged gremlin
@@ -27,9 +27,9 @@ maze master
 
 eye of cyclops
 DiMaggio's book
-cheese
+cheese - DONE
 
-MAKE bosses drop special items
+MAKE bosses drop special items - DONE
 potion of invisibility
 y-shaped stick
 holy water - restore life, luck skill
