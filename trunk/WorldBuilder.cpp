@@ -192,7 +192,7 @@ int WorldBuilder::ToggleFullScreen(int width, int height)
     scene.FullScreen(!scene.FullScreen());			// Toggle Fullscreen / Windowed Mode
 
     // Recreate Our OpenGL Window ( Modified )
-    if (!scene.CreateGLWindow((char *)Title.c_str(), width, height, 16, scene.FullScreen()))
+    if (!scene.CreateGLWindow((char *)Title.c_str(), width, height, 32, scene.FullScreen()))
     {
         return 0;			// Quit If Window Was Not Created
     }

@@ -186,12 +186,13 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 
     if (attackStrength > defenceStrength) //attacker hits defender
     {
-        if (attacker->isPlayer()) //player is attacker
+        if (!defender->isPlayer()) //player is attacker
         {
 
             if (!silver && defender->AbsorbTest())
             {
-                World.getTextManager().newLine("The %s's armour deflected the %s. ", defender->monster.name.c_str(), throw_name.c_str());
+                if (defender->isSeen() == 1)
+                    World.getTextManager().newLine("The %s's armour deflected the %s. ", defender->monster.name.c_str(), throw_name.c_str());
             }
             else
             {
@@ -199,11 +200,13 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
                 {
                     if (Random::getInt(4, 0) <= effect)
                     {
-                        World.getTextManager().newLine("The %s is repelled. ", throw_name.c_str(), defender->monster.name.c_str());
+                        if (defender->isSeen() == 1)
+                            World.getTextManager().newLine("The %s is repelled. ", throw_name.c_str(), defender->monster.name.c_str());
                         return 1;
                     }
                 }
-                World.getTextManager().newLine("The %s hits the %s. ", throw_name.c_str(), defender->monster.name.c_str());
+                if (defender->isSeen() == 1)
+                    World.getTextManager().newLine("The %s hits the %s. ", throw_name.c_str(), defender->monster.name.c_str());
                 if (defender->Name() == "wight" && !silver)
                     World.getTextManager().newLine("It does no damage. ", throw_name.c_str(), defender->monster.name.c_str());
                 else
@@ -222,7 +225,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
                 }
             }
         }
-        else if (defender->isPlayer())
+        else
         {
             if (defender->AbsorbTest())
                 World.getTextManager().newLine("The %s's %s clipped your armour. ", attacker->monster.name.c_str(), throw_name.c_str());
@@ -394,7 +397,7 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
     attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
-    World.getTextManager().newLine("A:%d D:%d Dam:%d ", attackStrength, defenceStrength, CalculateDamage(defender, attackStrength, defenceStrength));
+   // World.getTextManager().newLine("A:%d D:%d Dam:%d ", attackStrength, defenceStrength, CalculateDamage(defender, attackStrength, defenceStrength));
 
     // attack hits
     if (attackStrength > defenceStrength) //attacker hits defender

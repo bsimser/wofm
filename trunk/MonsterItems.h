@@ -30,7 +30,7 @@ public:
 	int EquipPlayer(MonsterData *player);
 
 	int EquipItem(MonsterData *monster,int item);
-	int RemoveItem(MonsterData *monster);
+    int RemoveItem(MonsterData *monster, int item);
     int UseItem(MonsterData *monster, Item & item);
 	int DropItem(MonsterData *monster,int item, bool erace_from_inv = true);
 	int PickupItem(MonsterData *monster);

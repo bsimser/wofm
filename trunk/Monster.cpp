@@ -118,7 +118,7 @@ int Monster::createPlayer()
 {
     symbol = '@';
     name = "Player";
-    setDescription("Our hero. ");
+    setDescription("An adventurer in search of the warlocks treasure. ");
 
     color1 = 200;
     color2 = 200;
@@ -133,7 +133,7 @@ int Monster::createPlayer()
     if (skill == 11)
         luck = 7 + Random::getInt(2, 0);
     else 
-        luck = 12 - skill + 6 + Random::getInt(3, 0);
+        luck = 6 + Random::getInt(6, 1);
 
     sight_range = 6;
     max_stamina = stamina;
@@ -318,7 +318,7 @@ int Monster::createDigger()
 
     setDescription("A collection of digging tools, seemily controlled by invisible hands. ");
 
-    setColor(255, 128, 0);
+    setColor(255, 242, 0);
 
     SetResistance(bPoison, 10);
     SetResistance(bFrost, 10);
