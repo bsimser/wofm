@@ -1,6 +1,13 @@
-// RestLevel.h: interface for the RestLevel class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_RESTLEVEL_H__DD933A6C_8B90_4365_975D_CE3C08ADCD20__INCLUDED_)
 #define AFX_RESTLEVEL_H__DD933A6C_8B90_4365_975D_CE3C08ADCD20__INCLUDED_

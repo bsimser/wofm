@@ -1,3 +1,13 @@
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
+//
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 #include ".\projectileitem.h"
 #include "numberGenerator.h"
 #include <string>
@@ -7,10 +17,6 @@ using namespace Random;
 ProjectileItem::ProjectileItem(void) : Item()
 {
     wearable(true);
-}
-
-ProjectileItem::~ProjectileItem(void)
-{
 }
 
 int ProjectileItem::CreateItem(eItemType _type, int level, int secondary_type)
@@ -50,6 +56,14 @@ int ProjectileItem::createProjectile(int level, int secondary_type)
         setColor(100, 100, 100);
         //SetDice_thr(1, 6);
         itemNumber[0] = crossbowBolts;
+        break;
+
+    case silver:  symbol = '\\';
+        name = ("silver arrow");
+        weight = 1;
+        setColor(99, 177, 177);
+        //SetDice_thr(1, 6);
+        itemNumber[0] = bowArrow;
         break;
     }
 

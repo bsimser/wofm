@@ -1,6 +1,13 @@
-// ActionManager.h: interface for the ActionManager class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_ACTIONMANAGER_H__EAA46311_0242_4D53_A628_FD790FF7E066__INCLUDED_)
 #define AFX_ACTIONMANAGER_H__EAA46311_0242_4D53_A628_FD790FF7E066__INCLUDED_

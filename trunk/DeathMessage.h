@@ -1,6 +1,13 @@
-// DeathMessage.h: interface for the DeathMessage class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_DEATHMESSAGE_H__F9F9626C_0FD6_460E_B14F_0575D7631A0E__INCLUDED_)
 #define AFX_DEATHMESSAGE_H__F9F9626C_0FD6_460E_B14F_0575D7631A0E__INCLUDED_

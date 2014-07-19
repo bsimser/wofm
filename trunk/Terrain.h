@@ -1,6 +1,12 @@
-// Terrain.h: interface for the Terrain class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 #if !defined(AFX_TERRAIN_H__94B87907_AC32_4D5A_9EAB_F7F1EF5D3BC5__INCLUDED_)
 #define AFX_TERRAIN_H__94B87907_AC32_4D5A_9EAB_F7F1EF5D3BC5__INCLUDED_

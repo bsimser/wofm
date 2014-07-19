@@ -1,6 +1,13 @@
-// StandardMonsterActions.h: interface for the StandardMonsterActions class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_STANDARDMONSTERACTIONS_H__0827BB51_C8A4_43C0_81BA_74884B9970EF__INCLUDED_)
 #define AFX_STANDARDMONSTERACTIONS_H__0827BB51_C8A4_43C0_81BA_74884B9970EF__INCLUDED_

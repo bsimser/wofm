@@ -1,6 +1,13 @@
-// MonsterInfo.h: interface for the MonsterInfo class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_MONSTERINFO_H__986C9E36_E764_4202_9703_0B2CBBA576BF__INCLUDED_)
 #define AFX_MONSTERINFO_H__986C9E36_E764_4202_9703_0B2CBBA576BF__INCLUDED_

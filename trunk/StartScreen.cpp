@@ -1,11 +1,17 @@
-// StartScreen.cpp: implementation of the StartScreen class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 0.2.2"
+#define VERSION "version 1.0.0 Release Candidate 01"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

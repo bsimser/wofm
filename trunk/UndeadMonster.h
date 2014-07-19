@@ -1,6 +1,13 @@
-// UndeadMonster.h: interface for the UndeadMonster class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_UNDEADMONSTER_H__071C5F21_C9DB_4B4D_B14A_F8EF2B910355__INCLUDED_)
 #define AFX_UNDEADMONSTER_H__071C5F21_C9DB_4B4D_B14A_F8EF2B910355__INCLUDED_

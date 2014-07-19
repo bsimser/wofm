@@ -1,6 +1,13 @@
-// OpenGLSceneGen.cpp: implementation of the OpenGLSceneGen class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 #include <windows.h>		// Header File For Windows
 #include "OpenGLSceneGen.h"
 #include "WorldBuilder.h"

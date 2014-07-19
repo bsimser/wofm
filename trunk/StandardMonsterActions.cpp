@@ -1,6 +1,12 @@
-// StandardMonsterActions.cpp: implementation of the StandardMonsterActions class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 #include "WorldBuilder.h"
 #include "StandardMonsterActions.h"
@@ -144,8 +150,10 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
     }
 
     //add to ground
-    if (Random::getInt(10, 0) < 7) //20% breakage
+    if (Random::getInt(10, 0) < 7 ) //20% breakage
+    {
         World.getMonsterManager().monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
+    }
 
     //calculate attack
     int dist = (int)sqrt((float)(attacker->pos.x - x)*(attacker->pos.x - x) + (attacker->pos.y - y) *(attacker->pos.y - y));
@@ -163,26 +171,31 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
     if (dist == 1)
-        attackStrength = attackStrength / 2;
+        attackStrength = attackStrength - 5;
+
+    bool silver = ((defender->monster.GetType() == mUndead || defender->Name() == "wight") && actualProjectile->BaseName() == "silver arrow") ? true : false;
+    if (silver)
+        attackStrength += 5;
 
     //if(slots.weapon != NULL)
     Item* a = World.getMonsterManager().monsterItems.GetEquipment(defender, armour);
     if (a)
         defenceStrength += a->absorb_bonus;
 
-    //World.getTextManager().newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
+    //World.getTextManager().newLine("A:%d D:%d Dam:%d ",attackStrength, defenceStrength, CalculateDamage(attackStrength,defenceStrength));
 
     if (attackStrength > defenceStrength) //attacker hits defender
     {
         if (attacker->isPlayer()) //player is attacker
         {
-            if (defender->AbsorbTest())
+
+            if (!silver && defender->AbsorbTest())
             {
                 World.getTextManager().newLine("The %s's armour deflected the %s. ", defender->monster.name.c_str(), throw_name.c_str());
             }
             else
             {
-                if (int effect = defender->monster.GetEffect(repelMissiles) > 0) //repel missiles
+                if (int effect = defender->monster.GetEffect(repelMissiles) > 0) // repel missiles
                 {
                     if (Random::getInt(4, 0) <= effect)
                     {
@@ -191,9 +204,17 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
                     }
                 }
                 World.getTextManager().newLine("The %s hits the %s. ", throw_name.c_str(), defender->monster.name.c_str());
-                defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
+                if (defender->Name() == "wight" && !silver)
+                    World.getTextManager().newLine("It does no damage. ", throw_name.c_str(), defender->monster.name.c_str());
+                else
+                    defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
                 defender->monster.stamina -= AddBrandDamage(attacker, defender, actualProjectile);
 
+                if (silver)
+                {
+                    defender->monster.stamina = -8;
+                    World.getTextManager().newLine("It sinks in deep! ");
+                }
                 if (defender->monster.stamina <= 0)
                 {
                     attacker->experience += defender->monster.experience;
@@ -373,7 +394,7 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
     attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
-    //World.getTextManager().newLine("A:%d D:%d Dam:%d ",attackStrength,defenceStrength, CalculateDamage(attackStrength,defenceStrength));
+    World.getTextManager().newLine("A:%d D:%d Dam:%d ", attackStrength, defenceStrength, CalculateDamage(defender, attackStrength, defenceStrength));
 
     // attack hits
     if (attackStrength > defenceStrength) //attacker hits defender
@@ -387,7 +408,10 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
             else
             {
                 World.getTextManager().newLine("You hit the %s. ", defender->monster.name.c_str());
-                defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
+                if (defender->Name() == "wight")
+                    World.getTextManager().newLine("It resists damage. ");
+                else
+                    defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
                 defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().monsterItems.GetEquipment(attacker, weapon));
 
                 if (defender->monster.stamina <= 0)
@@ -605,32 +629,75 @@ int	StandardMonsterActions::ThrowItem(MonsterData* attacker, const unsigned int 
     }
 
     //remove projectile from inventory and add to ground
+    Item* newItem = World.getItemManager().DuplicateItem(throwItem);
+    newItem->itemNumber[1] = 1;
+
     throwItem->itemNumber[1]--;
     if (throwItem->itemNumber[1] <= 0) //delete from inventory
     {
         attacker->inventory.erase(it);
     }
 
-    Item* newItem = World.getItemManager().DuplicateItem(throwItem);
-    newItem->itemNumber[1] = 1;
 
-    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, targetX, targetY, throwItem->symbol, throwItem->color1, throwItem->color2, throwItem->color2);
 
-    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[targetX][targetY].GetMonster();
-    MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
-    if (defender && defender != attacker)
+    // GET TRAJ
+    DungeonLevel* level = World.getDungeonManager().CurrentLevel();
+
+    int finalX = targetX;
+    int finalY = targetY;
+
+    level->HighLightPath(attacker->pos.x, attacker->pos.y, targetX, targetY);
+
+    for (COORDLIST::iterator it = level->show_path.begin(); it != level->show_path.end(); it++) //something in the way!!
     {
-        World.getTextManager().newLine("The %s bounces off the %s. ", newItem->BaseName().c_str(), defender->Name().c_str());
-        if (defender->Name() == "Zagor")
+        if (!level->IsCellTransparent(it->x, it->y) || level->map[it->x][it->y].monsterExists())
         {
-            World.getTextManager().newLine("Zagor laughs at you! ");
-            World.getDeathMessage().done.cheese = 1;
+            finalX = it->x;
+            finalY = it->y;
+            break;
         }
     }
-    else
-        World.getTextManager().newLine("The %s hits the ground. ", newItem->BaseName().c_str());
 
-    World.getMonsterManager().monsterItems.AttemptDropItem(NULL, newItem, targetX, targetY);
+    //GOT TRAJ
+
+    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, finalX, finalY, throwItem->symbol, throwItem->color1, throwItem->color2, throwItem->color2);
+
+    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[finalX][finalY].GetMonster();
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
+   
+    if (attacker->isPlayer())
+    {
+        if (defender && defender != attacker)
+        {
+            World.getTextManager().newLine("The %s bounces off the %s. ", newItem->BaseName().c_str(), defender->Name().c_str());
+            if (defender->Name() == "Zagor")
+            {
+                World.getTextManager().newLine("Zagor laughs at you! ");
+                World.getDeathMessage().done.cheese = 1;
+            }
+        }
+        else
+            World.getTextManager().newLine("The %s hits the ground. ", newItem->BaseName().c_str());
+    }
+    else if (defender && defender->isPlayer())
+    {
+        if (!defender->TestLuck())
+        {
+            World.getTextManager().newLine("You are hit by a flying %s. ", newItem->BaseName().c_str());
+            defender->monster.stamina -= 2;
+        }
+        else
+        {
+            World.getTextManager().newLine("You *luckily* avoid the flying %s. ", newItem->BaseName().c_str());
+        }
+       
+    }
+    World.getMonsterManager().monsterItems.AttemptDropItem(NULL, newItem, finalX, finalY);
+
+    if (defender && defender->monster.stamina < 1) //dead
+    {
+            World.getDeathMessage().SetDeathMessage("was killed by a flying %s. ", newItem->BaseName().c_str());
+    }
 
     return 1;
 }

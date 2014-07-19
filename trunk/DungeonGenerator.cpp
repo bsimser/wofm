@@ -1,6 +1,13 @@
-// DungeonGenerator.cpp: implementation of the DungeonGenerator class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #include "DungeonGenerator.h"
 #include "Dungeonlevel.h"

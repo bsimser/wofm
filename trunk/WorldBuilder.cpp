@@ -1,6 +1,13 @@
-// WorldBuilder.cpp: implementation of the WorldBuilder class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #include "WorldBuilder.h"
 #include "UserCommand.h"
@@ -307,6 +314,11 @@ void WorldBuilder::ProcessCommand(bool *keys)
         int ret = inventoryManager.InventoryCommand(keys);
         if (ret == 0) //exit inventory
             SetState(sNormal);
+        else if (ret == 3)  //action that took a turn and exit inventory
+        {
+            turns++;
+            SetState(sNormal);
+        }
         else if (ret == 2)  //action that took a turn I.e drop
             turns++;
         //return;

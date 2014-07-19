@@ -1,6 +1,13 @@
-// ItemManager.h: interface for the ItemManager class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_ITEMMANAGER_H__B0BE6CF1_CF3C_46EC_8082_9616CAF8BCC4__INCLUDED_)
 #define AFX_ITEMMANAGER_H__B0BE6CF1_CF3C_46EC_8082_9616CAF8BCC4__INCLUDED_

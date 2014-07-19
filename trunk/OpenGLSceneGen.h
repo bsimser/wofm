@@ -1,6 +1,13 @@
-// OpenGLSceneGen.h: interface for the OpenGLSceneGen class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_OPENGLSCENEGEN_H__AD83E990_77EB_443B_93FE_FEF2F0BCB075__INCLUDED_)
 #define AFX_OPENGLSCENEGEN_H__AD83E990_77EB_443B_93FE_FEF2F0BCB075__INCLUDED_

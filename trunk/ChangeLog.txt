@@ -4,8 +4,8 @@ Warlock of Firetop Mountain (c) 2014 Corremn
 
 Change log
 
-version 0.2.2 12/07/2014
-========================
+version 1.0.0 RC 01 12/07/2014
+==============================
 - Improved rendering speed.
 - reworked luck (see readme.txt)
 - added provisions (+4 stamina)
@@ -17,14 +17,14 @@ version 0.2.2 12/07/2014
 version 0.2.1c 12/07/2014
 =========================
 - added some extra monsters.
-- reward for <spoiler>.
-- Chests and keys now generate mostly in rooms (not corridoors).
+- reward for end.
+- Chests and keys now generate mostly in rooms (not corridors).
 - Ranged attacks now have animation.
 - Removed "red level" outside of mountain
 - Tweaked some other "red levels"
 - Removed spurious "confused" messages
 - Sleepy monsters are now obvious (mostly)
-- Switching to fullscreen now updates window correctly
+- Switching to full screen now updates window correctly
 - Fixed some more dungeon build crashes.
 - removed self-targeting for <a particular ability>
 - only some creatures can open doors
@@ -32,17 +32,17 @@ version 0.2.1c 12/07/2014
 - minor poison/death animation
 - removed item reference overflow - may magically transmute items
 - drop command from main screen
-- final locks are guarenteed to have generated keys
+- final locks are guaranteed to have generated keys
 
 
 version 0.2.1b 03/07/2014
 =========================
 - Fix bug in flood fill test
-- Items cant be dropped on teleport or fountain
+- Items can’t be dropped on teleport or fountain
 - Removed chance of empty chest upon opening
 - Increased change of better items from chests
 - Luck now has a minor effect on waking enemies
-- Fixed wierd player description text
+- Fixed weird player description text
 - Removed 0 strength resistances from list
 - Removed chance of no entry on level 6
 - Picking up items now use identified description message.
@@ -66,7 +66,7 @@ version 0.2.0 19/06/2014
 ========================
 - Rebuilt under MS Visual Studio 2013
 - Added loops in standard dungeon generation
-- All elemetal resistance items have max resistance
+- All elemental resistance items have max resistance
 - Added flee command ('F')
 - Added teleports
 - Fixed crash bug upon ascending special (red) down stairs
@@ -94,16 +94,16 @@ version 0.1.9 25/01/09
 version 0.1.8 08/03/06
 ======================
 - Fixed info screens refresh problem
-- Fixed run problem ('.')(cant run if see monster)
+- Fixed run problem ('.')(can’t run if see monster)
 - Cannot target when you have no projectiles
 - Game does not end when all monsters are dead unless you meet another condition
 - Added poison death message
 - Removed bug where a monster can hit you when you enter a rest stage
-- Can not shoot yourself
+- Cannot shoot yourself
 - You now have to get past the river level for it to show up in your messages.
 - Fixed 'Do you want to leave?' bug. Caused by any mob trying to enter the edge of screen instead of only player.
 - Dropping projectiles no longer reduces them by 70% (possibly the most stupidest code ever written)
-- Animals above dungeon level 9 have had there attack toned down
+- Animals above dungeon level 9 have had their attack toned down
 - Fixed projectile bug - where game crashed when last projectile hit the enemy
 - Fixed projectile equip bug - where some projectiles could not be equipped
 - Now uses same font for text and map - the original map font can be used (see Fonts.txt)
@@ -112,3 +112,4 @@ version 0.1.8 08/03/06
 version 0.1.7drl 03/02/06
 =========================
 - Initial release
+

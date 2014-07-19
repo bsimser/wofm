@@ -1,6 +1,13 @@
-// MonsterManager.h: interface for the MonsterManager class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #if !defined(AFX_MONSTERMANAGER_H__31959C7C_29D8_4DF2_9B54_BA49F3533281__INCLUDED_)
 #define AFX_MONSTERMANAGER_H__31959C7C_29D8_4DF2_9B54_BA49F3533281__INCLUDED_

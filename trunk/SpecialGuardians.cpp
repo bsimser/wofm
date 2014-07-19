@@ -1,6 +1,13 @@
-// SpecialGuardians.cpp: implementation of the SpecialGuardians class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #include "SpecialGuardians.h"
 #include "numbergenerator.h"

@@ -1,6 +1,13 @@
-// InventoryManager.cpp: implementation of the InventoryManager class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #include "InventoryManager.h"
 #include "WorldBuilder.h"
@@ -39,14 +46,16 @@ int InventoryManager::InventoryCommand(bool *keys)
 
     else if (mState == eEquip)
     {
-        if (Equip(keys))
-            return 2;
+        int ret = Equip(keys);
+        if (ret)
+            return ret;
     }
 
     else if (mState == eDrop)
     {
-        if (Drop(keys))
-            return 2;
+        int ret = Drop(keys);
+        if (ret)
+            return ret;
     }
 
     else if (keys[VK_U]) //equip/unequip

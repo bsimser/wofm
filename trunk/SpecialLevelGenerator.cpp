@@ -1,6 +1,13 @@
-// SpecialLevelGenerator.cpp: implementation of the SpecialLevelGenerator class.
+// --------------------------------------------------------------------------------------------------------------------------------
+//  DEMISERL
+//  Copyright 2014 Corremn
 //
-//////////////////////////////////////////////////////////////////////
+// $LastChangedBy$ 
+// $LastChangedDate$ 
+// $LastChangedRevision$ 
+// $HeadURL: $ 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 
 #include "SpecialLevelGenerator.h"
 #include "CellularAutomata.h"
