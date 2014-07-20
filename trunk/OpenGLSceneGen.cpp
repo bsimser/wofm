@@ -157,7 +157,7 @@ GLvoid OpenGLSceneGen::glwPrint(const wchar_t *fmt, ...)				// Custom GL "Print"
         return;							// Do Nothing
     
     va_start(ap, fmt);					// Parses The String For Variables
-    vswprintf(text, fmt, ap);			// And Converts Symbols To Actual Numbers
+    vswprintf(text, 256, fmt, ap);			// And Converts Symbols To Actual Numbers
     va_end(ap);							// Results Are Stored In Text
 
     glPushAttrib(GL_LIST_BIT);				// Pushes The Display List Bits		( NEW )

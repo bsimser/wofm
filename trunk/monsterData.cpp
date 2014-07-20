@@ -16,26 +16,23 @@ bool terrain_attack;
 using namespace Random;
 
 MonsterData::MonsterData(void) :
+last_stamina(0),
 experience(0), 
-is_archer(0), 
-kills(0), 
-is_magic(0), 
+experience_level(0),
+level(0),
+ref(-1),
+is_archer(0),
+is_magic(0),
 miss_turn(0), 
 fleeing(false), 
 flee_count(0), 
-luck_penalty(0)
+luck_penalty(0),
+kills(0),
+state(normal),
+group(evil)
 {
     terrain_attack = true;
 }
-
-MonsterData::~MonsterData(void)
-{
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 int MonsterData::NextAction(Action *action)
 {

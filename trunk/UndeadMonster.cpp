@@ -121,23 +121,32 @@ int UndeadMonster::createGhoul()
 int UndeadMonster::createVampire()
 {
     symbol = 'V';
-    name = ("big scary vampire");
-    setDescription("Big and scary this vampire is big and scary. ");
+    stamina = 8 + getInt(3, 1);
+    skill = 10 + getInt(3, 1);
+    luck = 8 + getInt(3, 1);
+
+    if (Random::getInt(2, 0))
+    {
+        name = ("big scary vampire");
+        setDescription("This gig and scary vampire is big and scary. ");
+        setColor(100, 100, 200);
+        experience = 15;
+    }
+    else
+    {
+        name = ("vampire");
+        setDescription("A vampire with hypnotic eyes. ");
+        skill--;
+        setColor(100, 100, 140);
+        experience = 13;
+    }
     SetBrand(bConfusion, 2);
-
-    setColor(100, 100, 140);
-
-    stamina = 8  + getInt(3, 1);
-    skill   = 10 + getInt(3, 1);
-    luck    = 8  + getInt(3, 1);
 
     sight_range = 5;
     max_stamina = stamina;
 
     humanoid = true;
     SetResistance(bFrost, 5);
-
-    experience = 15;
 
     return 1;
 }

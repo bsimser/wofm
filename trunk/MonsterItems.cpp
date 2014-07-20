@@ -47,16 +47,20 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
 {
     std::string & name = monster->monster.name;
 
-    monster->inventory.clear();
-
     Item * item;
 
-    if (name.find("Servant") != -1) //servants do not use armour and have maces or swords
+    if (name.find("servant") != -1) //servants do not use armour and have maces or swords
     {
         if (Random::getInt(2, 0) == 0)
             item = World.getItemManager().CreateItem(level, weapon, sword);
         else
             item = World.getItemManager().CreateItem(level, weapon, mace);
+        monster->inventory.push_back(*item);
+        monster->inventory.back().equipped = 1;
+    }
+    else if (name.find("cyclops") != -1)
+    {
+        item = World.getItemManager().CreateItem(level, gem);
         monster->inventory.push_back(*item);
         monster->inventory.back().equipped = 1;
     }
@@ -116,7 +120,7 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
         monster->inventory.push_back(*World.getItemManager().CreateItem(level, armour, bloodyapron));
         monster->inventory.back().equipped = 1;
     }
-
+    
     else if (name.find("Zagor") != -1)
     {
         item = World.getItemManager().CreateItem(level, weapon, staff);
@@ -143,7 +147,7 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
         if (level > 1)
         {
             int itemType = Random::getInt(silverArrow + 1, provisions);
-            if (itemType = silverArrow)
+            if (itemType == silverArrow)
             {
                 item = World.getItemManager().CreateItem(level, projectile, silver);
             }
@@ -162,7 +166,6 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
 
         }
     }
-
     return 1;
 }
 

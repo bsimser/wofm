@@ -17,12 +17,12 @@
 
 enum eMonsterState
 {
-    asleep,    //dont move, no detect
-    sentry, //dont move, can detect
-    normal, //irratic move, can detect
-    hostile, //attacks/chases
-    waking,  //transitional stage
-    panic,    //
+    asleep,     //dont move, no detect
+    sentry,     //dont move, can detect
+    normal,     //irratic move, can detect
+    hostile,    //attacks/chases
+    waking,     //transitional stage
+    panic,      //
     dead
 };
 
@@ -36,14 +36,12 @@ struct itemData
 {
     Item item;
     int equipped;
-
 };
 
 class MonsterData
 {
 public:
     MonsterData();
-    ~MonsterData();
 
     //actions
     int         NextAction(Action *action);
