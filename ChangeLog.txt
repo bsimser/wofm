@@ -6,6 +6,11 @@ Change log
 
 version 1.0.0 RC 01 12/07/2014
 ==============================
+- Fixed minor issues.
+
+
+version 1.0.0 RC 01 12/07/2014
+==============================
 - Improved rendering speed.
 - reworked luck (see readme.txt)
 - added provisions (+4 stamina)

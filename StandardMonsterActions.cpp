@@ -126,7 +126,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 
     // show trajectory
     Symbol symbol('*', 255, 0, 0);
-    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, x, y, actualProjectile->symbol, actualProjectile->color1, actualProjectile->color2, actualProjectile->color2);
+    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, x, y, actualProjectile->symbol, actualProjectile->color1, actualProjectile->color2, actualProjectile->color3);
 
     actualProjectile->equipped = 0;
 
@@ -173,7 +173,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
     if (dist == 1)
         attackStrength = attackStrength - 5;
 
-    bool silver = ((defender->monster.GetType() == mUndead || defender->Name() == "wight") && actualProjectile->BaseName() == "silver arrow") ? true : false;
+    bool silver = ((defender->monster.GetType() == mUndead || defender->Name() == "wight" || defender->Name().find("vampire") != -1 || defender->Name().find("pirate") != -1) && actualProjectile->BaseName() == "silver arrow") ? true : false;
     if (silver)
         attackStrength += 5;
 

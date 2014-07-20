@@ -11,7 +11,7 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 1.0.0 Release Candidate 01"
+#define VERSION "version 1.0.0 Release Candidate 02"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction

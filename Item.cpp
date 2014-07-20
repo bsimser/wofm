@@ -148,6 +148,13 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
         throw std::exception(err);
     }
 
+    if (stackable())
+    {
+        if (itemNumber[1] == 0)
+        {
+            itemNumber[1] = 1;
+        }
+    }
     type = _type; //type defines behaviour
 
     return 0;
@@ -220,6 +227,7 @@ void Item::createCheese()
     identified = true;
     symbol = ';';
     setColor(140, 230, 10);
+    itemNumber[1] = 1; // set stack to one
     name = ("smelly cheese");
     mWearable = true; // hack to be usable in inventory
 }

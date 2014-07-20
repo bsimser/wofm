@@ -328,7 +328,13 @@ int DungeonManager::PopulateDungeon(int lev)
         // create level guardian
         Coord *pos = NewMonsterPosition(lev); //??
         if (lev != 9)
+        {
             MonsterData * special = World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
+            if (lev == 6)
+            {
+                World.getMonsterManager().monsterItems.EquipMonster(special, lev);
+            }
+        }
     }
     if (lev == 4) //river level
     {
