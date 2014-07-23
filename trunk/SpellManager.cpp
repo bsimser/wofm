@@ -25,7 +25,7 @@ int SpellManager::Initialise(void)
 
 void SpellManager::CreateSpell(eSpellList type)
 {
-    SpellBase s;// = new SpellBase;
+    SpellBase s;
     if (s.CreateSpell(type))
         all_spells.push_back(s);
 }
@@ -160,7 +160,7 @@ int SpellManager::CastCurrentSpell(MonsterData* caster, int targetX, int targetY
 
     for (it = level->show_path.begin(); it != level->show_path.end(); it++)
     {
-        if (!level->IsCellTransparent(it->x, it->y) || level->map[it->x][it->y].monsterExists())
+        if (!level->IsCellTransparent(it->x, it->y) || level->getCell(it->x, it->y).monsterExists())
         {
 
             int ret = 0;

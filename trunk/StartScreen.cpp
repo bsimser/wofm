@@ -11,7 +11,7 @@
 #include "WorldBuilder.h"
 #include "StartScreen.h"
 
-#define VERSION "version 1.0.0 Release Candidate 02"
+#define VERSION "version 1.0.0 Release Candidate 03"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -23,11 +23,6 @@ StartScreen::StartScreen():
     pName(""),
     pClass("Adventurer")
 {
-}
-
-StartScreen::~StartScreen()
-{
-
 }
 
 void StartScreen::Display()

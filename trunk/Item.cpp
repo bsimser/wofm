@@ -52,7 +52,7 @@ Item::Item() :
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-Item::Item(const Item & rhs) : ResistanceBrands(rhs)
+/*Item::Item(const Item & rhs) : ResistanceBrands(rhs)
 {
     name = rhs.name;
 
@@ -91,7 +91,7 @@ Item::Item(const Item & rhs) : ResistanceBrands(rhs)
 
     postfix = rhs.postfix;
     prefix =  rhs.prefix;
-}
+}*/
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ int Item::CreateItem(eItemType _type, int level, int secondary_type)
     case cards:         createCards(level);                     break;
     case provisions:    createProvision();                      break;
     case gem:           createGem();                            break;
-    case stake:         createStake();                          break;
+    case stake:         createCheese();                          break; // no stake mechanics
     case cheese:        createCheese();                         break;
     case carcass:       createCarcass();                        break;
     case DiMaggio:      createDiMaggio();                        break;

@@ -120,7 +120,7 @@ int MonsterManager::DestroyMonster(int ref)
         if (it->ref == ref)
         {
             Coord * pos = it->getPosition();
-            World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
+            World.getDungeonManager().level(World.GetCurrentLevel()).getCell(pos->x, pos->y).RemoveMonsterRef();
             monster_list.erase(it);
             return 1;
         }
@@ -132,7 +132,7 @@ int MonsterManager::DestroyMonster(MONSTERLIST::iterator it)
 {
     //remove from map;
     Coord * pos = it->getPosition();
-    World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
+    World.getDungeonManager().level(World.GetCurrentLevel()).getCell(pos->x, pos->y).RemoveMonsterRef();
 
     monster_list.erase(it); //remove from list
 
@@ -147,7 +147,7 @@ MonsterData * /*MONSTERLIST::iterator */MonsterManager::Player()
 
 int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* actionManager)
 {
-    dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     //check status
     for (MONSTERLIST::iterator r_it = monster_list.begin(); r_it != monster_list.end();)
@@ -202,7 +202,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
 
             //remove from map;
             Coord * pos = r_it->getPosition();
-            World.getDungeonManager().level[World.GetCurrentLevel()].map[pos->x][pos->y].RemoveMonsterRef();
+            World.getDungeonManager().level(World.GetCurrentLevel()).getCell(pos->x, pos->y).RemoveMonsterRef();
 
             r_it = monster_list.erase(r_it); //remove from list
         }
@@ -220,7 +220,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
         if (it->isPlayer()) //no AI for player
         {
             Coord * pos = it->getPosition();
-            dungeonLevel->map[pos->x][pos->y].AssignMonster(&it->monster);
+            dungeonLevel->getCell(pos->x, pos->y).AssignMonster(&it->monster);
             //static int gogo =0; //effect tests
             //if(gogo==0)
             {
@@ -254,7 +254,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
                 ai.ProcessIntelligence(&(*it));
 
                 Coord * pos = it->getPosition();
-                dungeonLevel->map[pos->x][pos->y].AssignMonster(&it->monster);
+                dungeonLevel->getCell(pos->x, pos->y).AssignMonster(&it->monster);
 
                 it->last_stamina = it->monster.stamina;
             }

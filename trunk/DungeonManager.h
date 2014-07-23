@@ -8,7 +8,6 @@
 // $HeadURL: $ 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-
 #if !defined(AFX_DUNGEONMANAGER_H__AE152525_8D5E_4921_81AF_15FF648CBCC7__INCLUDED_)
 #define AFX_DUNGEONMANAGER_H__AE152525_8D5E_4921_81AF_15FF648CBCC7__INCLUDED_
 
@@ -24,9 +23,6 @@ class DungeonManager
 {
 public:
 	int Initialise();
-
-	DungeonLevel level[21];		
-
 	virtual int PopulateDungeon(int level);
 
 	Coord * NewMonsterPosition(int lev);
@@ -45,12 +41,14 @@ public:
 	void PrintDungeons();
 	void PopulateSpecialDungeon(int level,int type);
 
-	DungeonLevel* Level(int id){return &level[id];};
-
 	DungeonLevel* CurrentLevel();
     static std::string getLevelName(int level);
 
+    DungeonLevel & level(int level);
+
 private:
+    DungeonLevel dungeonLevels[21];
+
 	int AddKeysToDungeon();
 
 };

@@ -73,17 +73,17 @@ int DungeonManager::BuildCompleteDungeon(int max_num_levels)
 
 int DungeonManager::CreateDungeon(int dlevel, int type)
 {
-    level[dlevel].Initialise(type);
+    level(dlevel).Initialise(type);
 
     if (dlevel == 8) // minotaur level
-        level[dlevel].setMapLight(DungeonLevel::eNoFound);
+        level(dlevel).setMapLight(DungeonLevel::eNoFound);
 
     return 1;
 }
 
 int DungeonManager::DeleteDungeon(int dlevel)
 {
-    //	level[dlevel].Delete();
+    //	level(dlevel).Delete();
     return 1;
 }
 
@@ -92,7 +92,7 @@ Coord * DungeonManager::NewMonsterPosition(int lev)
 {
     try
     {
-        Coord *newPos = level[lev].FreeTerrainPosition(dfloor);
+        Coord *newPos = level(lev).FreeTerrainPosition(dfloor);
         if (newPos)
             return newPos;
         throw std::exception("Failed to find free floor position for monster");
@@ -109,7 +109,7 @@ Coord * DungeonManager::NewBridgePosition(int lev)
 {
     try
     {
-        return level[lev].FreeTerrainPosition(bridge);
+        return level(lev).FreeTerrainPosition(bridge);
     }
     catch (const std::exception & ex)
     {
@@ -125,44 +125,44 @@ int DungeonManager::AddItems(int lev)
 
     for (int i = 0; i < nItems; i++)
     {
-        Coord* pos = level[lev].NewItemPosition();
-        //level[lev].map[pos->x][pos->y].getItem() = World.getItemManager().CreateRandomItem(lev);
+        Coord* pos = level(lev).NewItemPosition();
+        //level(lev).getCell(pos->x, pos->y).getItem() = World.getItemManager().CreateRandomItem(lev);
         int item_test = getInt(10, 0);
         if (item_test == 0)
         {
-            Coord* pos = level[lev].NewItemPosition(true);
-            level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev, lockedChest));
+            Coord* pos = level(lev).NewItemPosition(true);
+            level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev, lockedChest));
         }
         else if (getInt(10, 0) < 2)
         {
-            Coord* pos = level[lev].NewItemPosition(true);
-            level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev, openChest));
+            Coord* pos = level(lev).NewItemPosition(true);
+            level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev, openChest));
         }
         else
         {
-            Coord* pos = level[lev].NewItemPosition();
-            level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev, corpse));
+            Coord* pos = level(lev).NewItemPosition();
+            level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev, corpse));
         }
     }
 
-    Coord * pos = level[lev].FreeTerrainPosition(random);
+    Coord * pos = level(lev).FreeTerrainPosition(random);
 
     if (pos)
     {
         switch (Random::getInt(5,0))
         {
-        case 0: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, corpse)); break;
-        case 1: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, weapon)); break;
-        case 2: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, armour)); break;
-        case 3: level[lev].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(lev+25, shield)); break;
+        case 0: level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev+25, corpse)); break;
+        case 1: level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev+25, weapon)); break;
+        case 2: level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev+25, armour)); break;
+        case 3: level(lev).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(lev+25, shield)); break;
         case 4:
         {
             Item * item = World.getItemManager().CreateItem(lev + 25, projectile);
             item->itemNumber[1] = 10;
-            level[lev].map[pos->x][pos->y].AssignItem(item);
+            level(lev).getCell(pos->x, pos->y).AssignItem(item);
         }break;
 
-        default: level[lev].map[pos->x][pos->y].terrain.Create(fountain); break;
+        default: level(lev).getCell(pos->x, pos->y).terrain.Create(fountain); break;
 
         }
         if (Random::getInt(2, 0))
@@ -174,8 +174,8 @@ int DungeonManager::AddItems(int lev)
 
     /*	if(lev==1)
         {
-        Coord* pos = level[lev].NewItemPosition();
-        level[lev].map[pos->x][pos->y].item = World.getItemManager().CreateItem(lockedChest,lev);
+        Coord* pos = level(lev).NewItemPosition();
+        level(lev).getCell(pos->x, pos->y].item = World.getItemManager().CreateItem(lockedChest,lev);
         }*/
 
     return 1;
@@ -186,12 +186,12 @@ int DungeonManager::PopulateDungeon(int lev)
     int sub_type = 0;
     //add player
 
-    if (!level[lev].initialised)
+    if (!level(lev).initialised)
         throw("Attempting to populate uninitialised level:");
 
     if (lev == 0) //first level add player
     {
-        Coord *start = level[lev].getStartPos(); //get starting point (up stairs)
+        Coord *start = level(lev).getStartPos(); //get starting point (up stairs)
         MonsterData* player = World.getMonsterManager().CreateMonster(mPlayer, sub_type, 0, start->x, start->y);
 
         player->SetState(normal);
@@ -248,8 +248,8 @@ int DungeonManager::PopulateDungeon(int lev)
         
         gog = World.getMonsterManager().CreateMonster(mOrc, sub_type, lev, pos->x, pos->y);
 
-        //pos = level[lev].FreeTerrainPosition(openStairs); //??
-        pos = level[lev].GetEndPosition();
+        //pos = level(lev).FreeTerrainPosition(openStairs); //??
+        pos = level(lev).GetEndPosition();
 
         World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
 
@@ -317,7 +317,7 @@ int DungeonManager::PopulateDungeon(int lev)
                 maxNumber = 4;
             for (int x = 0; x < maxNumber; x++)
             {
-                Coord *pos = level[lev].FreeTerrainPosition(deepWater);
+                Coord *pos = level(lev).FreeTerrainPosition(deepWater);
                 if (pos)
                 {
                     World.getMonsterManager().CreateMonster(mCrocodile, 0, lev, pos->x, pos->y);
@@ -343,7 +343,7 @@ int DungeonManager::PopulateDungeon(int lev)
             throw std::exception("no bridge master, Game halted");
         World.getMonsterManager().CreateMonster(mBridgeMaster, sub_type, lev, pos->x, pos->y);
 
-        pos = level[lev].FreeTerrainPosition(deepWater);
+        pos = level(lev).FreeTerrainPosition(deepWater);
         if (pos)
         {
             World.getMonsterManager().CreateMonster(mCrocodile, 0, lev, pos->x, pos->y);
@@ -371,8 +371,8 @@ int DungeonManager::PopulateDungeon(int lev)
 
     if (lev == 0)
     {
-        //	Coord* pos = level[lev].NewItemPosition();
-        //level[lev].map[3][3].AssignItem( World.getItemManager().CreateItem(lev,lockedChest));
+        //	Coord* pos = level(lev).NewItemPosition();
+        //level(lev).getCell(3,3).AssignItem( World.getItemManager().CreateItem(lev,lockedChest));
     }
 
 #endif
@@ -399,18 +399,18 @@ void DungeonManager::CreateSpecialDungeon()
                 PopulateSpecialDungeon(i + 10, slRandom);
 
                 // make entrance
-                Coord * pos = level[i].FreeTerrainPosition("dungeon floor");
+                Coord * pos = level(i].FreeTerrainPosition("dungeon floor");
                 if (!pos)
                 {
                     pos->x = 5;
                     pos->y = 5;
                 }
-                level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
 
-                pos = level[i + 10].NewSpecialItemPosition();
-                level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                pos = level(i + 10).NewSpecialItemPosition();
+                level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-               // pos = level[i + 10].NewSpecialItemPosition(); //??
+               // pos = level(i + 10).NewSpecialItemPosition(); //??
                 World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);*/
             }
             else if (i == 1 || i == 2 || i == 3)
@@ -421,10 +421,10 @@ void DungeonManager::CreateSpecialDungeon()
                     CreateDungeon(i + 10, slBarracks);
                     PopulateSpecialDungeon(i + 10, slBarracks);
                     Coord *pos = NewMonsterPosition(i);
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
@@ -434,13 +434,13 @@ void DungeonManager::CreateSpecialDungeon()
                     CreateDungeon(i + 10, slTrollCave);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     Coord *pos = NewMonsterPosition(i);
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
                     special_type1++;
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    pos = level[i + 10].NewSpecialItemPosition(); //??
+                    pos = level(i + 10).NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
                 // ogre cave
@@ -449,13 +449,13 @@ void DungeonManager::CreateSpecialDungeon()
                     CreateDungeon(i + 10, i + 10);
                     PopulateSpecialDungeon(i + 10, slRandom);
                     Coord *pos = NewMonsterPosition(i); //create entry on normal dungeon
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
                     special_type1++;
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    //pos = level[i+10].NewSpecialItemPosition(); // put guard of chest
+                    //pos = level(i+10].NewSpecialItemPosition(); // put guard of chest
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
@@ -472,14 +472,14 @@ void DungeonManager::CreateSpecialDungeon()
                     test++;
                     if (test > 10000)
                         break;
-                } while (std::string(level[i].map[pos->x][pos->y].terrain.name) != "sand");
+                } while (std::string(level(i).getCell(pos->x, pos->y).terrain.name) != "sand");
 
-                level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
+                level(i).getCell(pos->x, pos->y).terrain.Create(specialLocked);
 
-                pos = level[i + 10].NewSpecialItemPosition();
-                level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                pos = level(i + 10).NewSpecialItemPosition();
+                level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                //pos = level[i + 10].NewSpecialItemPosition(); //??
+                //pos = level(i + 10).NewSpecialItemPosition(); //??
                 World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
             }
             // spider cave
@@ -491,13 +491,13 @@ void DungeonManager::CreateSpecialDungeon()
                     PopulateSpecialDungeon(i + 10, slSpiderCave);
                     //choose one entrances
                     Coord *pos = NewMonsterPosition(i);
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
                     special_type2++;
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    pos = level[i + 10].NewSpecialItemPosition(); //??
+                    pos = level(i + 10).NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
                 // sandworm
@@ -507,12 +507,12 @@ void DungeonManager::CreateSpecialDungeon()
                     PopulateSpecialDungeon(i + 10, slRandom);
                     //choose one entrances
                     Coord *pos = NewMonsterPosition(i + 10);
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    pos = level[i + 10].NewSpecialItemPosition(); //??
+                    pos = level(i + 10).NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
@@ -525,13 +525,13 @@ void DungeonManager::CreateSpecialDungeon()
                     PopulateSpecialDungeon(i + 10, slUndead);
                     //choose special undead level
                     Coord *pos = NewMonsterPosition(i);
-                    level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialLocked);
                     special_type3++;
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    pos = level[i + 10].NewSpecialItemPosition(); //??
+                    pos = level(i + 10).NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
                 // minotaur
@@ -541,12 +541,12 @@ void DungeonManager::CreateSpecialDungeon()
                     PopulateSpecialDungeon(i + 10, slRandom);
                     //choose one entrances
                     Coord *pos = NewMonsterPosition(i);
-                    level[i].map[pos->x][pos->y].terrain.Create(specialOpen);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
 
-                    pos = level[i + 10].NewSpecialItemPosition();
-                    level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                    pos = level(i + 10).NewSpecialItemPosition();
+                    level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                    pos = level[i + 10].NewSpecialItemPosition(); //??
+                    pos = level(i + 10).NewSpecialItemPosition(); //??
                     World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
                 }
             }
@@ -558,15 +558,15 @@ void DungeonManager::CreateSpecialDungeon()
 
                 //create treasure level
                 Coord *pos = NewMonsterPosition(i);
-                level[i].map[pos->x][pos->y].terrain.Create(specialLocked);
+                level(i).getCell(pos->x, pos->y).terrain.Create(specialLocked);
 
                 AddKeysToDungeon();
 
                 // zagor locked chest
-                pos = level[i + 10].NewSpecialItemPosition();
-                level[i + 10].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
+                pos = level(i + 10).NewSpecialItemPosition();
+                level(i + 10).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(i + 10, lockedChest));
 
-                pos = level[i + 10].NewSpecialItemPosition(); //??
+                pos = level(i + 10).NewSpecialItemPosition(); //??
                 MonsterData *dragon = World.getMonsterManager().CreateMonster(mGuards, i, i + 10, pos->x, pos->y);
 
                 World.getSpellManager().AddMonsterSpell(dragon, spDragonFire);
@@ -594,7 +594,7 @@ void DungeonManager::CreateLockedDungeon()
     for (int i = 0; i < 10; i++)
     {
         //get gate position
-        Coord *pos = level[i].GetEndPosition();
+        Coord *pos = level(i).GetEndPosition();
 
         if (pos == NULL)
         {
@@ -610,13 +610,13 @@ void DungeonManager::CreateLockedDungeon()
             i == 8    //zagor entrance
             )
         {
-            if (level[i].map[pos->x][pos->y].terrain.type == openStairs)
-                level[i].map[pos->x][pos->y].terrain.Create(lockedStairs);
+            if (level(i).getCell(pos->x, pos->y).terrain.type == openStairs)
+                level(i).getCell(pos->x, pos->y).terrain.Create(lockedStairs);
         }
         else
         {
-            if (level[i].map[pos->x][pos->y].terrain.type == lockedStairs)
-                level[i].map[pos->x][pos->y].terrain.Create(openStairs);
+            if (level(i).getCell(pos->x, pos->y).terrain.type == lockedStairs)
+                level(i).getCell(pos->x, pos->y).terrain.Create(openStairs);
         }
     }
 }
@@ -642,7 +642,7 @@ void DungeonManager::PrintDungeons()
         {
             for (int w = 0; w < DUNGEON_SIZE_W; w++)
             {
-                ofile << (char)level[i].map[w][h].terrain.symbol;
+                ofile << (char)level(i).getCell(w, h).terrain.symbol;
             }
             ofile << std::endl;
         }
@@ -717,7 +717,7 @@ void DungeonManager::PopulateSpecialDungeon(int lev, int type)
     int maxCrocs = Random::getInt(5, 0);
     for (int x = 0; x < maxCrocs; x++)
     {
-        Coord *pos = level[lev].FreeTerrainPosition(deepWater);
+        Coord *pos = level(lev).FreeTerrainPosition(deepWater);
 
         if (pos)
         {
@@ -727,9 +727,16 @@ void DungeonManager::PopulateSpecialDungeon(int lev, int type)
 
     /*	if(lev==0)
         {
-        Coord* pos = level[lev].NewItemPosition();
-        level[lev].map[3][3].item = World.getItemManager().CreateItem(lev,lockedChest);
+        Coord* pos = level(lev).NewItemPosition();
+        level(lev).getCell(3, 3).item = World.getItemManager().CreateItem(lev,lockedChest);
         }*/
+}
+
+DungeonLevel & DungeonManager::level(int level)
+{
+    if (level < 0 || level > 20)
+        std::exception("Level out of bounds");
+    return dungeonLevels[level];
 }
 
 int DungeonManager::AddKeysToDungeon()
@@ -739,14 +746,14 @@ int DungeonManager::AddKeysToDungeon()
     {
         int rand_level = Random::getInt(ind - 1, 1); // key can be anywhere below current level. 
         //I.e key for level 15 (special level 5) can be anywhere below level 150
-        if (!level[rand_level].initialised)
+        if (!level(rand_level).initialised)
         {
             ind--;
             continue;
         }
         try
         {
-            Coord* pos = level[rand_level].NewItemPosition(true); // put keys in rooms
+            Coord* pos = level(rand_level).NewItemPosition(true); // put keys in rooms
             if (pos == NULL)
                 throw std::exception("Could not create keys");
 
@@ -768,7 +775,7 @@ int DungeonManager::AddKeysToDungeon()
             }
 
             if (!duplicated)
-                level[rand_level].map[pos->x][pos->y].AssignItem(World.getItemManager().CreateItem(ind, key));
+                level(rand_level).getCell(pos->x, pos->y).AssignItem(World.getItemManager().CreateItem(ind, key));
         }
         catch (const std::exception)
         {
@@ -782,7 +789,7 @@ int DungeonManager::AddKeysToDungeon()
 
 DungeonLevel* DungeonManager::CurrentLevel()
 {
-    return &level[World.GetCurrentLevel()];
+    return &level(World.GetCurrentLevel());
 }
 
 std::string DungeonManager::getLevelName(int level)

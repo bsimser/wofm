@@ -32,7 +32,6 @@ class StartScreen
 {
 public:
 	StartScreen();
-	virtual ~StartScreen();
 
 	virtual void Display();
 

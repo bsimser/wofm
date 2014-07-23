@@ -31,7 +31,7 @@ int StandardMonsterActions::ThrowTarget(MonsterData* attacker, int targetX, int 
 
     for (it = level->show_path.begin(); it != level->show_path.end(); it++) //something in the way!!
     {
-        if (!level->IsCellTransparent(it->x, it->y) || level->map[it->x][it->y].monsterExists())
+        if (!level->IsCellTransparent(it->x, it->y) || level->getCell(it->x, it->y).monsterExists())
         {
             finalX = it->x;
             finalY = it->y;
@@ -51,7 +51,7 @@ void StandardMonsterActions::ShowTrajectory(int level, int sourceX, int sourceY,
     Symbol vSymbol(symbol, c1, c2, c3);
 
     // get and copy path
-    DungeonLevel & dungeonLevel = World.getDungeonManager().level[level];
+    DungeonLevel & dungeonLevel = World.getDungeonManager().level(level);
     dungeonLevel.HighLightPath(sourceX, sourceY, targetX, targetY);
     COORDLIST path = dungeonLevel.show_path;
     World.getDungeonManager().CurrentLevel()->ClearPath();
@@ -59,10 +59,10 @@ void StandardMonsterActions::ShowTrajectory(int level, int sourceX, int sourceY,
     COORDLIST::iterator it;
     for (it = path.begin(); it != path.end(); it++) 
     {
-         dungeonLevel.map[it->x][it->y].setSymbol(vSymbol);
+         dungeonLevel.getCell(it->x, it->y).setSymbol(vSymbol);
         World.Render();
         Sleep(32);
-        dungeonLevel.map[it->x][it->y].clearSymbol();
+        dungeonLevel.getCell(it->x, it->y).clearSymbol();
     }
 }
 
@@ -104,7 +104,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
         }
     }
 
-    Item *actualProjectile = new Item(*projectilePile);
+    Item *actualProjectile = World.getItemManager().DuplicateItem(projectilePile);
     actualProjectile->itemNumber[1] = 1; //make only one
 
     //remove projectile from inventory and add to ground
@@ -130,15 +130,15 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 
     actualProjectile->equipped = 0;
 
-    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
+    Monster *d = World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).GetMonster();
     MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
     std::string throw_name = actualProjectile->BaseName();
 
     if (defender == NULL || d == NULL) //no target but terrain
     {
-        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == deepWater ||
-            World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == shallowWater)
+        if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).terrain.type == deepWater ||
+            World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).terrain.type == shallowWater)
             World.getTextManager().newLine("Splash! "); //missile are lost
         else
         {
@@ -150,7 +150,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
     }
 
     //add to ground
-    if (Random::getInt(10, 0) < 7 ) //20% breakage
+     if (Random::getInt(10, 0) < 7 ) //20% breakage
     {
         World.getMonsterManager().monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
     }
@@ -207,16 +207,24 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
                 }
                 if (defender->isSeen() == 1)
                     World.getTextManager().newLine("The %s hits the %s. ", throw_name.c_str(), defender->monster.name.c_str());
+                else
+                    World.getTextManager().newLine("The hear a painful grunt. ");
+
                 if (defender->Name() == "wight" && !silver)
-                    World.getTextManager().newLine("It does no damage. ", throw_name.c_str(), defender->monster.name.c_str());
+                {
+                    if(defender->isSeen() == 1)
+                        World.getTextManager().newLine("It does no damage. ", throw_name.c_str(), defender->monster.name.c_str());
+                }
                 else
                     defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
+
                 defender->monster.stamina -= AddBrandDamage(attacker, defender, actualProjectile);
 
                 if (silver)
                 {
                     defender->monster.stamina = -8;
-                    World.getTextManager().newLine("It sinks in deep! ");
+                    if (defender->isSeen() == 1)
+                        World.getTextManager().newLine("It sinks in deep! ");
                 }
                 if (defender->monster.stamina <= 0)
                 {
@@ -284,13 +292,13 @@ int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new
     if (monster->monster.GetEffect(paralysis))
         return 0;
 
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type == stone)
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).terrain.type == stone)
         return 0;
 
     if (World.GetCurrentLevel() == 0 && (new_y == 0 || new_x == 0 || new_x == DUNGEON_SIZE_W - 1 || new_y == DUNGEON_SIZE_H - 1)
         && monster->isPlayer()) //exit world
     {
-        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type != deepWater)
+        if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).terrain.type != deepWater)
         {
             World.getTextManager().newLine("Do you want to leave? (y)");
             World.SetState(sLeave);
@@ -302,7 +310,7 @@ int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new
         return 0;
 
     //check if a monster is in new spot(attack or stop)
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].GetMonster() != NULL)
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).GetMonster() != NULL)
     {
         if (monster->fleeing)
         {
@@ -315,11 +323,11 @@ int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new
     }
 
     //open door
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.type == closedDoor)   //open door
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).terrain.type == closedDoor)   //open door
     {
         if (monster->isHumanoid())
         {
-            World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
+            World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).terrain.Create(openDoor);     //makeopenDoor();
             if (monster->isPlayer())
                 World.getTextManager().newLine("You open the door. ");
             else if (monster->isSeen() == 1)
@@ -340,15 +348,15 @@ int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new
 
             if (Random::getInt(10, 0) == 0)
             {
-                World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.Create(openDoor);     //makeopenDoor();
+                World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).terrain.Create(openDoor);     //makeopenDoor();
             }
         }
         return 3;
     }
 
-    if (strcmp(World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].terrain.name, "a teleport") == 0)
+    if (strcmp(World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).terrain.name, "a teleport") == 0)
     {
-        Coord * ner_Coord = World.getDungeonManager().level[World.GetCurrentLevel()].FreeTerrainPosition(dfloor);
+        Coord * ner_Coord = World.getDungeonManager().level(World.GetCurrentLevel()).FreeTerrainPosition(dfloor);
         if (ner_Coord)
         {
             new_x = ner_Coord->x;
@@ -371,22 +379,22 @@ int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new
     }
 
     //remove old ref on successful move
-    World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveMonsterRef();
+    World.getDungeonManager().level(World.GetCurrentLevel()).getCell(monster->pos.x, monster->pos.y).RemoveMonsterRef();
 
     //update monster position
     monster->pos.x = new_x;
     monster->pos.y = new_y;
 
-    World.getDungeonManager().level[World.GetCurrentLevel()].map[monster->pos.x][monster->pos.y].RemoveMonsterRef();
+    World.getDungeonManager().level(World.GetCurrentLevel()).getCell(monster->pos.x, monster->pos.y).RemoveMonsterRef();
 
-    World.getDungeonManager().level[World.GetCurrentLevel()].map[new_x][new_y].AssignMonster(&monster->monster);
+    World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_x, new_y).AssignMonster(&monster->monster);
 
     return 1;
 }
 
 int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
 {
-    MonsterData* defender = World.getMonsterManager().FindMonsterData(World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster());
+    MonsterData* defender = World.getMonsterManager().FindMonsterData(World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).GetMonster());
 
     if (defender == NULL) 
         return 0;
@@ -653,7 +661,7 @@ int	StandardMonsterActions::ThrowItem(MonsterData* attacker, const unsigned int 
 
     for (COORDLIST::iterator it = level->show_path.begin(); it != level->show_path.end(); it++) //something in the way!!
     {
-        if (!level->IsCellTransparent(it->x, it->y) || level->map[it->x][it->y].monsterExists())
+        if (!level->IsCellTransparent(it->x, it->y) || level->getCell(it->x, it->y).monsterExists())
         {
             finalX = it->x;
             finalY = it->y;
@@ -663,9 +671,9 @@ int	StandardMonsterActions::ThrowItem(MonsterData* attacker, const unsigned int 
 
     //GOT TRAJ
 
-    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, finalX, finalY, throwItem->symbol, throwItem->color1, throwItem->color2, throwItem->color2);
+    ShowTrajectory(attacker->level, attacker->pos.x, attacker->pos.y, finalX, finalY, throwItem->symbol, throwItem->color1, throwItem->color2, throwItem->color3);
 
-    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[finalX][finalY].GetMonster();
+    Monster *d = World.getDungeonManager().level(World.GetCurrentLevel()).getCell(finalX, finalY).GetMonster();
     MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
    
     if (attacker->isPlayer())

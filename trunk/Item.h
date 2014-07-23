@@ -64,7 +64,7 @@ class Item : public ResistanceBrands
 {
 public:
 	Item();
-    Item(const Item& rhs);
+   // Item(const Item& rhs);
     bool operator< (const Item& rhs);
     
 	virtual int CreateItem(eItemType type,int level, int secondary_type=no_type);

@@ -65,8 +65,10 @@ int TextManager::newLine(char * fmt, ...)
     else
         messageList.push_back(text);
 
+    // remove first
     if (messageList.size() > 30)
-        messageList.pop_front();
+        messageList.erase(messageList.begin());
+       // messageList.pop_front();
     return 1;
 
 }

@@ -17,6 +17,8 @@
 
 #pragma warning(disable : 4786) 
 
+#include "GeneratorMap.h"
+
 #include "terrain.h"
 #include "monster.h"
 #include "Item.h"
@@ -126,7 +128,6 @@ public:
     int ClearPath();
     int LOS(int x, int y, int x2, int y2, int range);
 
-    cell map[DUNGEON_SIZE_W][DUNGEON_SIZE_H];
 
     int MakeLevelMap();
     Coord * getStartPos();
@@ -157,9 +158,13 @@ public:
 
     EMapLight getMapLight();
     void setMapLight(EMapLight mapLighting);
-private:
 
+    cell & getCell(int x, int y);
+
+private:
+    GeneratorMap<cell> map;
     EMapLight mapLighting;
+
 };
 
 #endif // !defined(AFX_DUNGEONLEVEL_H__764234F8_4887_42E3_812F_FD367433372A__INCLUDED_)

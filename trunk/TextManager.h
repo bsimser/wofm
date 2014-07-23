@@ -16,9 +16,9 @@
 #endif // _MSC_VER > 1000
 
 #include <string>
-#include <list>
+#include <vector>
 
-typedef std::list<std::string> STRINGLIST;
+typedef std::vector<std::string> STRINGLIST;
 
 class TextManager  
 {

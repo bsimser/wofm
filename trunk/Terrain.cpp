@@ -228,9 +228,9 @@ void Terrain::makeUpStairs()
 void Terrain::makeLockedStairs()
 {
     type = lockedStairs;
-    color1 = 174;
-    color2 = 174;
-    color3 = 132;
+    color1 = 234;
+    color2 = 234;
+    color3 = 0;
 
     symbol = '>';
     strcpy(name, "a locked gate");
@@ -273,8 +273,8 @@ void Terrain::makeSpecialLocked()
 {
     type = specialLocked;
     color1 = 255;
-    color2 = 102;
-    color3 = 102;
+    color2 = 0;
+    color3 = 0;
 
     symbol = '>';
     strcpy(name, "a locked iron gate");

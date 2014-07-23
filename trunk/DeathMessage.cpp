@@ -27,6 +27,7 @@ DeathMessage::DeathMessage()
     done.level = 0;
     done.entered = 0;
     done.zagor = 0;
+    done.cheese = 0;
 }
 
 int DeathMessage::ShowDeath(int success)
@@ -142,6 +143,7 @@ int DeathMessage::ShowDeath(int success)
     //equipment
     i++;
     World.getTextManager().SetDisplayLine(i++, "Equipment");
+
     ITEMLIST::iterator inv;
     i++;
     for (inv = World.getMonsterManager().Player()->inventory.begin(); inv != World.getMonsterManager().Player()->inventory.end(); inv++, i++)

@@ -133,7 +133,7 @@ void RestLevel::Encounter()
 {
     MonsterData * player = World.getMonsterManager().Player();
     Coord * pos = player->getPosition();
-    DungeonLevel * current_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel * current_lev = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     old_level = World.GetCurrentLevel();
     //Set to 
@@ -144,24 +144,24 @@ void RestLevel::Encounter()
     World.getDungeonManager().PopulateDungeon(20);
 
     //get gate position make sure it is open
-    Coord *pos1 = World.getDungeonManager().level[20].FreeTerrainPosition(lockedStairs);
+    Coord *pos1 = World.getDungeonManager().level(20).FreeTerrainPosition(lockedStairs);
 
-    if (World.getDungeonManager().level[20].map[pos1->x][pos1->y].terrain.type == lockedStairs)
-        World.getDungeonManager().level[20].map[pos1->x][pos1->y].terrain.Create(openStairs);
+    if (World.getDungeonManager().level(20).getCell(pos1->x, pos1->y).terrain.type == lockedStairs)
+        World.getDungeonManager().level(20).getCell(pos1->x, pos1->y).terrain.Create(openStairs);
 
-    DungeonLevel *new_lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel *new_lev = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     if (!new_lev)
         throw std::exception("invalid level move, down command");
 
     //remove reference to player on current level map
-    current_lev->map[pos->x][pos->y].RemoveMonsterRef();
+    current_lev->getCell(pos->x, pos->y).RemoveMonsterRef();
 
     //get start Coords on new map
     Coord* start_pos = new_lev->getStartPos();
 
     //place player on new map
-    new_lev->map[start_pos->x][start_pos->y].AssignMonster(&player->monster);
+    new_lev->getCell(start_pos->x, start_pos->y).AssignMonster(&player->monster);
 
     player->pos.x = start_pos->x;
     player->pos.y = start_pos->y;

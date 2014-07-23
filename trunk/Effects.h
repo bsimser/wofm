@@ -43,7 +43,6 @@ class Effects
 {
 public:
 	Effects(void);
-	~Effects(void);
 
     void AddEffect(eEffect effect, int strength);
 	int  GetEffect(eEffect effect);
@@ -56,5 +55,4 @@ public:
 
 private:
 	int max_effects;
-
 };

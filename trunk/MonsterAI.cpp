@@ -39,6 +39,10 @@ int MonsterAI::ProcessIntelligence(MonsterData* monster)
     {
         if (ProcessRat(monster))
             return 1;
+        else if (!Detect(monster) && Random::getInt(4,0) != 0)
+        {
+            return DoNothing(monster);
+        }
     }
 
     Detect(monster);
@@ -271,12 +275,13 @@ eMonsterState MonsterAI::UpdateMonsterState(MonsterData* monster)
     return monster->GetState();
 }
 
-void MonsterAI::DoNothing(MonsterData* monster)
+int MonsterAI::DoNothing(MonsterData* monster)
 {
     if (monster->GetState() != dead)
     {
         monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aWait));
     }
+    return 1;
 }
 
 int MonsterAI::RandomMove(MonsterData* monster)
@@ -306,33 +311,33 @@ int MonsterAI::RandomMove(MonsterData* monster)
     case dNorthWest: new_pos.x--; new_pos.y--; break;
     }
 
-    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     //cant move into stone, dont attack friendly monster, dont willingly go into water.
 
-    if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != stone &&
-         dungeonLevel->map[new_pos.x][new_pos.y].GetMonster() == NULL &&
-        (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != deepWater || monster->Name() == "crocodile"))
+    if (dungeonLevel->getCell(new_pos.x, new_pos.y).terrain.type != stone &&
+         dungeonLevel->getCell(new_pos.x, new_pos.y).GetMonster() == NULL &&
+        (dungeonLevel->getCell(new_pos.x, new_pos.y).terrain.type != deepWater || monster->Name() == "crocodile"))
     {
-        //	if(monster->state != dead && dungeonLevel->map[pos->x][pos->y].terrain.type != deepWater) 
+        //	if(monster->state != dead && dungeonLevel->getCell(pos->x, pos->y).terrain.type != deepWater) 
         {
-            dungeonLevel->map[pos->x][pos->y].RemoveMonsterRef();
+            dungeonLevel->getCell(pos->x, pos->y).RemoveMonsterRef();
             monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
         }
         //else get out of water
     }
-    else if (dungeonLevel->map[pos->x][pos->y].terrain.type == deepWater && dungeonLevel->map[new_pos.x][new_pos.y].terrain.type != stone)
+    else if (dungeonLevel->getCell(pos->x, pos->y).terrain.type == deepWater && dungeonLevel->getCell(new_pos.x, new_pos.y).terrain.type != stone)
     {	//find a way out of deep water
-        dungeonLevel->map[pos->x][pos->y].RemoveMonsterRef();
+        dungeonLevel->getCell(pos->x, pos->y).RemoveMonsterRef();
         monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
     }
     // dig your way out
-    else if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type == stone &&
+    else if (dungeonLevel->getCell(new_pos.x, new_pos.y).terrain.type == stone &&
              monster->monster.GetType() == mDigger)
     {
         if (Random::getInt(3,0) == 1 && new_pos.x < DUNGEON_SIZE_W - 1 && new_pos.y < DUNGEON_SIZE_H - 1 && new_pos.x > 0 && new_pos.y > 0)
         {
-            dungeonLevel->map[new_pos.x][new_pos.y].terrain.Create(dfloor);
+            dungeonLevel->getCell(new_pos.x, new_pos.y).terrain.Create(dfloor);
             monster->NextAction(World.getActionManager().UpdateAction(&monster->action, aMove, new_pos.x, new_pos.y));
         }
     }
@@ -475,13 +480,13 @@ int MonsterAI::CheckValidMove(int x, int y, int dir)
     case dNorthWest:	new_pos.x = x - 1;	new_pos.y = y - 1;	break;
     case dSouthWest:	new_pos.x = x - 1;	new_pos.y = y + 1; break;
     }
-    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
-    if (dungeonLevel->map[new_pos.x][new_pos.y].terrain.type == stone)
+    if (dungeonLevel->getCell(new_pos.x, new_pos.y).terrain.type == stone)
         return 0;
 
     // if cell contains friendly monster return 0
-    Monster * mob = dungeonLevel->map[new_pos.x][new_pos.y].GetMonster();
+    Monster * mob = dungeonLevel->getCell(new_pos.x, new_pos.y).GetMonster();
     if (mob)
     {
         if (World.getMonsterManager().FindMonsterData(mob)->isPlayer())
@@ -501,7 +506,7 @@ int MonsterAI::CheckValidMove(int x, int y, int dir)
 // I.e Move in x or y first allows player to out manoeurve AI
 int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
 {
-    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     int dir = dWait;
 
@@ -661,7 +666,7 @@ int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
     }
 
     //monsters hate water
-    /*	if(World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type == deepWater
+    /*	if(World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).terrain.type == deepWater
             && Random::getInt(10,0)) //random chance the mob chases in the water
             {
             if(sqrt( (m_x-p_x)*(m_x-p_x) +   (m_y - p_y)*(m_y - p_y))>1) //attack if close
@@ -672,14 +677,14 @@ int MonsterAI::MoveCloserToPlayer(int m_x, int m_y, int p_x, int p_y)
             }*/
 
     //dont attack friend
-    if ((World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster()))
-    if (!World.getMonsterManager().FindMonsterData(World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster())->isPlayer())
+    if ((World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).GetMonster()))
+    if (!World.getMonsterManager().FindMonsterData(World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).GetMonster())->isPlayer())
     {
         RandomMove(current_monster); //find better route to player (random for now)
         return 1;
     }
 
-    dungeonLevel->map[m_x][m_y].RemoveMonsterRef();
+    dungeonLevel->getCell(m_x, m_y).RemoveMonsterRef();
     current_monster->NextAction(World.getActionManager().UpdateAction(&current_monster->action, aMove, new_pos.x, new_pos.y));
 
     return 1;
@@ -692,7 +697,7 @@ int MonsterAI::DetectCheese(int m_x, int m_y, int &p_x, int &p_y)
 
     int smell_range = 10;
 
-    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     for (int x = m_x - 10; x < (m_x + 10); x++)
     {
@@ -701,7 +706,7 @@ int MonsterAI::DetectCheese(int m_x, int m_y, int &p_x, int &p_y)
             // valid cell
             if (x > 0 && y > 0 && x < DUNGEON_SIZE_W - 1 && y < DUNGEON_SIZE_H - 1)
             {
-                Item * item = dungeonLevel->map[x][y].getItem();
+                Item * item = dungeonLevel->getCell(x, y).getItem();
                 if (item && item->type == cheese)
                 {
                     p_x = x;
@@ -726,7 +731,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
     else
         sight = current_monster->monster.sight_range;
 
-    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     /*	//check radius for enemies
         int min_h_range = m_y-sight;
@@ -771,9 +776,9 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
         {
         if(dungeonLevel->IsCellVisible(m_x,m_y,w,h))
         {
-        if(dungeonLevel->map[w][h].GetMonster())
+        if(dungeonLevel->getCell(w, h).GetMonster())
         {
-        if(World.getMonsterManager().FindMonsterData(dungeonLevel->map[w][h].GetMonster())->isPlayer())
+        if(World.getMonsterManager().FindMonsterData(dungeonLevel->getCell(w, h).GetMonster())->isPlayer())
         {
         *p_x = w;
         *p_y = h;
@@ -793,9 +798,9 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
 
         if(LOS(m_x,m_y,w,h,sight))
         {
-        if(dungeonLevel->map[w][h].GetMonster())
+        if(dungeonLevel->getCell(w, h).GetMonster())
         {
-        if(World.getMonsterManager().FindMonsterData(dungeonLevel->map[w][h].GetMonster())->isPlayer())
+        if(World.getMonsterManager().FindMonsterData(dungeonLevel->getCell(w, h).GetMonster())->isPlayer())
         {
         *p_x = w;
         *p_y = h;
@@ -812,7 +817,7 @@ int MonsterAI::DetectPlayer(int m_x, int m_y, int *p_x, int *p_y)
 
 int MonsterAI::LOS(int m_x, int m_y, int p_x, int p_y, int range)
 {
-    DungeonLevel* dungeonLevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel* dungeonLevel = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     int r = (int)sqrt((float)(m_x - p_x)*(m_x - p_x) + (p_y - m_y)*(p_y - m_y));
 
@@ -824,7 +829,7 @@ int MonsterAI::LOS(int m_x, int m_y, int p_x, int p_y, int range)
 
     if (abs(p_x - m_x) > abs(p_y - m_y))  //further away in x direction
     {
-        if (dungeonLevel->map[m_x][m_y].terrain.type == stone || dungeonLevel->map[m_x][m_y].terrain.type == closedDoor)
+        if (dungeonLevel->getCell(m_x, m_y).terrain.type == stone || dungeonLevel->getCell(m_x, m_y).terrain.type == closedDoor)
             return 0;
 
         if (p_x - m_x < 0)
@@ -838,7 +843,7 @@ int MonsterAI::LOS(int m_x, int m_y, int p_x, int p_y, int range)
     }
     else if (abs(p_x - m_x) < abs(p_y - m_y)) //further away in m_y direction
     {
-        if (dungeonLevel->map[m_x][m_y].terrain.type == stone || dungeonLevel->map[m_x][m_y].terrain.type == closedDoor)
+        if (dungeonLevel->getCell(m_x, m_y).terrain.type == stone || dungeonLevel->getCell(m_x, m_y).terrain.type == closedDoor)
             return 0;
 
         if (p_y - m_y < 0)
@@ -855,7 +860,7 @@ int MonsterAI::LOS(int m_x, int m_y, int p_x, int p_y, int range)
 
     else						//equal
     {
-        if (dungeonLevel->map[m_x][m_y].terrain.type == stone || dungeonLevel->map[m_x][m_y].terrain.type == closedDoor)
+        if (dungeonLevel->getCell(m_x, m_y).terrain.type == stone || dungeonLevel->getCell(m_x, m_y).terrain.type == closedDoor)
             return 0;
 
         if (p_x - m_x < 0 && p_y - m_y < 0)

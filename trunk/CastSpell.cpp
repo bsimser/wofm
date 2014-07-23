@@ -102,10 +102,10 @@ int	CastMagic::Teleport(MonsterData* caster)
         if (new_x < 0 || new_x >= DUNGEON_SIZE_W) failed = 1;
         if (new_y < 0 || new_y >= DUNGEON_SIZE_H - 1) failed = 1;
 
-    } while (failed || level->map[new_x][new_y].terrain.type == stone || level->map[new_x][new_y].monsterExists());
+    } while (failed || level->getCell(new_x, new_y).terrain.type == stone || level->getCell(new_x, new_y).monsterExists());
 
     // hack to show traj on map
-    level->map[caster->pos.x][caster->pos.y].RemoveMonsterRef();
+    level->getCell(caster->pos.x, caster->pos.y).RemoveMonsterRef();
     World.getScene().DisplayMap(true);
     StandardMonsterActions::ShowTrajectory(caster->level, caster->pos.x, caster->pos.y, new_x, new_y, '@', Random::getInt(2, 0) ? 255 : 128, 0, 255);
 
@@ -119,7 +119,7 @@ int	CastMagic::Teleport(MonsterData* caster)
 
 int CastMagic::FlyingWeapon(MonsterData* caster, int x, int y)
 {
-    Monster * d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
+    Monster * d = World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).GetMonster();
     MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
     if (caster == defender)
     {
@@ -230,7 +230,7 @@ int CastMagic::FlyingWeapon(MonsterData* caster, int x, int y)
 
 int	CastMagic::DragonBreath(MonsterData* caster, int x, int y)
 {
-    Monster *d = World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].GetMonster();
+    Monster *d = World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).GetMonster();
     MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
 
     if (defender == NULL || d == NULL) 

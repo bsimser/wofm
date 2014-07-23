@@ -10,10 +10,8 @@
 
 #pragma once
 
-
 #include <map>
 #include <list>
-
 
 /* magical brands and resistance
 
@@ -84,7 +82,7 @@ class ResistanceBrands
 public:
 	ResistanceBrands(void);
 
-	ResistanceBrands(const ResistanceBrands& rhs);
+	//ResistanceBrands(const ResistanceBrands& rhs);
 
 	int GetResistance(eBrandType);
 	int GetBrand(eBrandType);

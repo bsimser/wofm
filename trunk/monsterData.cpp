@@ -92,7 +92,7 @@ int MonsterData::TerrainAttack(int x, int y)
 {
     terrain_attack = false;
 
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y].terrain.type == deepWater && Name() != "crocodile")
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).terrain.type == deepWater && Name() != "crocodile")
     {
         //Piranhas 
         int piranhas_attack = getInt(20, 0) + World.GetCurrentLevel() / 4;
@@ -140,29 +140,29 @@ int MonsterData::TerrainAttack(int x, int y)
             {
                 int swept_away = 1;
 
-                if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 1].terrain.type == deepWater)
+                if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y - 1).terrain.type == deepWater)
                 {
-                    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 1].GetMonster() == NULL)
+                    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y - 1).GetMonster() == NULL)
                         swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x, pos.y - 1));
 
                     else swept_away = 2;
                 }
 
-                else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x + 1][y - 1].terrain.type == deepWater)
+                else if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x + 1, y - 1).terrain.type == deepWater)
                 {
-                    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x + 1][y - 1].GetMonster() == NULL)
+                    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x + 1, y - 1).GetMonster() == NULL)
                         swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x + 1, pos.y - 1));
                     else swept_away = 2;
                 }
 
-                else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x - 1][y - 1].terrain.type == deepWater)
+                else if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x - 1, y - 1).terrain.type == deepWater)
                 {
-                    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x - 1][y - 1].GetMonster() == NULL)
+                    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x - 1, y - 1).GetMonster() == NULL)
                         swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x - 1, pos.y - 1));
                     else swept_away = 2;
                 }
-                else if (World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 1].terrain.type == bridge
-                    &&World.getDungeonManager().level[World.GetCurrentLevel()].map[x][y - 2].terrain.type == deepWater)
+                else if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y - 1).terrain.type == bridge
+                    &&World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y - 2).terrain.type == deepWater)
                     swept_away = NextAction(World.getActionManager().UpdateAction(&action, aMove, pos.x, pos.y - 2));
 
                 if (swept_away == 0)
@@ -191,8 +191,11 @@ int MonsterData::TerrainAttack(int x, int y)
                 {
                     if (isPlayer())
                         World.getTextManager().newLine("You are swept away!! ");
-                    else if (isSeen() == 1)
+                    if (isSeen() == 1)
                     {
+                        World.Render();
+                        Sleep(50);
+
                         //char buf[64];
                         //sprintf(buf,"The %s is swept away. ",monster.name.c_str());
                         //World.getTextManager().newLine(buf);
@@ -245,7 +248,7 @@ int MonsterData::isSeen()
 void MonsterData::UpdateSightRange()
 {
     if (World.GetCurrentLevel() >= 0)
-        World.getDungeonManager().level[World.GetCurrentLevel()].LightDungeon(pos.x, pos.y, monster.sight_range);
+        World.getDungeonManager().level(World.GetCurrentLevel()).LightDungeon(pos.x, pos.y, monster.sight_range);
 }
 
 void MonsterData::XP()
@@ -390,7 +393,7 @@ int MonsterData::AttackStrength()
     else attack += Random::getInt(6 + (level > 9) ? level / 2 : level, 1 + level / 3); //animal
 
     //attack is reduced in deep water
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater &&
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(pos.x, pos.y).terrain.type == deepWater &&
         Name() != "crocodile")
     {
         attack -= 5;
@@ -417,7 +420,7 @@ int MonsterData::DefendStrength()
     else if (isHumanoid()) //no weapon
         defend = (int)(defend + .5) / 2;
 
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[pos.x][pos.y].terrain.type == deepWater)
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(pos.x, pos.y).terrain.type == deepWater)
         defend -= 4;
 
     return defend;
