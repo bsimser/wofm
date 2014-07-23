@@ -7,6 +7,7 @@
 #pragma warning(disable : 4786) 
 //Include our header file.
 #include "FreeTypeFont.h"
+#include <assert.h>
 
 namespace freetype {
 
@@ -133,9 +134,8 @@ namespace freetype {
         glEndList();
     }
 
-
-
-    void font_data::init(const char * fname, unsigned int h) {
+    void font_data::init(const char * fname, unsigned int h)
+    {
         //Allocate some memory to store the texture ids.
         textures = new GLuint[128];
 
@@ -184,7 +184,7 @@ namespace freetype {
     void font_data::clean() {
         glDeleteLists(list_base, 128);
         glDeleteTextures(128, textures);
-        delete[] textures;
+        //delete[] textures;
     }
 
     /// A fairly straight forward function that pushes
@@ -217,16 +217,19 @@ namespace freetype {
         // We want a Coordinate system where things corresponding to window pixels.
         pushScreenCoordinateMatrix();
 
+        assert(strlen(fmt) < 1024);
+
         GLuint font = ft_font.list_base;
         float h = ft_font.h / .63f;						//We make the height about 1.5* that of
 
-        char		text[2131];								// Holds Our String
+        char		text[1024];								// Holds Our String
         va_list		ap;										// Pointer To List Of Arguments
 
         if (fmt == NULL)									// If There's No Text
             *text = 0;											// Do Nothing
 
-        else {
+        else 
+        {
             va_start(ap, fmt);									// Parses The String For Variables
             vsprintf(text, fmt, ap);						// And Converts Symbols To Actual Numbers
             va_end(ap);											// Results Are Stored In Text
@@ -241,7 +244,8 @@ namespace freetype {
         const char *start_line = text;
         vector<string> lines;
         const char *c;
-        for (c = text; *c; c++) {
+        for (c = text; *c; c++) 
+        {
             if (*c == '\n') {
                 string line;
                 for (const char *n = start_line; n < c; n++) line.append(1, *n);
@@ -249,7 +253,8 @@ namespace freetype {
                 start_line = c + 1;
             }
         }
-        if (start_line) {
+        if (start_line) 
+        {
             string line;
             for (const char *n = start_line; n < c; n++) line.append(1, *n);
             lines.push_back(line);

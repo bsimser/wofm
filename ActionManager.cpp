@@ -13,22 +13,6 @@
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------
 
-Action* ActionManager::CreateAction(eAction type, int param1, int param2, int param3, int param4)
-{
-    Action *action = new Action;
-    action->CreateAction(type);
-
-    switch (type)
-    {
-    case aMove: action->param1 = param1; action->param2 = param2; action->param2 = param2; break; //direction
-    case aAttack: action->param1 = param1; action->param2 = param2; break; //direction
-    }
-
-    return action;
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------
-
 Action* ActionManager::UpdateAction(Action* action, eAction type, int param1, int param2, int param3, int param4)
 {
     action->CreateAction(type);

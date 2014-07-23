@@ -41,7 +41,7 @@ private:
 	int ChasePlayer(MonsterData* monster);
 	int AttackPlayer(MonsterData* monster);
 	int DistanceAttackMonster(MonsterData* monster);
-	void DoNothing(MonsterData* monster);
+	int DoNothing(MonsterData* monster);
 	int DistanceAttackPlayer(MonsterData* monster);
 	int MagicAttackPlayer(MonsterData* monster);
 	

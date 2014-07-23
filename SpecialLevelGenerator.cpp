@@ -22,13 +22,8 @@ using namespace Random;
 
 int SpecialLevelGenerator::Create(int _type)
 {
-    int w, h;
-
     //Fill map with solid earth
-
-    for (h = 0; h < DUNGEON_SIZE_H; h++)
-    for (w = 0; w < DUNGEON_SIZE_W; w++)
-        dmap[w][h] = '#';
+    dmap.fill('#');
 
     type = lSpecial;
 
@@ -44,7 +39,7 @@ int SpecialLevelGenerator::Create(int _type)
     case	slBarracks:     makeBarracksDungeon(); break;
     case	slSpiderCave:   makeCavern(true); break;
     case	slUndead:       makeSpecialDungeon(); break;
-        
+
     default: makeSpecialDungeon();
 
     }
@@ -78,10 +73,10 @@ int SpecialLevelGenerator::makeCrypt()
     {
         for (int w = 0; w < DUNGEON_SIZE_W; w++)
         {
-            if (dmap[w][h] == '<')
-                dmap[w][h] = '(';
-            else if (dmap[w][h] == '>')
-                dmap[w][h] = '.';
+            if (dmap.getCell(w, h) == '<')
+                dmap.setCell(w, h, '(');
+            else if (dmap.getCell(w, h) == '>')
+                dmap.setCell(w, h, '.');
         }
     }
 
@@ -100,13 +95,13 @@ void SpecialLevelGenerator::makeCavern(bool webby)
     {
         for (int y = 0; y < DUNGEON_SIZE_H; y++)
         {
-            dmap[x][y] = cavern.getCell(x, y) ? '#' : '.';
+            dmap.setCell(x, y, cavern.getCell(x, y) ? '#' : '.');
         }
     }
 
     int x, y;
     findTerrainType(x, y, '.');
-    dmap[x][y] = ('(');
+    dmap.setCell(x, y, '(');
     makeSpecialItemSpot();
 
     if (webby)
@@ -115,18 +110,18 @@ void SpecialLevelGenerator::makeCavern(bool webby)
         {
             if (!findTerrainType(x, y, '.'))
                 break;
-            dmap[x][y] = 'W';
+            dmap.setCell(x, y, 'W');
         }
     }
 }
-    
+
 int SpecialLevelGenerator::makeBarracksDungeon()
 {
     //create dungeon
     //create rooms
     const int max_rooms = getInt(MAX_ROOMS, MIN_ROOMS);
-    int rooms(0); 
-    
+    int rooms(0);
+
     int dungeon_full = 0;
     SafetyReset();
 
@@ -135,11 +130,11 @@ int SpecialLevelGenerator::makeBarracksDungeon()
 
     for (int h = 2; h < 35; h++)
     {
-        dmap[randCorridoor_W][h] = '.';
-        dmap[randCorridoor_W + 1][h] = '.';
+        dmap.setCell(randCorridoor_W, h, '.');
+        dmap.setCell(randCorridoor_W + 1, h, '.');
     }
 
-    dmap[randCorridoor_W][getInt(10, 5)] = '(';
+    dmap.setCell(randCorridoor_W, getInt(10, 5), '(');
 
     while (rooms < max_rooms + 1)
     {
@@ -159,16 +154,16 @@ int SpecialLevelGenerator::makeBarracksDungeon()
 
         if (x < randCorridoor_W)
         {
-            for (int w = x; w<randCorridoor_W; w++)
+            for (int w = x; w < randCorridoor_W; w++)
             {
-                dmap[w][y] = '.';
+                dmap.setCell(w, y, '.');
             }
         }
         else if (x > randCorridoor_W)
         {
             for (int w = x; w > randCorridoor_W; w--)
             {
-                dmap[w][y] = '.';
+                dmap.setCell(w, y, '.');
             }
         }
     }
@@ -176,10 +171,10 @@ int SpecialLevelGenerator::makeBarracksDungeon()
     //BuildDoors
     for (int h = 2; h < DUNGEON_SIZE_H - 2; h++)
     {
-        if (dmap[randCorridoor_W - 1][h] == '.')
-            dmap[randCorridoor_W - 1][h] = '+';
-        if (dmap[randCorridoor_W + 2][h] == '.')
-            dmap[randCorridoor_W + 2][h] = '+';
+        if (dmap.getCell(randCorridoor_W - 1, h) == '.')
+            dmap.setCell(randCorridoor_W - 1, h, '+');
+        if (dmap.getCell(randCorridoor_W + 2, h) == '.')
+            dmap.setCell(randCorridoor_W + 2, h, '+');
     }
 
     makeSpecialItemSpot();
@@ -195,8 +190,8 @@ int SpecialLevelGenerator::makeSpecialItemSpot()
     {
         for (int w = 0; w < DUNGEON_SIZE_W; w++)
         {
-            if (dmap[w][h] == '.' && dmap[w + 1][h] == '.' && dmap[w - 1][h] == '.' && dmap[w][h + 1] == '.' && dmap[w][h - 1] == '.'
-                && dmap[w + 1][h + 1] == '.' && dmap[w - 1][h + 1] == '.' && dmap[w - 1][h - 1] == '.' && dmap[w + 1][h - 1] == '.')
+            if (dmap.getCell(w, h) == '.' && dmap.getCell(w + 1, h) == '.' && dmap.getCell(w - 1, h) == '.' && dmap.getCell(w, h + 1) == '.' && dmap.getCell(w, h - 1) == '.'
+                && dmap.getCell(w + 1, h + 1) == '.' && dmap.getCell(w - 1, h + 1) == '.' && dmap.getCell(w - 1, h - 1) == '.' && dmap.getCell(w + 1, h - 1) == '.')
             {
                 Coord new_Coord; new_Coord.x = w; new_Coord.y = h;
                 specialSpotCoords.push_back(new_Coord);
@@ -214,7 +209,7 @@ int SpecialLevelGenerator::makeSpecialItemSpot()
             {
                 int x = it->x;
                 int y = it->y;
-                dmap[it->x][it->y] = 'i';
+                dmap.setCell(it->x, it->y, 'i');
                 break;
             }
         }

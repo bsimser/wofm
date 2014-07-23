@@ -11,6 +11,7 @@
 #pragma once
 
 #include "DungeonGenerator.h" // for MAX size
+#include "GeneratorMap.h"
 
 #define TILE_FLOOR 0
 #define TILE_WALL 1
@@ -18,7 +19,6 @@
 #define CA_DEFAULT		0
 #define CA_LARGE_CAVERN 1
 #define CA_TWISTY		2
-
 
  typedef struct 
  {
@@ -50,8 +50,8 @@ private:
     void CellularAutomata::FloodFill(int x, int y);
     void setSize(const unsigned int x, const unsigned int y);
 
-    int grid[DUNGEON_SIZE_W][DUNGEON_SIZE_H];
-    int grid2[DUNGEON_SIZE_W][DUNGEON_SIZE_H];
+    GeneratorMap<int> grid;
+    GeneratorMap<int> grid2;
  
 	int fillprob;
 	int r1_cutoff, r2_cutoff;

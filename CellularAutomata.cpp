@@ -106,22 +106,15 @@ int CellularAutomata::randpick(void)
 
 void CellularAutomata::initmap(void)
 {
-    int y, x;
-
     //puts wall everywhere 
-    for (x = 0; x < mSizeX; x++) 
-    {
-        for (y = 0; y < mSizeY; y++)
-        {
-            grid[x][y] = grid2[x][y] = TILE_WALL;
-        }
-    }
+    grid.fill(TILE_WALL);
+    grid2.fill(TILE_WALL);
 
     //randomly fill map (grid 1)
-    for (x = 1; x < mSizeX - 1; x++) 
+    for (int x = 1; x < mSizeX - 1; x++)
     {
-        for (y = 1; y < mSizeY - 1; y++)
-            grid[x][y] = randpick();
+        for (int y = 1; y < mSizeY - 1; y++)
+            grid.setCell(x, y, randpick());
     }
 }
 
@@ -145,7 +138,7 @@ void CellularAutomata::generation(void)
             {
                 for (jj = -1; jj <= 1; jj++)
                 {
-                    if (grid[x + ii][y + jj] != TILE_FLOOR)
+                    if (grid.getCell(x + ii, y + jj) != TILE_FLOOR)
                         adjcount_r1++;
                 }
             }
@@ -159,16 +152,16 @@ void CellularAutomata::generation(void)
                         continue;
                     if (ii < 0 || jj < 0 || ii >= mSizeY || jj >= mSizeX) //ignore out of bounds
                         continue;
-                    if (grid[ii][jj] != TILE_FLOOR)	//get count
+                    if (grid.getCell(ii, jj) != TILE_FLOOR)	//get count
                         adjcount_r2++;
                 }
             }
             if (x > 40)
                 int t = 6;
             if (adjcount_r1 >= params.r1_cutoff || (adjcount_r2 <= params.r2_cutoff && use_2R))
-                grid2[x][y] = TILE_WALL; //add to working grid
+                grid2.setCell(x, y, TILE_WALL); //add to working grid
             else
-                grid2[x][y] = TILE_FLOOR;
+                grid2.setCell(x, y, TILE_FLOOR);
         }
     }
 
@@ -177,7 +170,7 @@ void CellularAutomata::generation(void)
     {
         for (y = 1; y < mSizeY - 1; y++)
         {
-            grid[x][y] = grid2[x][y]; 
+            grid.setCell(x, y, grid2.getCell(x, y));
         }
     }
 }
@@ -193,15 +186,6 @@ int GetNext(int x, int y)
 
 int CellularAutomata::Connect()
 {
-    //get random open area
-    for (int x = 1; x < mSizeX - 1; x++)
-    {
-        for (int y = 1; y < mSizeY - 1; y++)
-        {
-
-        }
-    }
-
     return 1;
 }
 
@@ -209,8 +193,8 @@ int CellularAutomata::Connect()
 
 void CellularAutomata::FloodFill(int x, int y)
 {
-    if ((grid[x][y] == TILE_FLOOR) && (grid2[x][y] != TILE_FLOOR))
-        grid2[x][y] = TILE_FLOOR;
+    if ((grid.getCell(x, y) == TILE_FLOOR) && (grid2.getCell(x, y) != TILE_FLOOR))
+        grid2.setCell(x, y, TILE_FLOOR);
     else
         return;
     FloodFill(x + 1, y);
@@ -236,12 +220,12 @@ void CellularAutomata::printfunc(void)
     //for(ii=0; ii<generations; ii++)
     //	{
     printf("Repeat %i: W'(p) = R[1](p) >= %i",
-        params_set[ii].reps, params_set[ii].r1_cutoff);
+    params_set[ii].reps, params_set[ii].r1_cutoff);
 
     if (params_set[ii].r2_cutoff >= 0)
-        printf(" || R[2](p) <= %i\n", params_set[ii].r2_cutoff);
+    printf(" || R[2](p) <= %i\n", params_set[ii].r2_cutoff);
     else
-        putchar('\n');*/
+    putchar('\n');*/
     //	}
 }
 
@@ -255,7 +239,8 @@ void CellularAutomata::printmap(void)
     {
         for (y = 0; y < mSizeY; y++)
         {
-            switch (grid[x][y]) {
+            switch (grid.getCell(x, y))
+            {
             case TILE_WALL:  std::cout << '#'; break;
             case TILE_FLOOR: std::cout << '.'; break;
             }
@@ -271,7 +256,7 @@ int CellularAutomata::getCell(const unsigned int x, const unsigned int y) const
     if (x >= DUNGEON_SIZE_W || y >= DUNGEON_SIZE_H)
         throw std::exception("Invalid size for CellularAutomata - out of bounds.");
 
-    return grid[x][y];
+    return grid.getCell(x, y);
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
@@ -324,7 +309,7 @@ int CellularAutomata::Create()
         for (int x = 0; x < mSizeX; x++) //put wall everywhere (grid 2)
         {
             for (int y = 0; y < mSizeY; y++)
-                grid2[x][y] = TILE_WALL;
+                grid2.setCell(x, y, TILE_WALL);
         }
 
         int found = 0;
@@ -335,7 +320,7 @@ int CellularAutomata::Create()
             x = Random::getInt(mSizeX, 1);
             y = Random::getInt(mSizeY, 1);
 
-            if (grid[x][y] == TILE_FLOOR)
+            if (grid.getCell(x, y) == TILE_FLOOR)
                 found = 1;
         }
 
@@ -349,12 +334,12 @@ int CellularAutomata::Create()
         {
             for (int y = 0; y < mSizeY; y++)
             {
-                if (grid[x][y] == TILE_FLOOR && grid2[x][y] == TILE_FLOOR)
+                if (grid.getCell(x, y) == TILE_FLOOR && grid2.getCell(x, y) == TILE_FLOOR)
                 {
-                    grid[x][y] = TILE_FLOOR;
+                    grid.setCell(x, y, TILE_FLOOR);
                 }
                 else
-                    grid[x][y] = TILE_WALL;
+                    grid.setCell(x, y, TILE_WALL);
             }
         }
 
@@ -365,7 +350,7 @@ int CellularAutomata::Create()
         {
             for (int y = 0; y < mSizeY; y++)
             {
-                if (grid[x][y] == TILE_FLOOR)
+                if (grid.getCell(x, y) == TILE_FLOOR)
                     count++;
                 total++;
             }

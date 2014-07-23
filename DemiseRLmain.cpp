@@ -20,28 +20,28 @@ bool    active = true;        // Window Active Flag Set To true By Default
 
 bool    keypress;
 
-LRESULT CALLBACK WndProc(HWND    hWnd,            // Handle For This Window
-						 UINT    uMsg,            // Message For This Window
-					 	 WPARAM    wParam,            // Additional Message Information
-					 	 LPARAM    lParam)            // Additional Message Information
+LRESULT CALLBACK WndProc(HWND   hWnd,            // Handle For This Window
+                         UINT   uMsg,            // Message For This Window
+                         WPARAM wParam,            // Additional Message Information
+                         LPARAM lParam)            // Additional Message Information
 {
-	// initial check for non-US keys
-	switch (wParam)
-	{
+    // initial check for non-US keys
+    switch (wParam)
+    {
 
-	case 60: // '<' 
-		keys[wParam] = TRUE;                                  // key
-		keypress = true;
-		return 0;
-	case 62: // '>'
-		keys[wParam] = TRUE;                                  // key
-		keypress = true;
-		return 0;
-	case 63: // '?'
-		keys[wParam] = TRUE;                                  // help key
-		keypress = true;
-		return 0;
-	}
+    case 60: // '<' 
+        keys[wParam] = TRUE;                                  // key
+        keypress = true;
+        return 0;
+    case 62: // '>'
+        keys[wParam] = TRUE;                                  // key
+        keypress = true;
+        return 0;
+    case 63: // '?'
+        keys[wParam] = TRUE;                                  // help key
+        keypress = true;
+        return 0;
+    }
 
     switch (uMsg)                                    // Check For Windows Messages
     {
@@ -61,14 +61,14 @@ LRESULT CALLBACK WndProc(HWND    hWnd,            // Handle For This Window
 
     case WM_SYSCOMMAND:                            // Intercept System Commands
     {
-		switch (wParam)                            // Check System Calls
-		{
-		case SC_SCREENSAVE:                  // Screensaver Trying To Start?
-		case SC_MONITORPOWER:                // Monitor Trying To Enter Powersave?
-			return 0;                            // Prevent From Happening
-		}
-		break;                                    // Exit
-	}
+        switch (wParam)                            // Check System Calls
+        {
+        case SC_SCREENSAVE:                  // Screensaver Trying To Start?
+        case SC_MONITORPOWER:                // Monitor Trying To Enter Powersave?
+            return 0;                            // Prevent From Happening
+        }
+        break;                                    // Exit
+    }
 
     case WM_CLOSE:                                // Did We Receive A Close Message?
     {
@@ -176,14 +176,14 @@ int WINAPI WinMain(HINSTANCE    hInstance,    // Instance
                 {
                     World.ProcessCommand(keys);
                     World.Run();
-					keypress = false;
-				}
+                    keypress = false;
+                }
                 else                                // Not Time To Quit, Update Screen
                 {
                     if (World.State() == sRunning || World.State() == sResting) //update while player is running or resting(HACK)
                         World.Run();
                 }
-				Sleep(10);
+                Sleep(10);
             }
 
             if (keys[VK_F1])                // Is F1 Being Pressed?

@@ -109,6 +109,10 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
             monster->inventory.push_back(*World.getItemManager().CreateItem(level, shield, 0));
             monster->inventory.back().equipped = 1;
         }
+        else if (monster->isSpecial() && Random::getInt(6, 0) == 0)
+        {
+            monster->inventory.push_back(*World.getItemManager().CreateItem(level, cheese));
+        }
 
     }
     else if (name.find("butcher") != -1)
@@ -190,6 +194,11 @@ int MonsterItems::EquipPlayer(MonsterData *player)
     item = World.getItemManager().CreateItem(level, provisions);
     item->itemNumber[1] = 4;
     player->inventory.push_back(*item);
+
+    /*item = World.getItemManager().CreateItem(level, stake);
+    item->itemNumber[1] = 4;
+    player->inventory.push_back(*item);*/
+
 
     /*item = World.getItemManager().CreateItem(level, cheese);
     item->itemNumber[1] = 4;
@@ -480,7 +489,7 @@ int MonsterItems::DropItem(MonsterData *monster, int item, bool erace_from_inv)
 int MonsterItems::PickupItem(MonsterData *monster)
 {
 
-    if (!World.getDungeonManager().level[monster->level].map[monster->pos.x][monster->pos.y].getItem()) //check if item exists
+    if (!World.getDungeonManager().level(monster->level).getCell(monster->pos.x, monster->pos.y).getItem()) //check if item exists
         return 0;
 
 
@@ -494,7 +503,7 @@ int MonsterItems::PickupItem(MonsterData *monster)
 
     if (monster->isPlayer()) //id item for player
     {
-        Item * item_to_copy = World.getDungeonManager().level[monster->level].map[monster->pos.x][monster->pos.y].getItem();
+        Item * item_to_copy = World.getDungeonManager().level(monster->level).getCell(monster->pos.x, monster->pos.y).getItem();
         if (item_to_copy->type == lockedChest || item_to_copy->type == openChest)
         {
             World.getTextManager().newLine("You cannot lift it. ");
@@ -504,12 +513,12 @@ int MonsterItems::PickupItem(MonsterData *monster)
     }
     //get copy of item
 
-    Item item(*World.getDungeonManager().level[monster->level].map[monster->pos.x][monster->pos.y].getItem());
+    Item item(*World.getDungeonManager().level(monster->level).getCell(monster->pos.x, monster->pos.y).getItem());
 
 
 
     //delete reference from map but item is still in all items list
-    World.getDungeonManager().level[monster->level].map[monster->pos.x][monster->pos.y].RemoveItemRef();
+    World.getDungeonManager().level(monster->level).getCell(monster->pos.x, monster->pos.y).RemoveItemRef();
 
     if (monster->isPlayer())
         World.getTextManager().newLine("You pick up the %s%s", item.GetName().c_str(), item.itemNumber[1] > 1 ? ". " : ". ");
@@ -600,16 +609,16 @@ int MonsterItems::DropStackableItem(MonsterData *monster, Item *item, int x, int
 {
     int dungeonLevel = monster ? monster->level : World.GetCurrentLevel();
 
-    Item* floor_item = World.getDungeonManager().level[dungeonLevel].map[x][y].getItem();
-    if (World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.type != dfloor
-        &&World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.type != bridge)
+    Item* floor_item = World.getDungeonManager().level(dungeonLevel).getCell(x, y).getItem();
+    if (World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.type != dfloor
+        &&World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.type != bridge)
     {
         return 0;
     }
 
     else if (floor_item == NULL) //no item
     {
-        World.getDungeonManager().level[dungeonLevel].map[x][y].AssignItem(item);
+        World.getDungeonManager().level(dungeonLevel).getCell(x, y).AssignItem(item);
         return 1;
     }
     else //item - check if same
@@ -627,7 +636,7 @@ int MonsterItems::DropItem(MonsterData *monster, Item *item, int x, int y)
 {
     int dungeonLevel = monster ? monster->level : World.GetCurrentLevel();
 
-    if (std::string("a fountain") == World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.name)
+    if (std::string("a fountain") == World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.name)
         int test = 0;
 
     if (x <= 0 || y <= 0 || x >= (DUNGEON_SIZE_W - 1) || y >= (DUNGEON_SIZE_W - 1))
@@ -638,18 +647,18 @@ int MonsterItems::DropItem(MonsterData *monster, Item *item, int x, int y)
         return DropStackableItem(monster, item, x, y);
     }
     // dont drop if there is an item there or the ground is not floor or bridge
-    else if (World.getDungeonManager().level[dungeonLevel].map[x][y].getItem() ||
-        (World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.type != dfloor &&
-        World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.type != bridge))
+    else if (World.getDungeonManager().level(dungeonLevel).getCell(x, y).getItem() ||
+        (World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.type != dfloor &&
+        World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.type != bridge))
     {
         return 0;
     }
-    else if (std::string("a fountain") == World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.name)
+    else if (std::string("a fountain") == World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.name)
         return 0;
-    else if (std::string("a teleport") == World.getDungeonManager().level[dungeonLevel].map[x][y].terrain.name)
+    else if (std::string("a teleport") == World.getDungeonManager().level(dungeonLevel).getCell(x, y).terrain.name)
         return 0;
     else
-        World.getDungeonManager().level[dungeonLevel].map[x][y].AssignItem(item);
+        World.getDungeonManager().level(dungeonLevel).getCell(x, y).AssignItem(item);
     return 1;
 }
 

@@ -289,7 +289,7 @@ void OpenGLSceneGen::DrawMap()
     {
         for (int w = 0; w < width_scr; w++)
         {
-            cell & currentCell = dLevel->map[w + W_MOD][h + h_MOD];
+            cell & currentCell = dLevel->getCell(w + W_MOD, h + h_MOD);
 
             /*if (World.GetCurrentLevel() == 0) // show all level
                 ;
@@ -409,11 +409,11 @@ freetype::print(map_font,(float)(w*9.1f) , (float)height_scr_offset-(h*14.5f),"@
 }
 else //if(true) //display terrain
 {
-glColor3f(convert255(dLevel->bigmap[w+W_MOD][h+h_MOD].terrain.color1),
-convert255(dLevel->bigmap[w+W_MOD][h+h_MOD].terrain.color2),
-convert255(dLevel->bigmap[w+W_MOD][h+h_MOD].terrain.color3));
+glColor3f(convert255(dLevel->bigmap[w+W_MOD][h+h_MOD).terrain.color1),
+convert255(dLevel->bigmap[w+W_MOD][h+h_MOD).terrain.color2),
+convert255(dLevel->bigmap[w+W_MOD][h+h_MOD).terrain.color3));
 
-freetype::print(map_font,(float)0+(w*9.1f) , (float)height_scr_offset-(h*14.5f),"%c", dLevel->bigmap[w+W_MOD][h+h_MOD].terrain.symbol);
+freetype::print(map_font,(float)0+(w*9.1f) , (float)height_scr_offset-(h*14.5f),"%c", dLevel->bigmap[w+W_MOD][h+h_MOD).terrain.symbol);
 
 }
 }

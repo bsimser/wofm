@@ -29,7 +29,6 @@ Item * UserCommand::toThrow = NULL;
 Coord UserCommand::autoTarget()
 {
     MonsterData * player = World.getMonsterManager().Player();
-    DungeonLevel * level = World.getDungeonManager().Level(player->level);
 
     int pX = player->pos.x;
     int pY = player->pos.y;
@@ -88,8 +87,8 @@ int UserCommand::ThrowItem()
     UnLook();
     // set auto target
 
-    DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
-    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    DungeonLevel & level = World.getDungeonManager().level(World.GetCurrentLevel());
+    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.getCell(look_pos.x, look_pos.y).GetMonster());
 
     if (monster)
         lastTarget = monster;
@@ -109,8 +108,8 @@ int UserCommand::ThrowTarget(eAction action)
     UnLook();
     // set auto target
 
-    DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
-    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    DungeonLevel & level = World.getDungeonManager().level(World.GetCurrentLevel());
+    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.getCell(look_pos.x, look_pos.y).GetMonster());
 
     if (monster)
         lastTarget = monster;
@@ -139,8 +138,8 @@ int UserCommand::CastSpellAtTarget()
 
     UnLook();
 
-    DungeonLevel & level = World.getDungeonManager().level[World.GetCurrentLevel()];
-    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.map[look_pos.x][look_pos.y].GetMonster());
+    DungeonLevel & level = World.getDungeonManager().level(World.GetCurrentLevel());
+    MonsterData * monster = World.getMonsterManager().FindMonsterData(level.getCell(look_pos.x, look_pos.y).GetMonster());
 
     if (monster)
         lastTarget = monster;
@@ -178,14 +177,14 @@ int UserCommand::ClimbStairs(int dir)
 
 int UserCommand::UnLook()
 {
-    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
-    level->map[look_pos.x][look_pos.y].show_target = 0;
+    DungeonLevel *level = &World.getDungeonManager().level(World.GetCurrentLevel());
+    level->getCell(look_pos.x, look_pos.y).show_target = 0;
     return 1;
 }
 
 int UserCommand::Look(bool *keys, bool show_path)
 {
-    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level(World.GetCurrentLevel());
     UnLook();
 
     if (keys[VC_X] || keys[VK_ESC])
@@ -195,7 +194,7 @@ int UserCommand::Look(bool *keys, bool show_path)
         return 0;
     }
 
-    if (!show_path && keys[VK_M] && level->map[look_pos.x][look_pos.y].GetMonster())
+    if (!show_path && keys[VK_M] && level->getCell(look_pos.x, look_pos.y).GetMonster())
     {
         World.SetState(sLookMore);
         keys[VK_M] = false;
@@ -222,11 +221,11 @@ int UserCommand::Look(bool *keys, bool show_path)
                 MonsterData * player = World.getMonsterManager().Player();
                 int p_x = player->pos.x;
                 int p_y = player->pos.y;
-                DungeonLevel *lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
+                DungeonLevel *lev = &World.getDungeonManager().level(World.GetCurrentLevel());
 
                 lev->HighLightPath(p_x, p_y, look_pos.x, look_pos.y);
             }
-            level->map[look_pos.x][look_pos.y].show_target = 1; return 1;
+            level->getCell(look_pos.x, look_pos.y).show_target = 1; return 1;
         }
 
         if (look_pos.x < 0) look_pos.x = 0;
@@ -241,26 +240,26 @@ int UserCommand::Look(bool *keys, bool show_path)
                 MonsterData * player = World.getMonsterManager().Player();
                 int p_x = player->pos.x;
                 int p_y = player->pos.y;
-                DungeonLevel *lev = &World.getDungeonManager().level[World.GetCurrentLevel()];
+                DungeonLevel *lev = &World.getDungeonManager().level(World.GetCurrentLevel());
 
                 lev->HighLightPath(p_x, p_y, look_pos.x, look_pos.y);
-                level->map[look_pos.x][look_pos.y].show_target = 1;
+                level->getCell(look_pos.x, look_pos.y).show_target = 1;
 
                 //World.getTextManager().newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
             }
             return 1;
         }
         else
-            level->map[look_pos.x][look_pos.y].show_target = 1;
+            level->getCell(look_pos.x, look_pos.y).show_target = 1;
     }
 
-    if (!level->map[look_pos.x][look_pos.y].terrain.found) //dont show
+    if (!level->getCell(look_pos.x, look_pos.y).terrain.found) //dont show
     {
         World.getTextManager().newLine("You have not been here yet. ");
     }
-    else if (level->map[look_pos.x][look_pos.y].GetMonster() && level->map[look_pos.x][look_pos.y].terrain.light) //display monsters
+    else if (level->getCell(look_pos.x, look_pos.y).GetMonster() && level->getCell(look_pos.x, look_pos.y).terrain.light) //display monsters
     {
-        MonsterData * monster = World.getMonsterManager().FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster());
+        MonsterData * monster = World.getMonsterManager().FindMonsterData(level->getCell(look_pos.x, look_pos.y).GetMonster());
 
         if (World.State() == sLookMore)
         {
@@ -269,10 +268,10 @@ int UserCommand::Look(bool *keys, bool show_path)
             return 2;
 
         }
-        float max_stamina = (float)level->map[look_pos.x][look_pos.y].GetMonster()->MaxStamina();
-        float cur_stamina = (float)level->map[look_pos.x][look_pos.y].GetMonster()->stamina;
+        float max_stamina = (float)level->getCell(look_pos.x, look_pos.y).GetMonster()->MaxStamina();
+        float cur_stamina = (float)level->getCell(look_pos.x, look_pos.y).GetMonster()->stamina;
 
-        int state = World.getMonsterManager().FindMonsterData(level->map[look_pos.x][look_pos.y].GetMonster())->GetState();
+        int state = World.getMonsterManager().FindMonsterData(level->getCell(look_pos.x, look_pos.y).GetMonster())->GetState();
 
         float wounded = (max_stamina - cur_stamina) / max_stamina * 100;
         char health[32];
@@ -306,10 +305,10 @@ int UserCommand::Look(bool *keys, bool show_path)
         else
             World.getTextManager().newLine("You see a %s. %s. It looks %s. [m]ore.", monster->Name().c_str(), status, health);
     }
-    else if (level->map[look_pos.x][look_pos.y].getItem()) //display items
+    else if (level->getCell(look_pos.x, look_pos.y).getItem()) //display items
     {
-        Item * item = level->map[look_pos.x][look_pos.y].getItem();
-        if (level->map[look_pos.x][look_pos.y].terrain.light)
+        Item * item = level->getCell(look_pos.x, look_pos.y).getItem();
+        if (level->getCell(look_pos.x, look_pos.y).terrain.light)
         {
             if (item->stackable() && item->itemNumber[1] > 1)
             {
@@ -318,7 +317,7 @@ int UserCommand::Look(bool *keys, bool show_path)
                 else
                     World.getTextManager().newLine("You see some %s here.", item->GetName().c_str());
             }
-            else if (level->map[look_pos.x][look_pos.y].getItem()->identified)
+            else if (level->getCell(look_pos.x, look_pos.y).getItem()->identified)
                 World.getTextManager().newLine("You see a %s.", item->GetName().c_str());
             else
                 World.getTextManager().newLine("You see an %s.", item->GetName().c_str());
@@ -328,18 +327,18 @@ int UserCommand::Look(bool *keys, bool show_path)
     }
     else //display terrain
     {
-        if (level->map[look_pos.x][look_pos.y].terrain.type == lockedStairs)
+        if (level->getCell(look_pos.x, look_pos.y).terrain.type == lockedStairs)
         {
-            World.getTextManager().newLine("This is %s (%d).", level->map[look_pos.x][look_pos.y].terrain.name,
+            World.getTextManager().newLine("This is %s (%d).", level->getCell(look_pos.x, look_pos.y).terrain.name,
                 World.getItemManager().keyLabels[World.GetCurrentLevel()]);
         }
-        else if (level->map[look_pos.x][look_pos.y].terrain.type == specialLocked)
+        else if (level->getCell(look_pos.x, look_pos.y).terrain.type == specialLocked)
         {
-            World.getTextManager().newLine("This is %s (%d).", level->map[look_pos.x][look_pos.y].terrain.name,
+            World.getTextManager().newLine("This is %s (%d).", level->getCell(look_pos.x, look_pos.y).terrain.name,
                 World.getItemManager().KeySpecial[World.GetCurrentLevel()]);
         }
         else
-            World.getTextManager().newLine("This is %s.", level->map[look_pos.x][look_pos.y].terrain.name);
+            World.getTextManager().newLine("This is %s.", level->getCell(look_pos.x, look_pos.y).terrain.name);
     }
 
     return 1;
@@ -464,10 +463,10 @@ int UserCommand::FleeCommand(int  dir)
     }
 
     //can more there
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).terrain.type != stone)
     {
         //check if occupied
-        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].getMonster())
+        if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).getMonster())
         {
             World.getTextManager().newLine("You cant flee that way. ");
 
@@ -527,7 +526,7 @@ int UserCommand::MoveCommand(int  dir)
 
     }
 
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type != stone)
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).terrain.type != stone)
     {
         if (dir != dWait)
             player->NextAction(World.getActionManager().UpdateAction(&player->action, aMove, new_pos.x, new_pos.y));
@@ -535,11 +534,11 @@ int UserCommand::MoveCommand(int  dir)
             player->NextAction(World.getActionManager().UpdateAction(&player->action, aWait));
 
         //move over item mesage 
-        if (dir != dWait  && World.getDungeonManager().level[World.GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
+        if (dir != dWait  && World.getDungeonManager().level(World.GetCurrentLevel()).getCell(player->getPosition()->x, player->getPosition()->y).getItem())
         {
             if (player->action.Type() == aMove)
             {
-                Item * item = World.getDungeonManager().level[World.GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem();
+                Item * item = World.getDungeonManager().level(World.GetCurrentLevel()).getCell(player->getPosition()->x, player->getPosition()->y).getItem();
                 assert(item);
 
                 // auto projectile pickup
@@ -567,18 +566,18 @@ int UserCommand::MoveCommand(int  dir)
 
                 if (!pickup)
                 {
-                    DungeonLevel* level = &World.getDungeonManager().level[World.GetCurrentLevel()];
-                    if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->itemNumber[1] > 1)
+                    DungeonLevel* level = &World.getDungeonManager().level(World.GetCurrentLevel());
+                    if (level->getCell(player->getPosition()->x, player->getPosition()->y).getItem()->itemNumber[1] > 1)
                     {
                         if (item->identified)
-                            World.getTextManager().newLine("You see %s here.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                            World.getTextManager().newLine("You see %s here.", level->getCell(player->getPosition()->x, player->getPosition()->y).getItem()->GetName().c_str());
                         else
-                            World.getTextManager().newLine("You see some %s.", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                            World.getTextManager().newLine("You see some %s.", level->getCell(player->getPosition()->x, player->getPosition()->y).getItem()->GetName().c_str());
                     }
-                    else if (level->map[player->getPosition()->x][player->getPosition()->y].getItem()->identified)
-                        World.getTextManager().newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                    else if (level->getCell(player->getPosition()->x, player->getPosition()->y).getItem()->identified)
+                        World.getTextManager().newLine("You see a %s here. ", level->getCell(player->getPosition()->x, player->getPosition()->y).getItem()->GetName().c_str());
                     else
-                        World.getTextManager().newLine("You see a %s here. ", level->map[player->getPosition()->x][player->getPosition()->y].getItem()->GetName().c_str());
+                        World.getTextManager().newLine("You see a %s here. ", level->getCell(player->getPosition()->x, player->getPosition()->y).getItem()->GetName().c_str());
                 }
             }
         }
@@ -628,17 +627,17 @@ int UserCommand::Close(bool *keys)
 
     }
 
-    if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.type == openDoor) //open door
+    if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).terrain.type == openDoor) //open door
     {
 
-        if (World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].getItem() ||
-            World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].GetMonster())
+        if (World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).getItem() ||
+            World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).GetMonster())
         {
             World.getTextManager().newLine("The door is blocked. ");
             return 0;
         }
 
-        World.getDungeonManager().level[World.GetCurrentLevel()].map[new_pos.x][new_pos.y].terrain.Create(closedDoor);//makeclosedDoor();
+        World.getDungeonManager().level(World.GetCurrentLevel()).getCell(new_pos.x, new_pos.y).terrain.Create(closedDoor);//makeclosedDoor();
         World.getTextManager().newLine("You close the door. ");
         return 1;
     }
@@ -693,7 +692,7 @@ int UserCommand::Run()
     }
 
 
-    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level(World.GetCurrentLevel());
 
     if (run_dir == dNone)
         return 2;
@@ -706,7 +705,7 @@ int UserCommand::Run()
     }
 
 
-    if (level->map[new_pos.x][new_pos.y].terrain.type != deepWater)
+    if (level->getCell(new_pos.x, new_pos.y).terrain.type != deepWater)
     {
         int halt;// = HaltRunFeature(pos->x, pos->y);
         halt = HaltRunFeature(pos->x + 1, pos->y);
@@ -739,9 +738,9 @@ int UserCommand::HaltRun(int x, int y, int oldx, int oldy)
     if (x == oldx && y == oldy)
         return 0;
 
-    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level(World.GetCurrentLevel());
 
-    if (level->map[x][y].GetMonster() == NULL)
+    if (level->getCell(x, y).GetMonster() == NULL)
 
         return 0;
     return 1;
@@ -752,13 +751,13 @@ int UserCommand::HaltRunFeature(int x, int y, int oldx, int oldy)
     if (x == oldx && y == oldy)
         return 0;
 
-    DungeonLevel *level = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel *level = &World.getDungeonManager().level(World.GetCurrentLevel());
 
-    if (level->map[x][y].GetMonster() == NULL
-        && level->map[x][y].terrain.type != closedDoor
-        && level->map[x][y].terrain.type != bridge
-        //&& level->map[x][y].terrain.type != openDoor
-        && level->map[x][y].getItem() == NULL)
+    if (level->getCell(x, y).GetMonster() == NULL
+        && level->getCell(x, y).terrain.type != closedDoor
+        && level->getCell(x, y).terrain.type != bridge
+        //&& level->getCell(x, y).terrain.type != openDoor
+        && level->getCell(x, y).getItem() == NULL)
         return 0;
     return 1;
 
@@ -893,7 +892,7 @@ int UserCommand::UseItem(bool *keys)
 
 int  UserCommand::UseItem(Item*item, int dir)
 {
-    DungeonLevel *dlevel = &World.getDungeonManager().level[World.GetCurrentLevel()];
+    DungeonLevel *dlevel = &World.getDungeonManager().level(World.GetCurrentLevel());
     MonsterData * player = World.getMonsterManager().Player();
 
     Coord * pos = player->getPosition();
@@ -920,7 +919,7 @@ int  UserCommand::UseItem(Item*item, int dir)
 
     //	if(item->type==key) //unlock
     {
-        if (dlevel->map[new_pos.x][new_pos.y].terrain.type == lockedStairs)
+        if (dlevel->getCell(new_pos.x, new_pos.y).terrain.type == lockedStairs)
         {
             ITEMLIST::iterator it;
             ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
@@ -944,11 +943,11 @@ int  UserCommand::UseItem(Item*item, int dir)
             else
             {
                 World.getTextManager().newLine("You unlock the gate. ");
-                dlevel->map[new_pos.x][new_pos.y].terrain.Create(openStairs);
+                dlevel->getCell(new_pos.x, new_pos.y).terrain.Create(openStairs);
                 return 1;
             }
         }
-        else if (dlevel->map[new_pos.x][new_pos.y].terrain.type == specialLocked)
+        else if (dlevel->getCell(new_pos.x, new_pos.y).terrain.type == specialLocked)
         {
             ITEMLIST::iterator it;
             ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
@@ -972,27 +971,27 @@ int  UserCommand::UseItem(Item*item, int dir)
             else
             {
                 World.getTextManager().newLine("You unlock the gate. You hear mad laughing. ");
-                dlevel->map[new_pos.x][new_pos.y].terrain.Create(specialOpen);
+                dlevel->getCell(new_pos.x, new_pos.y).terrain.Create(specialOpen);
                 return 1;
             }
         }
-        if (strcmp(dlevel->map[new_pos.x][new_pos.y].terrain.name, "a teleport") == 0)
+        if (strcmp(dlevel->getCell(new_pos.x, new_pos.y).terrain.name, "a teleport") == 0)
         {
             World.getTextManager().newLine("Walk into it! ");
             return 0;
         }
-        if (strcmp(dlevel->map[new_pos.x][new_pos.y].terrain.name, "a fountain") == 0)
+        if (strcmp(dlevel->getCell(new_pos.x, new_pos.y).terrain.name, "a fountain") == 0)
         {
             player->monster.stamina = player->monster.MaxStamina();
 
             World.getTextManager().newLine("You drink from the fountain. You feel healthier. ");
-            dlevel->map[new_pos.x][new_pos.y].terrain.Create(dryFountain);
+            dlevel->getCell(new_pos.x, new_pos.y).terrain.Create(dryFountain);
 
             return 1;
         }
-        if (dlevel->map[new_pos.x][new_pos.y].getItem()) //item exists
+        if (dlevel->getCell(new_pos.x, new_pos.y).getItem()) //item exists
         {
-            if (dlevel->map[new_pos.x][new_pos.y].getItem()->type == lockedChest)
+            if (dlevel->getCell(new_pos.x, new_pos.y).getItem()->type == lockedChest)
             {
                 ITEMLIST::iterator it;
                 ITEMLIST *inventory = &World.getMonsterManager().Player()->inventory;
@@ -1003,7 +1002,7 @@ int  UserCommand::UseItem(Item*item, int dir)
                 {
                     for (it = inventory->begin(); it != inventory->end(); it++)
                     {
-                        if (it->itemNumber[0] == dlevel->map[new_pos.x][new_pos.y].getItem()->itemNumber[0]) //chest (%d)
+                        if (it->itemNumber[0] == dlevel->getCell(new_pos.x, new_pos.y).getItem()->itemNumber[0]) //chest (%d)
                         {
                             match = 1;
                             break;
@@ -1011,7 +1010,7 @@ int  UserCommand::UseItem(Item*item, int dir)
                     }
                     if (match)
                     {
-                        dlevel->map[new_pos.x][new_pos.y].getItem()->CreateItem(openChest, World.GetCurrentLevel());
+                        dlevel->getCell(new_pos.x, new_pos.y).getItem()->CreateItem(openChest, World.GetCurrentLevel());
                         World.getTextManager().newLine("You open the chest. ");
 
                         if (World.GetCurrentLevel() > 9) //create special item
@@ -1074,14 +1073,14 @@ int  UserCommand::UseItem(Item*item, int dir)
                 {
                     for (it = inventory->begin(); it != inventory->end(); it++)
                     {
-                        if (it->itemNumber[0] == dlevel->map[new_pos.x][new_pos.y].getItem()->itemNumber[0] ||
-                            it->itemNumber[0] == dlevel->map[new_pos.x][new_pos.y].getItem()->itemNumber[1] ||
-                            it->itemNumber[0] == dlevel->map[new_pos.x][new_pos.y].getItem()->itemNumber[2])
+                        if (it->itemNumber[0] == dlevel->getCell(new_pos.x, new_pos.y).getItem()->itemNumber[0] ||
+                            it->itemNumber[0] == dlevel->getCell(new_pos.x, new_pos.y).getItem()->itemNumber[1] ||
+                            it->itemNumber[0] == dlevel->getCell(new_pos.x, new_pos.y).getItem()->itemNumber[2])
                             match++;
                     }
                     if (match == 3)
                     {
-                        dlevel->map[new_pos.x][new_pos.y].getItem()->CreateItem(openChest, World.GetCurrentLevel());
+                        dlevel->getCell(new_pos.x, new_pos.y).getItem()->CreateItem(openChest, World.GetCurrentLevel());
                         World.getTextManager().newLine("Click, Click, Click! You open the chest. <insert trumpet sounds here>");
                         Item *new_it = World.getItemManager().CreateItem(World.GetCurrentLevel(), gold);
                         World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
@@ -1107,12 +1106,12 @@ int  UserCommand::UseItem(Item*item, int dir)
                 }
 
             }
-            else if (dlevel->map[new_pos.x][new_pos.y].getItem()->type == openChest)
+            else if (dlevel->getCell(new_pos.x, new_pos.y).getItem()->type == openChest)
             {
                 World.getTextManager().newLine("All ready open. ");
                 return 0;
             }
-            else if (dlevel->map[new_pos.x][new_pos.y].getItem()->type == corpse)
+            else if (dlevel->getCell(new_pos.x, new_pos.y).getItem()->type == corpse)
             {
                 if (Random::getInt(2, 0))
                     World.getTextManager().newLine("It says 'Hello my name's Frank, whats yours?'. Come on, its a corpse!");
@@ -1156,7 +1155,7 @@ void UserCommand::Throw(Item * throwItem)
     //UnLook();
     look_pos.x = World.getMonsterManager().Player()->pos.x;
     look_pos.y = World.getMonsterManager().Player()->pos.y;
-    World.getTextManager().newLine("Use direction keys[dir], [space] to target, [x] to cancel. ");
+    World.getTextManager().newLine("Throw direction keys[dir], [space] to target, [x] to cancel. ");
 
     toThrow = throwItem;
 }

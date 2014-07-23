@@ -16,11 +16,6 @@ Effects::Effects(void) : max_effects(7)
 {
 }
 
-Effects::~Effects(void)
-{
-}
-
-
 void Effects::AddEffect(eEffect effect, int strength)
 {
     if (effect < 0 || effect > max_effects)
@@ -35,10 +30,10 @@ void Effects::AddEffect(eEffect effect, int strength)
     }
     else
     {
-        EFFECT *e = new EFFECT;
-        e->strength = strength;
-        e->type = effect;
-        effectList.push_back(*e);
+        EFFECT e;
+        e.strength = strength;
+        e.type = effect;
+        effectList.push_back(e);
     }
 }
 

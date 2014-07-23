@@ -27,7 +27,7 @@ class Monster  : public ResistanceBrands, public Effects
 {
 public:
 	Monster();
-	Monster(const Monster& rhs);
+	//Monster(const Monster& rhs);
 	virtual ~Monster();
 
 	virtual int Create(int type,int level, int level_variation=0);

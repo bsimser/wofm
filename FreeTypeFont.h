@@ -42,8 +42,9 @@ namespace freetype
 
     // This holds all of the information related to any
     // freetype font that we want to create.  
-    struct font_data
+    class font_data
     {
+    public:
         float h;			///< Holds the height of the font.
         GLuint * textures;	///< Holds the texture id's 
         GLuint list_base;	///< Holds the first display list id
@@ -52,6 +53,7 @@ namespace freetype
         // of the height h from the file fname.
         void init(const char * fname, unsigned int h);
 
+        ~font_data(){ clean(); }
         // Free all the resources associated with the font.
         void clean();
     };

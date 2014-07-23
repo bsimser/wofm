@@ -52,10 +52,11 @@ namespace Random
             seed = (int)time(NULL);
 
         srand(seed);
-
-     /*   std::ofstream myfile;
+#ifdef _DEBUG
+        std::ofstream myfile;
         myfile.open("seed.txt");
         myfile << seed;
-        myfile.close();*/
+        myfile.close();
+#endif
     }
 }

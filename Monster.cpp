@@ -44,7 +44,7 @@ Monster::Monster() :
         descriptions.push_back(std::string("This creature dwells deep within the mountain. "));
 
 }
-
+/*
 Monster::Monster(const Monster& rhs) :ResistanceBrands(rhs)
 {
     name  = rhs.name;
@@ -71,7 +71,7 @@ Monster::Monster(const Monster& rhs) :ResistanceBrands(rhs)
     speed = rhs.speed;
     type = rhs.type;
     description = rhs.description;
-}
+}*/
 
 Monster::~Monster()
 {
@@ -460,7 +460,7 @@ int Monster::createOrc(int level)
         experience = 8;
         varient += 2;
     }
-    else if (varient < 6)
+    else if (varient < 7)
     {
         name = ("orc sentry"); color2 = 128;
         setDescription("A slightly better equipped orc than most. He looks like he has been on guard duty a long time. ");

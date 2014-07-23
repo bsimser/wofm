@@ -60,41 +60,43 @@ int DungeonLevel::Initialise(int level_type)
         for (int w = 0; w < DUNGEON_SIZE_W; w++)
         {
             //terrain
-            switch (generator->dmap[w][h])
+            switch (generator->getMap().getCell(w, h))
             {
-            case '#':map[w][h].terrain.Create(stone); break;
-            case '.':map[w][h].terrain.Create(dfloor); break;
-            case '<':map[w][h].terrain.Create(upStairs); break;
-            case '>':map[w][h].terrain.Create(lockedStairs); break;
-            case '+':map[w][h].terrain.Create(closedDoor); break;
-            case '"':map[w][h].terrain.Create(openDoor); break;
-            case '=':map[w][h].terrain.Create(deepWater); break;
-            case 'w':map[w][h].terrain.Create(shallowWater); break;
-            case 'b':map[w][h].terrain.Create(bridge); break;
-            case 'g':map[w][h].terrain.Create(grass); break;
-            case 'T':map[w][h].terrain.Create(tree); break;
-            case 't':map[w][h].terrain.Create(deadTree); break;
-            case 's':map[w][h].terrain.Create(sand); break;
-            case 'M':map[w][h].terrain.Create(mountain); break;
-            case 'u':map[w][h].terrain.Create(tomb); break;
-            case '(':map[w][h].terrain.Create(specialUp); break;
-            case ')':map[w][h].terrain.Create(specialLocked); break;
-            case 'i':map[w][h].terrain.Create(specialItem); break;
-            case 'r':map[w][h].terrain.Create(ruins); break;
-            case 'f':map[w][h].terrain.Create(fountain); break;
-            case 'v':map[w][h].terrain.Create(teleport); break;
-            case 'S':map[w][h].terrain.Create(random); break;
-            case 'W':map[w][h].terrain.Create(spiderWeb); break;
+            case '#':getCell(w, h).terrain.Create(stone); break;
+            case '.':getCell(w, h).terrain.Create(dfloor); break;
+            case '<':getCell(w, h).terrain.Create(upStairs); break;
+            case '>':getCell(w, h).terrain.Create(lockedStairs); break;
+            case '+':getCell(w, h).terrain.Create(closedDoor); break;
+            case '"':getCell(w, h).terrain.Create(openDoor); break;
+            case '=':getCell(w, h).terrain.Create(deepWater); break;
+            case 'w':getCell(w, h).terrain.Create(shallowWater); break;
+            case 'b':getCell(w, h).terrain.Create(bridge); break;
+            case 'g':getCell(w, h).terrain.Create(grass); break;
+            case 'T':getCell(w, h).terrain.Create(tree); break;
+            case 't':getCell(w, h).terrain.Create(deadTree); break;
+            case 's':getCell(w, h).terrain.Create(sand); break;
+            case 'M':getCell(w, h).terrain.Create(mountain); break;
+            case 'u':getCell(w, h).terrain.Create(tomb); break;
+            case '(':getCell(w, h).terrain.Create(specialUp); break;
+            case ')':getCell(w, h).terrain.Create(specialLocked); break;
+            case 'i':getCell(w, h).terrain.Create(specialItem); break;
+            case 'r':getCell(w, h).terrain.Create(ruins); break;
+            case 'f':getCell(w, h).terrain.Create(fountain); break;
+            case 'v':getCell(w, h).terrain.Create(teleport); break;
+            case 'S':getCell(w, h).terrain.Create(random); break;
+            case 'W':getCell(w, h).terrain.Create(spiderWeb); break;
 
-            default:map[w][h].terrain.Create(stone); break;
+            default:getCell(w, h).terrain.Create(stone); break;
             }
 
             //monsters
-            map[w][h].RemoveMonsterRef();
-            map[w][h].RemoveItemRef();
+            getCell(w, h).RemoveMonsterRef();
+            getCell(w, h).RemoveItemRef();
             //items
         }
     }
+    delete generator;
+
     //MakeLevelMap();
     initialised = 1;
     return initialised;
@@ -109,9 +111,9 @@ int DungeonLevel::MakeLevelMap()
     int x=0;
     for( int w=0;w<DUNGEON_SIZE_W;w+=MAP_SCALE,x++)
     {
-    bigmap[x][y].terrain = map[w][h].terrain;
-    bigmap[x][y].RemoveMonsterRef();
-    bigmap[x][y].RemoveItemRef();
+    biggetCell(x, y).terrain = getCell(w, h).terrain;
+    biggetCell(x, y).RemoveMonsterRef();
+    biggetCell(x, y).RemoveItemRef();
     }
     }*/
     return 1;
@@ -122,13 +124,13 @@ int DungeonLevel::Delete()
     for (int h = 0; h < DUNGEON_SIZE_H; h++)
     for (int w = 0; w < DUNGEON_SIZE_W; w++)
     {
-        //if(map[w][h].monster) //monsters deleted elsewhere
-        //	delete map[w][h].monster;
-        if (map[w][h].getItem() != NULL)
-            delete map[w][h].getItem();
+        //if(getCell(w, h).monster) //monsters deleted elsewhere
+        //	delete getCell(w, h).monster;
+        if (getCell(w, h).getItem() != NULL)
+            delete getCell(w, h).getItem();
 
-        map[w][h].RemoveMonsterRef();
-        map[w][h].RemoveItemRef();
+        getCell(w, h).RemoveMonsterRef();
+        getCell(w, h).RemoveItemRef();
     }
     return 1;
 }
@@ -148,8 +150,8 @@ int DungeonLevel::Delete()
     {
     if(LOS(x,y,w,h,sight))
     {
-    map[w][h].terrain.found = 1;
-    map[w][h].terrain.light = 1;
+    getCell(w, h).terrain.found = 1;
+    getCell(w, h).terrain.light = 1;
     Coord *pos = new Coord;
     pos->x=w;
     pos->y=h;
@@ -157,7 +159,7 @@ int DungeonLevel::Delete()
     }
     else
     {
-    map[w][h].terrain.light = 0;
+    getCell(w, h).terrain.light = 0;
     }
     }
     }
@@ -179,8 +181,8 @@ void DungeonLevel::LightDungeon(int x, int y, int range) //los??
     {
     if(LOS(x,y,w,h,range))
     {
-    map[w][h].terrain.found = 1;
-    map[w][h].terrain.light = 1;
+    getCell(w, h).terrain.found = 1;
+    getCell(w, h).terrain.light = 1;
     //Coord *pos = new Coord;
     //	pos->x=w;
     //pos->y=h;
@@ -188,7 +190,7 @@ void DungeonLevel::LightDungeon(int x, int y, int range) //los??
     }
     else
     {
-    map[w][h].terrain.light = 0;
+    getCell(w, h).terrain.light = 0;
     }
     }
     }
@@ -204,8 +206,8 @@ void DungeonLevel::LightDungeon(int x, int y, int range) //los??
     {
         int x1 = it->x;
         int y1 = it->y;
-        map[x1][y1].terrain.light = 0; //shadows
-        //	map[x1][y1].terrain.found = 0; //hide
+        getCell(x1, y1).terrain.light = 0; //shadows
+        //	getCell(x1, y1).terrain.found = 0; //hide
     }
     lit_cells.clear();
 
@@ -237,8 +239,8 @@ void DungeonLevel::LightDungeon(int x, int y, int range) //los??
             {
                 if (IsCellVisible(x, y, w, h))
                 {
-                    map[w][h].terrain.found = 1;
-                    map[w][h].terrain.light = 1;
+                    getCell(w, h).terrain.found = 1;
+                    getCell(w, h).terrain.light = 1;
                     Coord new_Coord;
                     new_Coord.x = w;
                     new_Coord.y = h;
@@ -255,7 +257,7 @@ int DungeonLevel::ClearPath()
 
     for (it = show_path.begin(); it != show_path.end(); it++)
     {
-        map[it->x][it->y].show_path = none;
+        getCell(it->x, it->y).show_path = none;
     }
     show_path.clear();
 
@@ -312,7 +314,7 @@ bool DungeonLevel::HighLightPath(int x, int y, int w, int h)
                 if (isAdjacent(*it, *test_it2))
                 {
                     //delete test_it1
-                    map[test_it1->x][test_it1->y].show_path = none;
+                    getCell(test_it1->x, test_it1->y).show_path = none;
                     show_path.erase(test_it1);
                     if (it != show_path.begin()) // keep testing current cell until none are adjacent
                         it--;
@@ -324,10 +326,13 @@ bool DungeonLevel::HighLightPath(int x, int y, int w, int h)
     // set character.
     for (it = show_path.begin(); it != show_path.end() - 1; it++) // dont do the end one as a box character is needed.
     {
-        if (map[it->x][it->y].terrain.type == stone || map[it->x][it->y].terrain.type == closedDoor || map[it->x][it->y].GetMonster())
-            map[it->x][it->y].show_path = blocked;
+        if (getCell(it->x, it->y).terrain.type == stone || getCell(it->x, it->y).terrain.type == closedDoor || 
+            (getCell(it->x, it->y).GetMonster() && !World.getMonsterManager().FindMonsterData(getCell(it->x, it->y).GetMonster())->isSeen()))
+        {
+            getCell(it->x, it->y).show_path = blocked;
+        }
         else
-            map[it->x][it->y].show_path = clear;
+            getCell(it->x, it->y).show_path = clear;
     }
 
 
@@ -348,7 +353,7 @@ int DungeonLevel::LOS(int x, int y, int x2, int y2, int range)
 
     if (abs(x2 - x) > abs(y2 - y))  //further away in x direction
     {
-        if (map[x][y].terrain.type == stone || map[x][y].terrain.type == closedDoor)
+        if (getCell(x, y).terrain.type == stone || getCell(x, y).terrain.type == closedDoor)
             return 0;
 
         if (x2 - x < 0)
@@ -362,7 +367,7 @@ int DungeonLevel::LOS(int x, int y, int x2, int y2, int range)
     }
     else if (abs(x2 - x) < abs(y2 - y)) //further away in y direction
     {
-        if (map[x][y].terrain.type == stone || map[x][y].terrain.type == closedDoor)
+        if (getCell(x, y).terrain.type == stone || getCell(x, y).terrain.type == closedDoor)
             return 0;
 
         if (y2 - y < 0)
@@ -377,7 +382,7 @@ int DungeonLevel::LOS(int x, int y, int x2, int y2, int range)
 
     else						//equal
     {
-        if (map[x][y].terrain.type == stone || map[x][y].terrain.type == closedDoor)
+        if (getCell(x, y).terrain.type == stone || getCell(x, y).terrain.type == closedDoor)
             return 0;
 
         if (x2 - x < 0 && y2 - y < 0)
@@ -401,7 +406,7 @@ int DungeonLevel::ClearMonsters()
 {
     for (int h = 0; h < DUNGEON_SIZE_H; h++)
     for (int w = 0; w < DUNGEON_SIZE_W; w++)
-        map[w][h].RemoveMonsterRef();
+        getCell(w, h).RemoveMonsterRef();
 
     return 0;
 
@@ -421,7 +426,7 @@ Coord * DungeonLevel::getStartPos()
     {
         for (int x = 0; x < DUNGEON_SIZE_W; x++)
         {
-            if (map[x][y].terrain.type == upStairs)
+            if (getCell(x, y).terrain.type == upStairs)
             {
                 tempPos.x = x;
                 tempPos.y = y;
@@ -437,7 +442,7 @@ Coord * DungeonLevel::GetEndPosition()
     {
         for (int x = 0; x < DUNGEON_SIZE_W; x++)
         {
-            if (map[x][y].terrain.type == lockedStairs || map[x][y].terrain.type == openStairs)
+            if (getCell(x, y).terrain.type == lockedStairs || getCell(x, y).terrain.type == openStairs)
             {
                 tempPos.x = x;
                 tempPos.y = y;
@@ -456,7 +461,7 @@ Coord * DungeonLevel::FreeTerrainPosition(const std::string & name)
     {
         for (int w = 1; w < DUNGEON_SIZE_W - 1; w++)
         {
-            if (name == map[w][h].terrain.name)
+            if (name == getCell(w, h).terrain.name)
             {
                 Coord pos;
                 pos.x = w;
@@ -489,7 +494,7 @@ Coord * DungeonLevel::FreeTerrainPosition(eTerrainType type)
     {
         for (int w = 1; w < DUNGEON_SIZE_W - 1; w++)
         {
-            if (map[w][h].terrain.type == type)
+            if (getCell(w, h).terrain.type == type)
             {
                 Coord pos;
                 pos.x = w;
@@ -522,7 +527,7 @@ for(int h=1;h<DUNGEON_SIZE_H-1;h++)
 {
 for(int w=1;w<DUNGEON_SIZE_W-1;w++)
 {
-if(map[w][h].item == NULL && map[w][h].GetMonster() == NULL && map[w][h].terrain.type == bridge )
+if(getCell(w, h).item == NULL && getCell(w, h).GetMonster() == NULL && getCell(w, h).terrain.type == bridge )
 {
 Coord pos;pos.x = w; pos.y=h;
 posList.push_back(pos);
@@ -554,21 +559,21 @@ int DungeonLevel::getAdjacentFreeSpaces(int x, int y)
 {
     int spaces = 0;
 
-    if (map[x+1][y].terrain.type == dfloor)
+    if (getCell(x+1, y).terrain.type == dfloor)
         spaces++;
-    if (map[x-1][y].terrain.type == dfloor)
+    if (getCell(x-1, y).terrain.type == dfloor)
         spaces++;
-    if (map[x][y+1].terrain.type == dfloor)
+    if (getCell(x, y+1).terrain.type == dfloor)
         spaces++;
-    if (map[x][y-1].terrain.type == dfloor)
+    if (getCell(x, y-1).terrain.type == dfloor)
         spaces++;
-    if (map[x-1][y-1].terrain.type == dfloor)
+    if (getCell(x-1, y-1).terrain.type == dfloor)
         spaces++;
-    if (map[x-1][y+1].terrain.type == dfloor)
+    if (getCell(x-1, y+1).terrain.type == dfloor)
         spaces++;
-    if (map[x+1][y-1].terrain.type == dfloor)
+    if (getCell(x+1, y-1).terrain.type == dfloor)
         spaces++;
-    if (map[x+1][y+1].terrain.type == dfloor)
+    if (getCell(x+1, y+1).terrain.type == dfloor)
         spaces++;
 
     return spaces;
@@ -584,7 +589,7 @@ Coord * DungeonLevel::NewItemPosition(bool space)
     {
         for (int w = 1; w < DUNGEON_SIZE_W - 1; w++)
         {
-            if (map[w][h].getItem() == NULL && map[w][h].GetMonster() == NULL && map[w][h].terrain.type == dfloor)
+            if (getCell(w, h).getItem() == NULL && getCell(w, h).GetMonster() == NULL && getCell(w, h).terrain.type == dfloor)
             {
                 if (space)
                 {
@@ -622,7 +627,7 @@ Coord * DungeonLevel::NewSpecialItemPosition()
     {
         for (int w = 1; w < DUNGEON_SIZE_W - 1; w++)
         {
-            if (map[w][h].terrain.type == specialItem)
+            if (getCell(w, h).terrain.type == specialItem)
             {
                 tempPos.x = w; tempPos.y = h;
                 return &tempPos;
@@ -636,10 +641,10 @@ Coord * DungeonLevel::NewSpecialItemPosition()
 
 int DungeonLevel::isNearWall(int x, int y)
 {
-    if (map[x + 1][y].terrain.type == stone &&
-        map[x][y + 1].terrain.type == stone &&
-        map[x - 1][y].terrain.type == stone &&
-        map[x][y - 1].terrain.type == stone)
+    if (getCell(x + 1, y).terrain.type == stone &&
+        getCell(x, y + 1).terrain.type == stone &&
+        getCell(x - 1, y).terrain.type == stone &&
+        getCell(x, y - 1).terrain.type == stone)
         return 0;
 
     return 1;
@@ -647,7 +652,10 @@ int DungeonLevel::isNearWall(int x, int y)
 
 bool DungeonLevel::IsCellTransparent(int x, int y)
 {
-    bool is = map[x][y].terrain.type == stone || map[x][y].terrain.type == closedDoor ? 0 : 1;
+    if (x < 0 || y < 0 || x >= DUNGEON_SIZE_W || y >= DUNGEON_SIZE_H)
+        return false;
+
+    bool is = getCell(x, y).terrain.type == stone || getCell(x, y).terrain.type == closedDoor ? 0 : 1;
 
     if (highlight)
     {
@@ -660,11 +668,11 @@ bool DungeonLevel::IsCellTransparent(int x, int y)
         }
         //if(is)
         {
-        //	map[x][y].show_path = clear;
+        //	getCell(x, y).show_path = clear;
 
     }
         //else
-        //map[x][y].show_path = blocked;
+        //getCell(x, y).show_path = blocked;
     }
     return is;
 }
@@ -677,4 +685,9 @@ DungeonLevel::EMapLight DungeonLevel::getMapLight()
 void DungeonLevel::setMapLight(EMapLight lighting)
 {
     mapLighting = lighting;
+}
+
+cell & DungeonLevel::getCell(int x, int y)
+{
+    return map.getCell(x, y);
 }

@@ -7,6 +7,9 @@ Change log
 version 1.0.0 RC 01 12/07/2014
 ==============================
 - Fixed minor issues.
+- Lost of minor changes.
+- Locked stairs are different colours from unlocked
+- Massive internal structure rewrite
 
 
 version 1.0.0 RC 01 12/07/2014

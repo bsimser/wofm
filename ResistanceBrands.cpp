@@ -15,7 +15,7 @@ brand(0),
 resistance(0)
 {
 }
-
+/*
 ResistanceBrands::ResistanceBrands(const ResistanceBrands& rhs)
 {
     BRANDMAP_CITERATOR it;
@@ -29,7 +29,7 @@ ResistanceBrands::ResistanceBrands(const ResistanceBrands& rhs)
     brand = rhs.brand;
     resistance = rhs.resistance;
 }
-
+*/
 int ResistanceBrands::GetResistance(eBrandType type)
 {
     BRANDMAP::iterator it = resistanceMap.find(type);

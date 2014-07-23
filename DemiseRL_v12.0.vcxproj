@@ -129,7 +129,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>freetype/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader />
@@ -222,6 +222,7 @@
       <BrowseInformation Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</BrowseInformation>
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
     </ClCompile>
+    <ClCompile Include="GeneratorMap.cpp" />
     <ClCompile Include="OpenGLSceneGen.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug_non|Win32'">Disabled</Optimization>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug_non|Win32'">EnableFastChecks</BasicRuntimeChecks>
@@ -515,6 +516,7 @@
   <ItemGroup>
     <ClInclude Include="CellularAutomata.h" />
     <ClInclude Include="FreeTypeFont.h" />
+    <ClInclude Include="GeneratorMap.h" />
     <ClInclude Include="OpenGLSceneGen.h" />
     <ClInclude Include="SceneGenerator.h" />
     <ClInclude Include="DungeonLevel.h" />

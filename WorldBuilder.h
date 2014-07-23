@@ -173,7 +173,7 @@ public:
     void SetState(eDisplayState st) { state = st; };
     eDisplayState State(){ return state; };
     OpenGLSceneGen & getScene() { return scene; };
-
+    
 private:
     DungeonManager dungeonManager;
     ActionManager actionManager;

@@ -1,12 +1,7 @@
 Warlock Of Firetop Mountain RL (c) Corremn 2014
 ===============================================
 
-All specials dudes gave me a silver arrow. -FIXED
-0 smelly cheese generated on special.	- FIXED
-no key on cyclops? is there one? - FIXED
 undead level had locked special gate - check that. 
-
-
 
 Task List
 ---------

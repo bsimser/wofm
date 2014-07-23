@@ -25,6 +25,7 @@ int ItemManager::KeySpecial[10];
 int ItemManager::Initialise()
 {
     all_items.clear();
+
     try
     {
         makeKeysLabels();

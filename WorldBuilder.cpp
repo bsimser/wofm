@@ -217,13 +217,13 @@ void WorldBuilder::UpdateMap()
 {
     if ((old_turns < turns || first_update) && (state != sStart || state != sRest || state != sResting))
     {
-        monsterManager.UpdateMonsters(&dungeonManager.level[GetCurrentLevel()], &actionManager);
+        monsterManager.UpdateMonsters(&dungeonManager.level(GetCurrentLevel()), &actionManager);
         old_turns = turns;
         first_update = false;
     }
     old_turns = turns;
 
-    scene.dLevel = &dungeonManager.level[World.GetCurrentLevel()];
+    scene.dLevel = &dungeonManager.level(World.GetCurrentLevel());
 }
 
 void WorldBuilder::UpdateStatusBar()
@@ -658,7 +658,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
 
     else if (keys[VC_COMMA] || keys[VC_G]) //pickup
     {
-        if (dungeonManager.level[World.GetCurrentLevel()].map[player->getPosition()->x][player->getPosition()->y].getItem())
+        if (dungeonManager.level(World.GetCurrentLevel()).getCell(player->getPosition()->x, player->getPosition()->y).getItem())
         {
             player->NextAction(actionManager.UpdateAction(&player->action, aPickup, 0));
             turns++;
