@@ -4,7 +4,7 @@ Warlock of Firetop Mountain (c) 2014 Corremn
 
 Change log
 
-version 1.0.0 RC 01 12/07/2014
+version 1.0.0 RC 03 20/07/2014
 ==============================
 - Fixed minor issues.
 - Lost of minor changes.
@@ -12,7 +12,7 @@ version 1.0.0 RC 01 12/07/2014
 - Massive internal structure rewrite
 
 
-version 1.0.0 RC 01 12/07/2014
+version 1.0.0 RC 01 19/07/2014
 ==============================
 - Improved rendering speed.
 - reworked luck (see readme.txt)
