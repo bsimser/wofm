@@ -238,11 +238,11 @@ int EffectManager::RunPoison(MonsterData *monster, int strength)
     unsigned char c2 = monster->monster.color2;
     unsigned char c3 = monster->monster.color3;
     monster->monster.setColour(0, 255, 0);
-    World.Render();
+    World.RenderScene();
     Sleep(20);
     monster->monster.setColour(c1, c2, c3);
 
-    World.Render();
+    World.RenderScene();
 
     //get Resistance
     int resistance = monster->monster.GetResistance(EquivalentResistance(poisoned));

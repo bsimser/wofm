@@ -4,6 +4,10 @@ Warlock of Firetop Mountain (c) 2014 Corremn
 
 Change log
 
+==============================
+- permantly unlocked a red level.
+
+
 version 1.0.0 RC 03 20/07/2014
 ==============================
 - Fixed minor issues.

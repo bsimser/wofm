@@ -11,7 +11,7 @@
 #pragma warning(disable : 4786) 
 
 #include "Item.h"
-#include "ItemManager.h"
+#include "WorldBuilder.h"
 #include "numberGenerator.h"
 
 #include "worldbuilder.h" // get all items from manager
@@ -276,13 +276,13 @@ void Item::createKey(int level)
 
     if (level > 9)
     {
-        itemNumber[0] = ItemManager::KeySpecial[level - 10];
+        itemNumber[0] = World.getItemManager().KeySpecial[level - 10];
         sprintf(keyName, "key labelled %d", itemNumber[0]);
     }
 
     else
     {
-        itemNumber[0] = ItemManager::keyLabels[level];
+        itemNumber[0] = World.getItemManager().keyLabels[level];
         sprintf(keyName, "key labelled %d", itemNumber[0]);
     }
     name = keyName;
@@ -360,9 +360,9 @@ void Item::createLockedChest(int level)
     else
     {
         if (level > 9)
-            itemNumber[0] = ItemManager::KeySpecial[level - 10];
+            itemNumber[0] = World.getItemManager().KeySpecial[level - 10];
         else
-            itemNumber[0] = ItemManager::KeySpecial[level];
+            itemNumber[0] = World.getItemManager().KeySpecial[level];
 
         sprintf(chestName, "chest (%d)", itemNumber[0]);
         weight = 100;

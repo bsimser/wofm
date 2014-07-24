@@ -134,76 +134,65 @@ public:
     int Run();
     int Initialise(const char* title);
     int Stop();
-    void Render();
-
+    void RenderScene();
     int ToggleFullScreen(int width, int height);
-
     void Resize(WPARAM lParam, LPARAM wParam);
 
     void ProcessCommand(bool *keys);
     int CompleteUserCommands();
 
-    int GetCurrentLevel(){ return current_level; };
-    int SetDungeonLevel(int new_lev){ current_level = new_lev; return current_level; };
+    int GetCurrentLevel();
+    int SetDungeonLevel(int new_lev);
 
-    //int BuildDungeon(int level);
+    DungeonManager &    getDungeonManager();
+    ActionManager &     getActionManager();
+    TextManager &       getTextManager();
+    ItemManager &       getItemManager();
+    MonsterManager &    getMonsterManager();
+    InventoryManager &  getInventoryManager();
+    SpellManager &      getSpellManager();
+    DeathMessage &      getDeathMessage();
+    StartScreen &       getStartScreen();
+    RestLevel &         getRestLevel();
 
-    DungeonManager & getDungeonManager() { return dungeonManager; };
-    ActionManager & getActionManager(){ return actionManager; };
-    TextManager & getTextManager(){ return textManager; };
-    ItemManager & getItemManager(){ return itemManager; };
-    MonsterManager & getMonsterManager(){ return monsterManager; };
-    InventoryManager & getInventoryManager(){ return inventoryManager; };
-    SpellManager & getSpellManager(){ return spellManager; };
+    int UpLevel();
+    int DownLevel();
 
-    DeathMessage & getDeathMessage(){ return deathMessage; };
-    StartScreen & getStartScreen(){ return start; };
-    RestLevel & getRestLevel(){ return restLevel; };
+    int UpSpecialLevel();
+    int DownSpecialLevel();
+    int DownEncounterLevel();
 
-    int UpLevel(){ current_level--; return current_level; };
-    int DownLevel(){ current_level++; return current_level; };
+    int GetMaxLevels();
 
-    int UpSpecialLevel(){ current_level -= 10; return current_level; };
-    int DownSpecialLevel(){ current_level += 10; return current_level; };
-    int DownEncounterLevel(){ current_level = 20; return current_level; };
-
-    int GetMaxLevels(){ return max_num_levels; };
-
-    int GetTurns(){ return turns; };
-    void SetState(eDisplayState st) { state = st; };
-    eDisplayState State(){ return state; };
-    OpenGLSceneGen & getScene() { return scene; };
+    int GetTurns();
+    void SetState(eDisplayState st);
+    eDisplayState State();
+    OpenGLSceneGen & getScene();
     
 private:
-    DungeonManager dungeonManager;
-    ActionManager actionManager;
-    TextManager textManager;
-    ItemManager itemManager;
-    MonsterManager monsterManager;
-    InventoryManager inventoryManager;
-    SpellManager spellManager;
-
-    DeathMessage deathMessage;
-    StartScreen start;
-    RestLevel restLevel;
-
-    OpenGLSceneGen scene;
-
-    	eDisplayState state;
-    int current_level;
-
     void UpdateStatusBar();
     void UpdateMap();
     void InventoryCommand(bool *keys);
-    long turns;
-    int max_num_levels;
 
-    int old_turns;
-
-    std::string Title;
-
-    bool first_update;
-    Coord map_Coord;
+    DungeonManager      dungeonManager;
+    ActionManager       actionManager;
+    TextManager         textManager;
+    ItemManager         itemManager;
+    MonsterManager      monsterManager;
+    InventoryManager    inventoryManager;
+    SpellManager        spellManager;
+    DeathMessage        deathMessage;
+    StartScreen         start;
+    RestLevel           restLevel;
+    OpenGLSceneGen      scene;
+    eDisplayState       state;
+    int                 current_level;
+    long                turns;
+    int                 max_num_levels;
+    int                 old_turns;
+    std::string         Title;
+    bool                first_update;
+    Coord               map_Coord;
 };
 
 #endif // !defined(AFX_WORLDBUILDER_H__685DBA95_20E8_4392_B7C8_CEF79C98C238__INCLUDED_)

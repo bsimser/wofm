@@ -332,7 +332,7 @@ int DungeonManager::PopulateDungeon(int lev)
             MonsterData * special = World.getMonsterManager().CreateMonster(mSpecial, sub_type, lev, pos->x, pos->y);
             if (lev == 6)
             {
-                World.getMonsterManager().monsterItems.EquipMonster(special, lev);
+                World.getMonsterManager().getMonsterItems().EquipMonster(special, lev);
             }
         }
     }
@@ -525,7 +525,7 @@ void DungeonManager::CreateSpecialDungeon()
                     PopulateSpecialDungeon(i + 10, slUndead);
                     //choose special undead level
                     Coord *pos = NewMonsterPosition(i);
-                    level(i).getCell(pos->x, pos->y).terrain.Create(specialLocked);
+                    level(i).getCell(pos->x, pos->y).terrain.Create(specialOpen);
                     special_type3++;
 
                     pos = level(i + 10).NewSpecialItemPosition();

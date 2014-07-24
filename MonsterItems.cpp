@@ -8,13 +8,14 @@
 // $HeadURL: $ 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-
-#include "WorldBuilder.h"
 #include "MonsterItems.h"
+#include "WorldBuilder.h"
 #include "UserCommand.h"
 #include "numberGenerator.h"
 
 using namespace Random;
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 Item * MonsterItems::GetEquipment(MonsterData *monster, eItemType equip_type)
 {
@@ -30,6 +31,8 @@ Item * MonsterItems::GetEquipment(MonsterData *monster, eItemType equip_type)
     return NULL;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 Item * MonsterItems::GetInventoryItem(MonsterData *monster, eItemType equip_type)
 {
     ITEMLIST::iterator it;
@@ -42,6 +45,8 @@ Item * MonsterItems::GetInventoryItem(MonsterData *monster, eItemType equip_type
     }
     return NULL;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::EquipMonster(MonsterData *monster, int level)
 {
@@ -173,6 +178,8 @@ int MonsterItems::EquipMonster(MonsterData *monster, int level)
     return 1;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int MonsterItems::EquipPlayer(MonsterData *player)
 {
     int level = 0;
@@ -250,6 +257,8 @@ int MonsterItems::EquipPlayer(MonsterData *player)
 
     return 1;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::EquipItem(MonsterData *monster, int item)
 {
@@ -354,6 +363,8 @@ int MonsterItems::RemoveItem(MonsterData *monster, int ref)
     return 0;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int MonsterItems::UseItem(MonsterData *monster, Item & item)
 {
     if (item.type == provisions && item.itemNumber[1])
@@ -394,7 +405,7 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
     if (item.type == DiMaggio)
     {
         // DRAGON
-        for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); ++it)
+        for (MONSTERLIST::iterator it = World.getMonsterManager().getMonsterList().begin(); it != World.getMonsterManager().getMonsterList().end(); ++it)
         {
             if (it->monster.name == "dragon")
             {
@@ -417,7 +428,7 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
     else if (item.type == gem)
     {
         bool done = false;
-        for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); ++it)
+        for (MONSTERLIST::iterator it = World.getMonsterManager().getMonsterList().begin(); it != World.getMonsterManager().getMonsterList().end(); ++it)
         {
             if (it->isSeen() == 1 && !it->isPlayer() )
             {
@@ -440,6 +451,8 @@ int MonsterItems::UseItem(MonsterData *monster, Item & item)
     }
     return 0;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::DropItem(MonsterData *monster, int item, bool erace_from_inv)
 {
@@ -485,6 +498,7 @@ int MonsterItems::DropItem(MonsterData *monster, int item, bool erace_from_inv)
     return 0;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::PickupItem(MonsterData *monster)
 {
@@ -514,8 +528,6 @@ int MonsterItems::PickupItem(MonsterData *monster)
     //get copy of item
 
     Item item(*World.getDungeonManager().level(monster->level).getCell(monster->pos.x, monster->pos.y).getItem());
-
-
 
     //delete reference from map but item is still in all items list
     World.getDungeonManager().level(monster->level).getCell(monster->pos.x, monster->pos.y).RemoveItemRef();
@@ -553,6 +565,8 @@ int MonsterItems::PickupItem(MonsterData *monster)
     return 1;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 //drop all keys
 int MonsterItems::DropRandomItems(MonsterData *monster)
 {
@@ -571,12 +585,12 @@ int MonsterItems::DropRandomItems(MonsterData *monster)
     {
         if (it->type == key)
         {
-            World.getMonsterManager().monsterItems.DropItem(monster, i, false);
+            DropItem(monster, i, false);
             it = monster->inventory.erase(it);
         }
         else if (it->type == cards)
         {
-            World.getMonsterManager().monsterItems.DropItem(monster, i, false);
+            DropItem(monster, i, false);
             it = monster->inventory.erase(it);
         }
         else
@@ -586,7 +600,7 @@ int MonsterItems::DropRandomItems(MonsterData *monster)
         }
         /*else if(rit->type == gold)
         {
-        World.getMonsterManager().monsterItems.DropItem(monster,i);
+        .DropItem(monster,i);
         }*/
     }
 
@@ -595,16 +609,16 @@ int MonsterItems::DropRandomItems(MonsterData *monster)
     if (rand_drop == monster->inventory.size()) //no drop (0=0)
         return 0;
 
-    World.getMonsterManager().monsterItems.DropItem(monster, rand_drop);
+    DropItem(monster, rand_drop);
 
     if (monster->inventory.size() > 0) //more items to drop
         DropRandomItems(monster);
 
     return 1;
-
 }
 
-///////////private///////////////////
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int MonsterItems::DropStackableItem(MonsterData *monster, Item *item, int x, int y)
 {
     int dungeonLevel = monster ? monster->level : World.GetCurrentLevel();
@@ -631,6 +645,8 @@ int MonsterItems::DropStackableItem(MonsterData *monster, Item *item, int x, int
     }
     return 0;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::DropItem(MonsterData *monster, Item *item, int x, int y)
 {
@@ -661,6 +677,8 @@ int MonsterItems::DropItem(MonsterData *monster, Item *item, int x, int y)
         World.getDungeonManager().level(dungeonLevel).getCell(x, y).AssignItem(item);
     return 1;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 //Spiral drop
 int MonsterItems::AttemptDropItem(MonsterData *monster, Item *item, int x, int y)
@@ -722,31 +740,41 @@ int MonsterItems::AttemptDropItem(MonsterData *monster, Item *item, int x, int y
     return 1; //success
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int MonsterItems::moveFromInvToEquipList(MonsterData *monster)
 {
     return 1;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::moveFromEquipToInvList(MonsterData *monster)
 {
     return 1;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 int MonsterItems::moveFromInvToAllList(MonsterData *monster)
 {
     return 1;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------
 
 int MonsterItems::moveFromAllToInvList(MonsterData *monster)
 {
     return 1;
 }
 
+// --------------------------------------------------------------------------------------------------------------------------------
+
 bool MonsterItems::isBetter(MonsterData &monster, Item &item)
 {
     if (item.type == weapon)
     {
-        Item * w = World.getMonsterManager().monsterItems.GetEquipment(&monster, weapon);
+        Item * w = GetEquipment(&monster, weapon);
 
         if (!w || item.getAverage_h2h() > w->getAverage_h2h())
         {
@@ -755,7 +783,7 @@ bool MonsterItems::isBetter(MonsterData &monster, Item &item)
     }
     else if (item.type == armour)
     {
-        Item * w = World.getMonsterManager().monsterItems.GetEquipment(&monster, armour);
+        Item * w = GetEquipment(&monster, armour);
 
         if (!w || item.absorb_bonus > w->absorb_bonus)
         {
@@ -764,7 +792,7 @@ bool MonsterItems::isBetter(MonsterData &monster, Item &item)
     }
     else if (item.type == shield)
     {
-        Item * w = World.getMonsterManager().monsterItems.GetEquipment(&monster, shield);
+        Item * w = GetEquipment(&monster, shield);
 
         if (!w || item.absorb_bonus > w->absorb_bonus)
         {
@@ -773,7 +801,7 @@ bool MonsterItems::isBetter(MonsterData &monster, Item &item)
     }
     else if (item.type == projectileWeapon)
     {
-        Item * w = World.getMonsterManager().monsterItems.GetEquipment(&monster, projectileWeapon);
+        Item * w = GetEquipment(&monster, projectileWeapon);
 
         if (!w || item.getAverage_thr() > w->getAverage_thr())
         {
@@ -782,3 +810,5 @@ bool MonsterItems::isBetter(MonsterData &monster, Item &item)
     }
     return false;
 }
+
+// --------------------------------------------------------------------------------------------------------------------------------

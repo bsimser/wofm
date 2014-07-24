@@ -19,7 +19,7 @@ int	CastMagic::SlowEnemies(MonsterData* caster)
     {
         MONSTERLIST::iterator it;
         //get list of enemies on LOS.
-        for (it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
+        for (it = World.getMonsterManager().getMonsterList().begin(); it != World.getMonsterManager().getMonsterList().end(); it++)
         {
             if (it->isSeen() == 1 && !it->isPlayer())
             {
@@ -212,7 +212,7 @@ int CastMagic::FlyingWeapon(MonsterData* caster, int x, int y)
         if (defender->isPlayer())
         {
             //	if(defender->slots.weapon !=NULL)
-            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon))
+            if (World.getMonsterManager().getMonsterItems().GetEquipment(defender, weapon))
             {
                 World.getTextManager().newLine("The %s's magic missile misses you. ", caster->monster.name.c_str());
             }
