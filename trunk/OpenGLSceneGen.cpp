@@ -325,7 +325,7 @@ void OpenGLSceneGen::DrawMap()
                 // update colour on screen if better than item held
                 if (!item->hasBrand() && !item->hasResistance())
                 {
-                    if(World.getMonsterManager().monsterItems.isBetter(*World.getMonsterManager().Player(), *item))
+                    if(World.getMonsterManager().getMonsterItems().isBetter(*World.getMonsterManager().Player(), *item))
                         glColor3ub(0, 128, 255);
                 }
                 freetype::printChar(map_font, calcX(w), calcY(h), currentCell.getItem()->symbol);

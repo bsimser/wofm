@@ -8,7 +8,6 @@
 // $HeadURL: $ 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-
 #if !defined(AFX_MONSTERMANAGER_H__31959C7C_29D8_4DF2_9B54_BA49F3533281__INCLUDED_)
 #define AFX_MONSTERMANAGER_H__31959C7C_29D8_4DF2_9B54_BA49F3533281__INCLUDED_
 
@@ -19,17 +18,17 @@
 #include "MonsterData.h"
 
 #include "MonsterItems.h"
-#include "DungeonManager.h" //manage and create dungeons
-
-#include "ActionManager.h"	//manage and create actions
-#include "ItemManager.h"
+#include "DungeonLevel.h" 
+#include "ActionManager.h"
 
 //non standard monsters
 #include "UndeadMonster.h"
 #include "SpecialGuardians.h"
 #include "RandomMonster.h"
 
-#include <list>
+// IMPORTANT - do not use a container that reorganises its internal memory, because I lazily keep pointers to the internal structures.
+// list & deque is ok vector bad m'kay
+#include <deque>
 
 enum eMonsterMajorType
 {
@@ -67,12 +66,11 @@ public:
     MonsterData* Player();
 
     int UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* actionManager);
+    int GetNumMonsters();
 
-    int GetNumMonsters(){ return m_monsterNum; };
+    MONSTERLIST & getMonsterList();
 
-    MONSTERLIST monster_list;
-
-    MonsterItems monsterItems;
+    MonsterItems & getMonsterItems();
 
     void PrintMonsters();
 
@@ -82,6 +80,10 @@ public:
     const std::string getDescription(const Monster & monster) const;
 
 private:
+
+    MonsterItems mMonsterItems;
+    MONSTERLIST monster_list;
+
     int m_monsterNum;
 };
 

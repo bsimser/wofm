@@ -201,8 +201,8 @@ int InventoryManager::ShowInventory(int type)
             World.getTextManager().SetDisplayLine(12,buf);*/
     }
 
-    //std::sort(inventory->begin(), inventory->end());
-    inventory->sort();
+    std::sort(inventory->begin(), inventory->end());
+    //inventory->sort();
     i = 3;
 
     for (it = inventory->begin(); it != inventory->end(); it++, i++)
@@ -246,7 +246,7 @@ int InventoryManager::Equip(bool *keys)
     {
         if (keys[i] == true)
         {
-            int ret = World.getMonsterManager().monsterItems.EquipItem(&(*World.getMonsterManager().Player()), i - 65);
+            int ret = World.getMonsterManager().getMonsterItems().EquipItem(&(*World.getMonsterManager().Player()), i - 65);
             mState = eDisplay;
             keys[i] = false;
             ShowInventory(-1);

@@ -8,7 +8,6 @@
 // $HeadURL: $ 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-
 #pragma warning(disable : 4786) 
 
 #include "WorldBuilder.h"
@@ -26,7 +25,7 @@ using namespace Random;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-MonsterManager::MonsterManager():
+MonsterManager::MonsterManager() :
 m_monsterNum(0)
 {
 }
@@ -44,15 +43,34 @@ MonsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     //select monsters
     switch (major_type)
     {
-    case mGuards:{	SpecialGuardians guard; guard.Create(minor_type, level); new_monster.monster = guard; }break;
-    case mUndead:{	UndeadMonster undead; undead.Create(minor_type, level); new_monster.monster = undead; }break;
-    case mOrc:		new_monster.monster.Create(mOrc, level, 0); break;
-    case mCrocodile:    new_monster.monster.Create(mCrocodile, level, 0); break;
-    case mSpecial:  new_monster.monster.Create(mSpecial, level); break;
-    case mWizard:	new_monster.monster.Create(mSpecial, level); break;
-    case mPlayer:	new_monster.monster.Create(mPlayer, level); break;
-    case mBridgeMaster:	new_monster.monster.Create(mBridgeMaster, level); break; //special case
-    case mRandom:{	RandomMonster random; random.Create(level, minor_type); new_monster.monster = random; }break;
+    case mGuards:
+    {
+        SpecialGuardians guard;
+        guard.Create(minor_type, level);
+        new_monster.monster = guard;
+        break;
+    }
+    case mUndead:
+    {	
+        UndeadMonster undead; 
+        undead.Create(minor_type, level); 
+        new_monster.monster = undead; 
+        break;
+    }
+        
+    case mOrc:		    new_monster.monster.Create(mOrc, level);            break;
+    case mCrocodile:    new_monster.monster.Create(mCrocodile, level);      break;
+    case mSpecial:      new_monster.monster.Create(mSpecial, level);        break;
+    case mWizard:	    new_monster.monster.Create(mSpecial, level);        break;
+    case mPlayer:	    new_monster.monster.Create(mPlayer, level);         break;
+    case mBridgeMaster:	new_monster.monster.Create(mBridgeMaster, level);   break; //special case
+    case mRandom:
+    {
+        RandomMonster random; 
+        random.Create(level, minor_type); 
+        new_monster.monster = random; 
+        break;
+    }
 
     default: new_monster.monster.Create(major_type, level); break;
     }
@@ -61,10 +79,10 @@ MonsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     //equip monsters
     if (new_monster.isHumanoid()) //equip humanoids
         //new_monster.EquipMonster(level);
-    if (monster_list.size() == 0) //no monsters so must be player
-        monsterItems.EquipPlayer(&new_monster);
-    else
-        monsterItems.EquipMonster(&new_monster, level);
+        if (monster_list.size() == 0) //no monsters so must be player
+            getMonsterItems().EquipPlayer(&new_monster);
+        else
+            getMonsterItems().EquipMonster(&new_monster, level);
 
     if (new_monster.isSpecial())
         new_monster.EquipKey(level);
@@ -86,7 +104,7 @@ MonsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
         new_monster.SetState(sentry);
 
     int asleep_test = getInt(100, 0);
-    if (new_monster.GetState() == sentry) 
+    if (new_monster.GetState() == sentry)
         asleep_test += 40; //40 %more chance that sentry will be asleep
 
     if (asleep_test > 90 + level && major_type != 0) //10% - level that creature will be asleep
@@ -99,11 +117,6 @@ MonsterData* MonsterManager::CreateMonster(int major_type, int minor_type, int l
     new_monster.last_stamina = new_monster.monster.stamina;
 
     new_monster.TestArcher();
-
-    // natural resistances
-    if (new_monster.isUndead())
-    {
-    }
 
     //put monster in list //cannot use isPlayer until after this
     monster_list.push_back(new_monster);
@@ -168,12 +181,12 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
                     r_it->monster.color1 = 255;
                     r_it->monster.color2 = 0;
                     r_it->monster.color3 = 0;
-                    World.Render();
-                    Sleep(50 );
+                    World.RenderScene();
+                    Sleep(50);
                     r_it->monster.color1 = c1;
                     r_it->monster.color2 = c2;
                     r_it->monster.color3 = c3;
-                    World.Render();
+                    World.RenderScene();
                     Sleep(50);
                 }
                 World.SetState(sDeath);
@@ -191,7 +204,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
                 dungeonLevel->setMapLight(DungeonLevel::eNormal);
             }
 
-            World.getMonsterManager().monsterItems.DropRandomItems(&(*r_it));
+            World.getMonsterManager().getMonsterItems().DropRandomItems(&(*r_it));
             r_it->SetState(dead);
             r_it->monster.dead();
             if (r_it->monster.GetType() == mWizard)
@@ -261,7 +274,7 @@ int MonsterManager::UpdateMonsters(DungeonLevel* dungeonLevel, ActionManager* ac
         }
     }
 
-    if (World.getMonsterManager().monster_list.size() == 1 && World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), gold) != NULL)
+    if (World.getMonsterManager().monster_list.size() == 1 && World.getMonsterManager().getMonsterItems().GetEquipment(World.getMonsterManager().Player(), gold) != NULL)
     {
         World.getDeathMessage().SetDeathMessage("killed all that moved and acquired the treasure. WOW!");
         World.getDeathMessage().ShowDeath(1);
@@ -354,7 +367,7 @@ void MonsterManager::PrintMonsters()
 
     for (it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
     {
-        ofile << it->monster.name << "," << (int)it->monster.skill << "," << (int)it->monster.stamina << "," << (it->isHumanoid()?"true":"false");
+        ofile << it->monster.name << "," << (int)it->monster.skill << "," << (int)it->monster.stamina << "," << (it->isHumanoid() ? "true" : "false");
         ofile << std::endl;
     }
     ofile.close();
@@ -364,4 +377,19 @@ void MonsterManager::PrintMonsters()
 const std::string MonsterManager::getDescription(const Monster & monster) const
 {
     return monster.getDescription();
+}
+
+MONSTERLIST & MonsterManager::getMonsterList()
+{
+    return monster_list;
+}
+
+int MonsterManager::GetNumMonsters()
+{
+    return m_monsterNum;
+}
+
+MonsterItems & MonsterManager::getMonsterItems()
+{
+    return mMonsterItems;
 }

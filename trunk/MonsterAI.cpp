@@ -189,14 +189,14 @@ int MonsterAI::AttackPlayer(MonsterData* monster)
         DistanceAttackPlayer(monster);
     else
     {
-        if (monster->Name() == "ogre" && World.getMonsterManager().monsterItems.GetInventoryItem(monster, carcass))
+        if (monster->Name() == "ogre" && World.getMonsterManager().getMonsterItems().GetInventoryItem(monster, carcass))
         {
             if (monster->isSeen())
             {
                 return World.getActionManager().monsterAction.ThrowItem(monster,
                                                                         World.getMonsterManager().Player()->pos.x,
                                                                         World.getMonsterManager().Player()->pos.y,
-                                                                        World.getMonsterManager().monsterItems.GetInventoryItem(monster, carcass)->ref);
+                                                                        World.getMonsterManager().getMonsterItems().GetInventoryItem(monster, carcass)->ref);
             }
         }
         else

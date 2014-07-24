@@ -17,32 +17,32 @@
 #endif // _MSC_VER > 1000
 
 #include "Item.h"
-#include <list>
+#include <deque>
 
 //item types
 #include ".\projectileitem.h"
 
-typedef std::list<Item> ITEMLIST;
+// IMPORTANT - do not use a container that reorganises its internal memory, because I lazily keep pointers to the internal structures.
+typedef std::deque<Item> ITEMLIST;
 
-class ItemManager  
+class ItemManager
 {
 public:
-	int Initialise();
+    int Initialise();
 
-	Item * CreateRandomItem(int level);
+    Item * CreateRandomItem(int level);
     Item * CreateItem(int level, int type, int secondary_type = 0);
     Item * DuplicateItem(Item * item);
-	void makeKeysLabels();
+    void makeKeysLabels();
 
-	ITEMLIST all_items;
+    ITEMLIST all_items;
 
-	void PrintItems();
+    void PrintItems();
 
-	static int keyLabels[10];
-	static int KeySpecial[10];
+    int CalculateBrandDamage(Item* item, eBrandType brandType, int strength);
 
-	int CalculateBrandDamage(Item* item,eBrandType brandType,int strength);
-
+    int keyLabels[10];
+    int KeySpecial[10];
 };
 
 #endif // !defined(AFX_ITEMMANAGER_H__B0BE6CF1_CF3C_46EC_8082_9616CAF8BCC4__INCLUDED_)

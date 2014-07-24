@@ -56,8 +56,8 @@ int MonsterData::NextAction(Action *action)
     case aWait:  break;
     case aMove:  success = World.getActionManager().monsterAction.MoveMonster(this, action->param1, action->param2); break;
     case aAttack: success = World.getActionManager().monsterAction.AttackMonster(this, action->param1, action->param2); break;
-    case aPickup: success = World.getMonsterManager().monsterItems.PickupItem(this); break;
-    case aDrop:  success = World.getMonsterManager().monsterItems.DropItem(this, action->param1); break;
+    case aPickup: success = World.getMonsterManager().getMonsterItems().PickupItem(this); break;
+    case aDrop:  success = World.getMonsterManager().getMonsterItems().DropItem(this, action->param1); break;
     case aFire:  success = World.getActionManager().monsterAction.FireItem(this, action->param1, action->param2); break;
     case aCastSpell:  success = World.getActionManager().monsterAction.CastSpell(this, action->param1); break;
     case aThrow:  success = World.getActionManager().monsterAction.ThrowItem(this, action->param1, action->param2, action->param3); break;
@@ -193,7 +193,7 @@ int MonsterData::TerrainAttack(int x, int y)
                         World.getTextManager().newLine("You are swept away!! ");
                     if (isSeen() == 1)
                     {
-                        World.Render();
+                        World.RenderScene();
                         Sleep(50);
 
                         //char buf[64];
@@ -366,7 +366,7 @@ int MonsterData::AdjustedSkill()
 
     //	if(slots.weapon != NULL)
 
-    Item* w = World.getMonsterManager().monsterItems.GetEquipment(this, weapon);
+    Item* w = World.getMonsterManager().getMonsterItems().GetEquipment(this, weapon);
     if (w)
         skill += w->skill_bonus;
 
@@ -383,7 +383,7 @@ int MonsterData::AttackStrength()
     int attack = monster.skill;
 
     //if(slots.weapon != NULL)
-    Item* w = World.getMonsterManager().monsterItems.GetEquipment(this, weapon);
+    Item* w = World.getMonsterManager().getMonsterItems().GetEquipment(this, weapon);
     if (w)
         attack += w->GetAttack_h2h(); //get weapon damage
 
@@ -411,7 +411,7 @@ int MonsterData::DefendStrength()
     int defend = monster.skill;
 
     //if(slots.weapon != NULL)
-    Item* w = World.getMonsterManager().monsterItems.GetEquipment(this, weapon);
+    Item* w = World.getMonsterManager().getMonsterItems().GetEquipment(this, weapon);
     if (w)
         defend += w->GetAttack_h2h();
 
@@ -455,11 +455,11 @@ bool MonsterData::AbsorbTest()
     bool absorb = false;
 
     //if(slots.armour == NULL)
-    if (!World.getMonsterManager().monsterItems.GetEquipment(this, armour))
+    if (!World.getMonsterManager().getMonsterItems().GetEquipment(this, armour))
         absorb = false;
     else
     {
-        Item * a = World.getMonsterManager().monsterItems.GetEquipment(this, armour);
+        Item * a = World.getMonsterManager().getMonsterItems().GetEquipment(this, armour);
         int test = getInt(10, 0); //1-9
         if (a->absorb_bonus > test)
         {
@@ -524,8 +524,8 @@ void MonsterData::Heal()
 
 bool MonsterData::TestArcher()
 {
-    Item* p = World.getMonsterManager().monsterItems.GetEquipment(this, projectile);
-    Item* pw = World.getMonsterManager().monsterItems.GetEquipment(this, projectileWeapon);
+    Item* p = World.getMonsterManager().getMonsterItems().GetEquipment(this, projectile);
+    Item* pw = World.getMonsterManager().getMonsterItems().GetEquipment(this, projectileWeapon);
 
     if (!p) //no projectiles
     {

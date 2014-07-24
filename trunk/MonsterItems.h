@@ -8,21 +8,17 @@
 // $HeadURL: $ 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-
-#if !defined(AFX_MONSTERITEMS_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_)
-#define AFX_MONSTERITEMS_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_
+#if !defined(MonsterItems_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_)
+#define MonsterItems_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "monsterManager.h"
+#include "MonsterData.h"
 #include "item.h"
 
-class MonsterData;
-class Item;
-
-class MonsterItems  
+class MonsterItems
 {
 public:
 
@@ -53,4 +49,4 @@ private:
 	int moveFromAllToInvList(MonsterData *monster);
 };
 
-#endif // !defined(AFX_MONSTERITEMS_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_)
+#endif // !defined(AFX_MonsterItems_H__FB40F0AB_EA77_47C4_BBA8_3CAECF1DB255__INCLUDED_)

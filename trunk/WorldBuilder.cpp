@@ -125,7 +125,7 @@ int WorldBuilder::Run()
 
         UpdateMap(); //update scene (items,map,npc,pc etc) ??
 
-        Render();
+        RenderScene();
 
         if (monsterManager.Player()->miss_turn == 1)
         {
@@ -203,11 +203,11 @@ int WorldBuilder::ToggleFullScreen(int width, int height)
 void WorldBuilder::Resize(WPARAM lParam, LPARAM wParam)
 {
     scene.ReSizeGLScene(LOWORD(lParam), HIWORD(lParam));
-    
+
     if (!first_update)
     {
         Run();
-        Render();
+        RenderScene();
     }
 }
 
@@ -230,14 +230,14 @@ void WorldBuilder::UpdateStatusBar()
 {
     //add text lines
     char line1[128];
-    MONSTERLIST::iterator player = monsterManager.monster_list.begin();
+    MONSTERLIST::iterator player = monsterManager.getMonsterList().begin();
 
     char name[32];
     sprintf(name, "%s  Level %d", player->monster.name.c_str(), player->experience_level);
 
     sprintf(line1, "%-20s  Stamina: %2d/%d  Skill: %2d(%+d)  Luck: %-2d(%+d)  Dungeon Level: %s", name,
 
-    //sprintf(line1, "%-20s  Skill: %2d(%+d)  Stamina: %2d/%d  Luck: %-2d(%+d)   Dungeon Level: %s", name,
+        //sprintf(line1, "%-20s  Skill: %2d(%+d)  Stamina: %2d/%d  Luck: %-2d(%+d)   Dungeon Level: %s", name,
 
         //sprintf(line1,"%s Level %d Skill: %2d(%d)  Stamina: %2d     Turns: %4d  DL: %d XP: %d Mode %d",
         //sprintf(line1, "%-20s  Skill: %2d(%d)  Stamina: %2d(%d)  Luck: %-2d(%d)   Dungeon Level:%d  Turns: %d", name,
@@ -253,7 +253,7 @@ void WorldBuilder::UpdateStatusBar()
         //player->pos.x,
         //player->pos.y);
         World.getDungeonManager().getLevelName(GetCurrentLevel()).c_str());
-        //turns);
+    //turns);
 
     //GetCurrentLevel(),		
     //player->experience,
@@ -267,7 +267,7 @@ void WorldBuilder::UpdateStatusBar()
         textManager.display_line1 = line1;
 }
 
-void WorldBuilder::Render()
+void WorldBuilder::RenderScene()
 {
     if (State() != sMap)
         scene.CreateOffset(monsterManager.Player()->pos);
@@ -450,7 +450,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
         //command.FireItem();
         if (keys[VK_SPACE]) //target acquired
         {
-             if (command.ThrowItem())
+            if (command.ThrowItem())
                 turns++;
             SetState(sNormal);
         }
@@ -549,7 +549,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
             {
                 //int l = GetCurrentLevel();
                 //if (l != 1 && l != 4 && l != 7 && l != 10)
-                 //   turns++; //monsters get first attack except coming from rest level
+                //   turns++; //monsters get first attack except coming from rest level
             }
             keys[VC_COMMA] = false;
             keys[VK_SHIFT] = false;
@@ -687,7 +687,7 @@ void WorldBuilder::ProcessCommand(bool *keys)
     }
     else if (keys[VK_Z]) //no spell cast
     {
-        if (World.getMonsterManager().monsterItems.GetInventoryItem(player, cards) != NULL)
+        if (World.getMonsterManager().getMonsterItems().GetInventoryItem(player, cards) != NULL)
         {
             MagicScreen spell;
             spell.Display();
@@ -735,4 +735,120 @@ void WorldBuilder::ProcessCommand(bool *keys)
         monsterManager.Player()->Heal();
     }
 
+}
+
+int WorldBuilder::GetCurrentLevel()
+{ 
+    return current_level;
+}
+
+int WorldBuilder::SetDungeonLevel(int new_lev)
+{
+    current_level = new_lev; 
+    return current_level; 
+}
+
+//int BuildDungeon(int level);
+
+DungeonManager & WorldBuilder::getDungeonManager() 
+{ 
+    return dungeonManager; 
+}
+
+ActionManager & WorldBuilder::getActionManager()
+{ 
+    return actionManager;
+}
+
+TextManager & WorldBuilder::getTextManager()
+{ 
+    return textManager;
+}
+
+ItemManager & WorldBuilder::getItemManager()
+{
+    return itemManager;
+}
+
+MonsterManager & WorldBuilder::getMonsterManager()
+{ 
+    return monsterManager; 
+}
+
+InventoryManager & WorldBuilder::getInventoryManager()
+{ 
+    return inventoryManager; 
+}
+
+SpellManager & WorldBuilder::getSpellManager()
+{ 
+    return spellManager; 
+}
+
+DeathMessage & WorldBuilder::getDeathMessage()
+{ 
+    return deathMessage; 
+}
+
+StartScreen & WorldBuilder::getStartScreen()
+{ 
+    return start; 
+}
+
+RestLevel & WorldBuilder::getRestLevel()
+{ 
+    return restLevel; 
+}
+
+int WorldBuilder::UpLevel()
+{ 
+    current_level--; 
+    return current_level; 
+}
+
+int WorldBuilder::DownLevel()
+{ 
+    current_level++; 
+    return current_level; 
+}
+
+int WorldBuilder::UpSpecialLevel()
+{ 
+    current_level -= 10; 
+    return current_level; 
+}
+int WorldBuilder::DownSpecialLevel()
+{ 
+    current_level += 10; 
+    return current_level; 
+}
+int WorldBuilder::DownEncounterLevel()
+{ 
+    current_level = 20; 
+    return current_level; 
+}
+
+int WorldBuilder::GetMaxLevels()
+{ 
+    return max_num_levels; 
+}
+
+int WorldBuilder::GetTurns()
+{ 
+    return turns; 
+}
+
+void WorldBuilder::SetState(eDisplayState st)
+{ 
+    state = st; 
+}
+
+eDisplayState WorldBuilder::State()
+{ 
+    return state;
+}
+
+OpenGLSceneGen & WorldBuilder::getScene() 
+{ 
+    return scene; 
 }

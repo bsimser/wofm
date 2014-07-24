@@ -57,10 +57,10 @@ void StandardMonsterActions::ShowTrajectory(int level, int sourceX, int sourceY,
     World.getDungeonManager().CurrentLevel()->ClearPath();
 
     COORDLIST::iterator it;
-    for (it = path.begin(); it != path.end(); it++) 
+    for (it = path.begin(); it != path.end(); it++)
     {
-         dungeonLevel.getCell(it->x, it->y).setSymbol(vSymbol);
-        World.Render();
+        dungeonLevel.getCell(it->x, it->y).setSymbol(vSymbol);
+        World.RenderScene();
         Sleep(32);
         dungeonLevel.getCell(it->x, it->y).clearSymbol();
     }
@@ -68,8 +68,8 @@ void StandardMonsterActions::ShowTrajectory(int level, int sourceX, int sourceY,
 
 int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 {
-    Item* projectilePile = World.getMonsterManager().monsterItems.GetEquipment(attacker, projectile);
-    Item* projectileLauncher = World.getMonsterManager().monsterItems.GetEquipment(attacker, projectileWeapon);
+    Item* projectilePile = World.getMonsterManager().getMonsterItems().GetEquipment(attacker, projectile);
+    Item* projectileLauncher = World.getMonsterManager().getMonsterItems().GetEquipment(attacker, projectileWeapon);
 
     if (attacker->pos.x == x && attacker->pos.y == y)
     {
@@ -144,15 +144,15 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
         {
             World.getTextManager().newLine("Thud! ");
             if (Random::getInt(10, 0) < 5) //50% breakage
-                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
+                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, actualProjectile, x, y);
         }
         return 1;
     }
 
     //add to ground
-     if (Random::getInt(10, 0) < 7 ) //20% breakage
+    if (Random::getInt(10, 0) < 7) //20% breakage
     {
-        World.getMonsterManager().monsterItems.AttemptDropItem(NULL, actualProjectile, x, y);
+        World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, actualProjectile, x, y);
     }
 
     //calculate attack
@@ -167,7 +167,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 
     int defenceStrength = defender->monster.skill + dist;
 
-    attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
+    attackStrength = attackStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
     if (dist == 1)
@@ -178,7 +178,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
         attackStrength += 5;
 
     //if(slots.weapon != NULL)
-    Item* a = World.getMonsterManager().monsterItems.GetEquipment(defender, armour);
+    Item* a = World.getMonsterManager().getMonsterItems().GetEquipment(defender, armour);
     if (a)
         defenceStrength += a->absorb_bonus;
 
@@ -212,7 +212,7 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
 
                 if (defender->Name() == "wight" && !silver)
                 {
-                    if(defender->isSeen() == 1)
+                    if (defender->isSeen() == 1)
                         World.getTextManager().newLine("It does no damage. ", throw_name.c_str(), defender->monster.name.c_str());
                 }
                 else
@@ -269,14 +269,14 @@ int	StandardMonsterActions::FireItem(MonsterData* attacker, int x, int y)
     {
         if (attacker->isPlayer())
         {
-            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon) && defender->isHumanoid())
+            if (World.getMonsterManager().getMonsterItems().GetEquipment(defender, weapon) && defender->isHumanoid())
                 World.getTextManager().newLine("The %s deflects your attack. ", defender->monster.name.c_str());
             else
                 World.getTextManager().newLine("The %s dodges your attack. ", defender->monster.name.c_str());
         }
         if (defender->isPlayer())
         {
-            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon))
+            if (World.getMonsterManager().getMonsterItems().GetEquipment(defender, weapon))
                 World.getTextManager().newLine("You deflect the %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
             else
                 World.getTextManager().newLine("You dodge the %s's %s. ", attacker->monster.name.c_str(), throw_name.c_str());
@@ -342,7 +342,7 @@ int	StandardMonsterActions::MoveMonster(MonsterData* monster, int new_x, int new
             if (monster->isPlayer())
                 World.getTextManager().newLine("You bang at the door. ");
             else if (monster->isSeen() == 1)
-                World.getTextManager().newLine("The %s %s at the door. ", monster->monster.name.c_str(), Random::getInt(2, 0) ? "scratches":"bangs");
+                World.getTextManager().newLine("The %s %s at the door. ", monster->monster.name.c_str(), Random::getInt(2, 0) ? "scratches" : "bangs");
             else if (monster->isSeen() == 2)
                 World.getTextManager().newLine("You hear banging. ");
 
@@ -396,16 +396,16 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
 {
     MonsterData* defender = World.getMonsterManager().FindMonsterData(World.getDungeonManager().level(World.GetCurrentLevel()).getCell(x, y).GetMonster());
 
-    if (defender == NULL) 
+    if (defender == NULL)
         return 0;
 
-    int attackStrength  = attacker->AttackStrength();
+    int attackStrength = attacker->AttackStrength();
     int defenceStrength = defender->DefendStrength();
 
-    attackStrength  = attackStrength  + (Random::getInt(7, 1) + Random::getInt(7, 1));
+    attackStrength = attackStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
     defenceStrength = defenceStrength + (Random::getInt(7, 1) + Random::getInt(7, 1));
 
-   // World.getTextManager().newLine("A:%d D:%d Dam:%d ", attackStrength, defenceStrength, CalculateDamage(defender, attackStrength, defenceStrength));
+    // World.getTextManager().newLine("A:%d D:%d Dam:%d ", attackStrength, defenceStrength, CalculateDamage(defender, attackStrength, defenceStrength));
 
     // attack hits
     if (attackStrength > defenceStrength) //attacker hits defender
@@ -423,7 +423,7 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
                     World.getTextManager().newLine("It resists damage. ");
                 else
                     defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
-                defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().monsterItems.GetEquipment(attacker, weapon));
+                defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().getMonsterItems().GetEquipment(attacker, weapon));
 
                 if (defender->monster.stamina <= 0)
                 {
@@ -455,7 +455,7 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
             {
                 World.getTextManager().newLine("The %s hits you. ", attacker->monster.name.c_str());
                 defender->monster.stamina -= CalculateDamage(defender, attackStrength, defenceStrength);
-                defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().monsterItems.GetEquipment(attacker, weapon));
+                defender->monster.stamina -= AddBrandDamage(attacker, defender, World.getMonsterManager().getMonsterItems().GetEquipment(attacker, weapon));
                 World.getDeathMessage().SetDeathMessage("was killed by a %s ", attacker->monster.name.c_str());
             }
         }
@@ -477,7 +477,7 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
     {
         if (attacker->isPlayer())
         {
-            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon) && defender->isHumanoid())
+            if (World.getMonsterManager().getMonsterItems().GetEquipment(defender, weapon) && defender->isHumanoid())
             {
                 World.getTextManager().newLine("The %s parries your attack. ", defender->monster.name.c_str());
             }
@@ -488,7 +488,7 @@ int	StandardMonsterActions::AttackMonster(MonsterData* attacker, int x, int y)
         }
         if (defender->isPlayer())
         {
-            if (World.getMonsterManager().monsterItems.GetEquipment(defender, weapon))
+            if (World.getMonsterManager().getMonsterItems().GetEquipment(defender, weapon))
             {
                 World.getTextManager().newLine("You parry the %s's attack. ", attacker->monster.name.c_str());
             }
@@ -512,7 +512,7 @@ int	StandardMonsterActions::CalculateDamage(MonsterData* defender, int attackStr
     if (diff <= 0)
         return 0;
 
-    Item* has_shield = World.getMonsterManager().monsterItems.GetEquipment(defender, shield);
+    Item* has_shield = World.getMonsterManager().getMonsterItems().GetEquipment(defender, shield);
 
     if (has_shield)
     {
@@ -675,7 +675,7 @@ int	StandardMonsterActions::ThrowItem(MonsterData* attacker, const unsigned int 
 
     Monster *d = World.getDungeonManager().level(World.GetCurrentLevel()).getCell(finalX, finalY).GetMonster();
     MonsterData* defender = World.getMonsterManager().FindMonsterData(d);
-   
+
     if (attacker->isPlayer())
     {
         if (defender && defender != attacker)
@@ -701,13 +701,13 @@ int	StandardMonsterActions::ThrowItem(MonsterData* attacker, const unsigned int 
         {
             World.getTextManager().newLine("You *luckily* avoid the flying %s. ", newItem->BaseName().c_str());
         }
-       
+
     }
-    World.getMonsterManager().monsterItems.AttemptDropItem(NULL, newItem, finalX, finalY);
+    World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, newItem, finalX, finalY);
 
     if (defender && defender->monster.stamina < 1) //dead
     {
-            World.getDeathMessage().SetDeathMessage("was killed by a flying %s. ", newItem->BaseName().c_str());
+        World.getDeathMessage().SetDeathMessage("was killed by a flying %s. ", newItem->BaseName().c_str());
     }
 
     return 1;

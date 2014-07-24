@@ -41,7 +41,7 @@ Coord UserCommand::autoTarget()
 
     if (lastTarget == NULL) // find closest monster
     {
-        MONSTERLIST & monsters = World.getMonsterManager().monster_list;
+        MONSTERLIST & monsters = World.getMonsterManager().getMonsterList();
 
         float range = 100;
         MONSTERLIST::iterator it = ++monsters.begin();// ignore player
@@ -66,7 +66,7 @@ Coord UserCommand::autoTarget()
 int UserCommand::FireItem(bool itemCheck)
 {
     UnLook();
-    if (itemCheck && !World.getMonsterManager().monsterItems.GetEquipment(World.getMonsterManager().Player(), projectile))
+    if (itemCheck && !World.getMonsterManager().getMonsterItems().GetEquipment(World.getMonsterManager().Player(), projectile))
     {
         World.getTextManager().newLine("Nothing to fire. ");
         return 0;
@@ -545,7 +545,7 @@ int UserCommand::MoveCommand(int  dir)
                 bool pickup = false;
                 if (item->type == projectile)
                 {
-                    Item* projectilePile = World.getMonsterManager().monsterItems.GetEquipment(player, projectile);
+                    Item* projectilePile = World.getMonsterManager().getMonsterItems().GetEquipment(player, projectile);
                     if (projectilePile && projectilePile->secondaryType == item->secondaryType &&
                         projectilePile->skill_bonus == item->skill_bonus  &&
                         projectilePile->BaseName() == item->BaseName() &&
@@ -697,7 +697,7 @@ int UserCommand::Run()
     if (run_dir == dNone)
         return 2;
 
-    for (MONSTERLIST::iterator it = World.getMonsterManager().monster_list.begin(); it != World.getMonsterManager().monster_list.end(); it++)
+    for (MONSTERLIST::iterator it = World.getMonsterManager().getMonsterList().begin(); it != World.getMonsterManager().getMonsterList().end(); it++)
     { //is this too slow? seems OK to me
         if (it->level == World.GetCurrentLevel() && !it->isPlayer())
             if (it->isSeen() == 1)
@@ -1026,18 +1026,18 @@ int  UserCommand::UseItem(Item*item, int dir)
                             switch (random_item)
                             {
                             case 0: new_it = World.getItemManager().CreateItem(20 + item_boost, armour, platemail);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             case 1: new_it = World.getItemManager().CreateItem(20 + item_boost, weapon, axe);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             case 2:;
                             case 3: new_it = World.getItemManager().CreateItem(20 + item_boost, shield);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             default:  new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + 20 + item_boost);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
                                 new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + 20 + item_boost);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                                 new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + 20 + item_boost);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y); break;
                             }
                         }
                         else
@@ -1058,7 +1058,7 @@ int  UserCommand::UseItem(Item*item, int dir)
                                 }
 
                                 Item *new_it = World.getItemManager().CreateRandomItem(World.GetCurrentLevel() + item_boost);
-                                World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
+                                World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
                             }
                         }
                         return 1;
@@ -1083,7 +1083,7 @@ int  UserCommand::UseItem(Item*item, int dir)
                         dlevel->getCell(new_pos.x, new_pos.y).getItem()->CreateItem(openChest, World.GetCurrentLevel());
                         World.getTextManager().newLine("Click, Click, Click! You open the chest. <insert trumpet sounds here>");
                         Item *new_it = World.getItemManager().CreateItem(World.GetCurrentLevel(), gold);
-                        World.getMonsterManager().monsterItems.AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
+                        World.getMonsterManager().getMonsterItems().AttemptDropItem(NULL, new_it, new_pos.x, new_pos.y);
 
                         return 1;
                     }
