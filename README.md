@@ -79,7 +79,7 @@ Use in game help '?': key bindings
 
 ## Acknowledgments
 
-This game is based on the book "The Warlock Of Firestone Mountain" by Ian Livingstone & Steve Jackson (c) 1982.
+This game is based on the book [The Warlock Of Firetop Mountain](https://en.wikipedia.org/wiki/The_Warlock_of_Firetop_Mountain) by Ian Livingstone & Steve Jackson (c) 1982.
 
 FreeType library
 Portions of this software are copyright <2005> The FreeType
